@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ArtPlatform</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="tab_homepage">主页</string>
+    <string name="tab_question_answer">问答</string>
+    <string name="tab_me">个人</string>
+    <string name="tab_gallery">图库</string>
+    <string name="tab_find">发现</string>
+    <string name="tab_school">院校</string>
+    <string name="timefirst">时间↑</string>
+    <string name="hotfirst">热度↑</string>
+    <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="title_activity_question_info">QuestionInfo</string>
+    <string name="title_activity_register">RegisterActivity</string>
+
+</resources>

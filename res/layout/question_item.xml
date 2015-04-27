@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <ImageView android:id="@+id/iv_header_question_item"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_contact_picture"/>
+    <LinearLayout android:id="@+id/ll_question_head_1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_header_question_item"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView android:id="@+id/tv_name_question_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="我是用户名"
+            android:textSize="20sp"
+            android:textColor="#000000"/>
+        <ImageView android:id="@+id/iv_iscomment_question_item"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_menu_emoticons"/>
+        <TextView android:id="@+id/tv_iscomment_question_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#44000000"
+            android:text="已评论"
+            />
+    </LinearLayout>
+    
+    <LinearLayout android:id="@+id/ll_question_head_2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toRightOf="@id/iv_header_question_item"
+        android:layout_alignBottom="@id/iv_header_question_item">
+        <TextView android:id="@+id/tv_time_question_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3小时前"
+            android:textColor="#44000000"/>
+        <TextView android:id="@+id/tv_area_question_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="#44000000"
+            android:text="广东"/>
+        <TextView android:id="@+id/tv_latestcommentor_question_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:textColor="#44000000"
+            android:text="湖美杨思思"/>
+        
+    </LinearLayout>
+    
+    <TextView android:id="@+id/tv_content_question_item"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_header_question_item"
+        android:text="测试问题内容测试问题内容测试问题内容测试问题内容测试问题内容测试问题内容"/>
+    <ImageView android:id="@+id/iv_pic_question_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_content_question_item"
+            android:src="@drawable/ic_menu_emoticons"/>
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_below="@id/iv_pic_question_item">
+        <TextView android:id="@+id/tv_type_question_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#44000000"
+            android:text="测试"/>
+        <ImageView android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_menu_emoticons"/>
+        <TextView android:id="@+id/tv_count_question_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="#44000000"
+            android:layout_weight="1"
+            android:text="1"/>
+        <ImageView android:id="@+id/iv_praise_question_item"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:clickable="true"
+            android:src="@drawable/ic_menu_emoticons"/>
+        <ImageView android:id="@+id/iv_show_question_item"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_menu_emoticons"/>
+        
+    </LinearLayout>
+
+</RelativeLayout>
