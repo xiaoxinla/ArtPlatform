@@ -1,7 +1,6 @@
 package com.gexin.artplatform.adapter;
 
 import java.util.List;
-import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,14 +15,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gexin.artplatform.R;
+import com.gexin.artplatform.entity.Problem;
+import com.gexin.artplatform.utils.StringUtil;
 
 public class QuestionAdapter extends BaseAdapter {
 
 	private static final String TAG = "QuestionAdapter";
 	private Context mContext;
-	private List<Map<String, Object>> mList;
+	private List<Problem> mList;
 
-	public QuestionAdapter(Context mContext, List<Map<String, Object>> mList) {
+	public QuestionAdapter(Context mContext, List<Problem> mList) {
 		super();
 		this.mContext = mContext;
 		this.mList = mList;
@@ -47,9 +48,10 @@ public class QuestionAdapter extends BaseAdapter {
 	@SuppressLint("InflateParams")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		// Log.v(TAG, "getView");
 		ViewHolder holder = null;
-		Map<String, Object> item = mList.get(position);
-//		Log.v(TAG, "item:" + item.toString());
+		Problem item = mList.get(position);
+		// Log.v(TAG, "item:" + item.toString());
 		if (convertView == null) {
 			convertView = LayoutInflater.from(mContext).inflate(
 					R.layout.question_item, null);
@@ -76,21 +78,24 @@ public class QuestionAdapter extends BaseAdapter {
 					.findViewById(R.id.tv_count_question_item);
 			holder.tvIscomment = (TextView) convertView
 					.findViewById(R.id.tv_iscomment_question_item);
+			holder.tvZan = (TextView) convertView
+					.findViewById(R.id.tv_zan_question_item);
 			holder.ivPraise = (ImageView) convertView
 					.findViewById(R.id.iv_praise_question_item);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		int header = (Integer) item.get("header");
-		Bitmap bitmap = (Bitmap) item.get("pic");
-		int count = (Integer) item.get("count");
-		String name = (String) item.get("name");
-		String area = (String) item.get("area");
-		String time = (String) item.get("time");
-		String type = (String) item.get("type");
-		String content = (String) item.get("content");
-		String commentor = (String) item.get("commentor");
+		int header = R.drawable.ic_contact_picture;
+		Bitmap bitmap = null;
+		int count = item.getAnswerNum();
+		int zan = item.getZan();
+		String name = item.getName();
+		String area = "Œ¥…Ë÷√";
+		String time = StringUtil.convertTimestampToString(item.getTimestamp());
+		String type = "Œ¥…Ë÷√";
+		String content = item.getContent();
+		String commentor = "Œ¥…Ë÷√";
 		holder.ivHeader.setImageResource(header);
 		holder.ivPic.setImageBitmap(bitmap);
 		holder.tvName.setText(name);
@@ -100,6 +105,7 @@ public class QuestionAdapter extends BaseAdapter {
 		holder.tvCount.setText("" + count);
 		holder.tvContent.setText(content);
 		holder.tvCommentor.setText(commentor);
+		holder.tvZan.setText("" + zan);
 		if (commentor == null || commentor.isEmpty()) {
 			holder.ivComment.setVisibility(View.GONE);
 			holder.tvIscomment.setVisibility(View.GONE);
@@ -107,9 +113,9 @@ public class QuestionAdapter extends BaseAdapter {
 			holder.ivComment.setVisibility(View.VISIBLE);
 			holder.tvIscomment.setVisibility(View.VISIBLE);
 		}
-		
+
 		holder.ivPraise.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
 				Log.v(TAG, "PraiseClick");
@@ -132,6 +138,7 @@ public class QuestionAdapter extends BaseAdapter {
 		TextView tvType;
 		TextView tvCount;
 		TextView tvIscomment;
+		TextView tvZan;
 	}
 
 }

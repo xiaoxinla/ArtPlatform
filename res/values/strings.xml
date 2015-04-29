@@ -14,5 +14,6 @@
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="title_activity_question_info">QuestionInfo</string>
     <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_post_problem">PostProblemActivity</string>
 
 </resources>

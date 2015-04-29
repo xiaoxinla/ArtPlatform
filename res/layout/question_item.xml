@@ -93,6 +93,10 @@
             android:layout_height="20dp"
             android:clickable="true"
             android:src="@drawable/ic_menu_emoticons"/>
+        <TextView android:id="@+id/tv_zan_question_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#44000000"/>
         <ImageView android:id="@+id/iv_show_question_item"
             android:layout_width="20dp"
             android:layout_height="20dp"
