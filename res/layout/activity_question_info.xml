@@ -68,6 +68,14 @@
             android:layout_height="20dp"
             android:src="@drawable/ic_menu_emoticons"/>
         <TextView android:id="@+id/tv_count_question_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#44000000"
+            android:text="1"/>
+        <ImageView android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_menu_emoticons"/>
+        <TextView android:id="@+id/tv_viewnum_question_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="#44000000"

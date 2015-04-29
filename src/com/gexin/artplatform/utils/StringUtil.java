@@ -6,24 +6,26 @@ import java.text.SimpleDateFormat;
 
 /**
  * ×Ö·û´®¹¤¾ßÀà
- * @author xiaoxin
- *	20150-4-29
+ * 
+ * @author xiaoxin 20150-4-29
  */
 public class StringUtil {
 
 	/**
 	 * ÅÐ¶Ï×Ö·û´®ÊÇ·ñÎª¿Õ
+	 * 
 	 * @param str
 	 * @return
 	 */
-	public static boolean isEmpty(String str){
-		if(str==null||str.isEmpty()){
+	public static boolean isEmpty(String str) {
+		if (str == null || str.isEmpty()) {
 			return true;
 		}
 		return false;
 	}
-	
-	@SuppressLint("SimpleDateFormat") public static String convertTimestampToString(int input){
+
+	@SuppressLint("SimpleDateFormat")
+	public static String convertTimestampToString(long input) {
 		Timestamp timestamp = new Timestamp(input);
 		String tsStr = "";
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

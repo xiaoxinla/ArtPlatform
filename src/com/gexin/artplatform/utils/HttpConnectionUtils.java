@@ -27,8 +27,9 @@ import android.util.Log;
 
 /**
  * HTTP connection helper
+ * 
  * @author
- *
+ * 
  */
 public class HttpConnectionUtils implements Runnable {
 	private static final String TAG = HttpConnectionUtils.class.getSimpleName();
@@ -56,9 +57,9 @@ public class HttpConnectionUtils implements Runnable {
 	public HttpConnectionUtils(Handler _handler) {
 		handler = _handler;
 	}
-	
+
 	public void create(int method, String url, List<NameValuePair> data) {
-		Log.v(TAG, "method:"+method+" ,url:"+url+" ,data:"+data);
+		Log.v(TAG, "method:" + method + " ,url:" + url + " ,data:" + data);
 		this.method = method;
 		this.url = url;
 		this.data = data;
@@ -72,7 +73,7 @@ public class HttpConnectionUtils implements Runnable {
 	public void post(String url, List<NameValuePair> data) {
 		create(POST, url, data);
 	}
-	
+
 	public void put(String url, List<NameValuePair> data) {
 		create(PUT, url, data);
 	}
@@ -87,10 +88,10 @@ public class HttpConnectionUtils implements Runnable {
 
 	@Override
 	public void run() {
-		handler.sendMessage(Message.obtain(handler, HttpConnectionUtils.DID_START));
+		handler.sendMessage(Message.obtain(handler,
+				HttpConnectionUtils.DID_START));
 		httpClient = new DefaultHttpClient();
-		HttpConnectionParams
-				.setConnectionTimeout(httpClient.getParams(), 6000);
+		HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), 6000);
 		try {
 			HttpResponse response = null;
 			switch (method) {
@@ -99,12 +100,12 @@ public class HttpConnectionUtils implements Runnable {
 				break;
 			case POST:
 				HttpPost httpPost = new HttpPost(url);
-				httpPost.setEntity(new UrlEncodedFormEntity(data,HTTP.UTF_8));
+				httpPost.setEntity(new UrlEncodedFormEntity(data, HTTP.UTF_8));
 				response = httpClient.execute(httpPost);
 				break;
 			case PUT:
 				HttpPut httpPut = new HttpPut(url);
-				httpPut.setEntity(new UrlEncodedFormEntity(data,HTTP.UTF_8));
+				httpPut.setEntity(new UrlEncodedFormEntity(data, HTTP.UTF_8));
 				response = httpClient.execute(httpPut);
 				break;
 			case DELETE:
@@ -121,13 +122,13 @@ public class HttpConnectionUtils implements Runnable {
 			handler.sendMessage(Message.obtain(handler,
 					HttpConnectionUtils.DID_ERROR, e));
 		}
-		  ConnectionManager.getInstance().didComplete(this);
+		ConnectionManager.getInstance().didComplete(this);
 	}
 
 	private void processEntity(HttpEntity entity) throws IllegalStateException,
 			IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(entity
-				.getContent()));
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				entity.getContent()));
 		String line, result = "";
 		while ((line = br.readLine()) != null)
 			result += line;
@@ -140,4 +141,5 @@ public class HttpConnectionUtils implements Runnable {
 		Bitmap bm = BitmapFactory.decodeStream(bufHttpEntity.getContent());
 		handler.sendMessage(Message.obtain(handler, DID_SUCCEED, bm));
 	}
+
 }

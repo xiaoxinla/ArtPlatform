@@ -1,5 +1,8 @@
 package com.gexin.artplatform.entity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Problem {
 
 	private String id;
@@ -8,7 +11,7 @@ public class Problem {
 	private String content;
 	private String image;
 	private String name;
-	private int timestamp;
+	private long timestamp;
 	private String userid;
 	private int viewNum;
 	private int zan;
@@ -17,7 +20,7 @@ public class Problem {
 	}
 
 	public Problem(String id, int answerNum, String avatarUrl, String content,
-			String image, String name, int timestamp, String userid,
+			String image, String name, long timestamp, String userid,
 			int viewNum, int zan) {
 		super();
 		this.id = id;
@@ -80,11 +83,11 @@ public class Problem {
 		this.name = name;
 	}
 
-	public int getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(int timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 
@@ -119,6 +122,29 @@ public class Problem {
 				+ ", image=" + image + ", name=" + name + ", timestamp="
 				+ timestamp + ", userid=" + userid + ", viewNum=" + viewNum
 				+ ", zan=" + zan + "]";
+	}
+	
+	public static Problem analyzeJson(JSONObject jsonObject){
+		Problem problem = null;
+		try {
+			String id = jsonObject.getString("_id");
+			String avatarUrl = jsonObject.getString("avatarUrl");
+			String content = jsonObject.getString("content");
+			String image = jsonObject.getString("image");
+			String name = jsonObject.getString("name");
+			String user_id = jsonObject.getString("userId");
+			int answerNum = jsonObject.getInt("answerNum");
+			long timestamp = jsonObject.getLong("timestamp");
+			int viewNum = jsonObject.getInt("viewNum");
+			int zan = jsonObject.getInt("zan");
+			problem = new Problem(id, answerNum, avatarUrl,
+					content, image, name, timestamp, user_id, viewNum,
+					zan);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return problem;
 	}
 
 }

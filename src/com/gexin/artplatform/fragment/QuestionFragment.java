@@ -26,7 +26,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.gexin.artplatform.PostProblemActivity;
 import com.gexin.artplatform.QuestionInfo;
@@ -35,6 +34,7 @@ import com.gexin.artplatform.adapter.QuestionAdapter;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.entity.Problem;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.NetUtil;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
@@ -42,16 +42,17 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 /**
  * 问答Fragment
- * @author xiaoxin
- * 2015-4-29
+ * 
+ * @author xiaoxin 2015-4-29
  */
 public class QuestionFragment extends Fragment {
 
 	private static final String TAG = "QuestionFragment";
 	private static final int POST_REQUEST_CODE = 1;
+	private static final String PROBLEMS_API = Constant.SERVER_URL
+			+ Constant.PROBLEM_API + "s";
 
 	private PullToRefreshListView mListView;
-	private TextView timeFirst, hotFirst;
 	private Button btnAsk;
 	private QuestionAdapter adapter;
 	private List<Problem> problems;
@@ -67,12 +68,11 @@ public class QuestionFragment extends Fragment {
 
 	/**
 	 * 初始化控件
+	 * 
 	 * @param view
 	 */
 	private void initView(View view) {
 		mListView = (PullToRefreshListView) view.findViewById(R.id.lv_question);
-		timeFirst = (TextView) view.findViewById(R.id.tv_timefirst_question);
-		hotFirst = (TextView) view.findViewById(R.id.tv_hotfirst_question);
 		btnAsk = (Button) view.findViewById(R.id.btn_ask_question);
 
 		btnAsk.setOnClickListener(new OnClickListener() {
@@ -97,14 +97,14 @@ public class QuestionFragment extends Fragment {
 				// Update the LastUpdatedLabel
 				refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 				// Do work to refresh the list here.
-				new GetDataTask().execute();
+				new GetLatestDataTask().execute();
 
 			}
 
 			@Override
 			public void onPullUpToRefresh(
 					PullToRefreshBase<ListView> refreshView) {
-				new GetDataTask().execute();
+				new GetNextDataTask().execute();
 			}
 		});
 
@@ -158,8 +158,7 @@ public class QuestionFragment extends Fragment {
 
 		};
 
-		new HttpConnectionUtils(handler).get(Constant.SERVER_URL
-				+ Constant.PROBLEM_API + "s");
+		new HttpConnectionUtils(handler).get(PROBLEMS_API);
 	}
 
 	@Override
@@ -178,14 +177,25 @@ public class QuestionFragment extends Fragment {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	private class GetDataTask extends AsyncTask<Void, Void, List<Problem>> {
+	private class GetLatestDataTask extends
+			AsyncTask<Void, Void, List<Problem>> {
 
 		@Override
 		protected List<Problem> doInBackground(Void... params) {
 			// Simulates a background job.
+			String result = "";
+			result = NetUtil.connect(NetUtil.GET, PROBLEMS_API, null);
+			// Log.v(TAG, "result:" + result);
 			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
+				JSONObject jObject = new JSONObject(result == null ? ""
+						: result.trim());
+				List<Problem> tempList = analyzeJson(jObject);
+				if (tempList != null) {
+					problems.clear();
+					problems.addAll(tempList);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 			return problems;
 		}
@@ -201,41 +211,72 @@ public class QuestionFragment extends Fragment {
 		}
 	}
 
+	private class GetNextDataTask extends AsyncTask<Void, Void, List<Problem>> {
+
+		@Override
+		protected List<Problem> doInBackground(Void... params) {
+			// Simulates a background job.
+			String result = "";
+			String prm = "?skip=" + problems.size();
+			result = NetUtil.connect(NetUtil.GET, PROBLEMS_API + prm, null);
+			// Log.v(TAG, "result:" + result);
+			try {
+				JSONObject jObject = new JSONObject(result == null ? ""
+						: result.trim());
+				List<Problem> tempList = analyzeJson(jObject);
+				if (tempList != null) {
+					problems.addAll(tempList);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			return problems;
+		}
+
+		@Override
+		protected void onPostExecute(List<Problem> result) {
+			Log.v(TAG, "problemNum:" + problems.size());
+			adapter.notifyDataSetChanged();
+
+			// Call onRefreshComplete when the list has been refreshed.
+			mListView.onRefreshComplete();
+
+			super.onPostExecute(result);
+		}
+	}
+
 	/**
 	 * 获取后台数据成功执行的操作
+	 * 
 	 * @param jObject
 	 */
 	private void success(JSONObject jObject) {
+		List<Problem> tempList = analyzeJson(jObject);
+		if (tempList != null) {
+			problems.clear();
+			problems.addAll(tempList);
+			adapter.notifyDataSetChanged();
+		}
+
+	}
+
+	private List<Problem> analyzeJson(JSONObject jObject) {
+		List<Problem> list = null;
 		try {
 			int state = jObject.getInt("stat");
 			if (state == 1) {
-				problems.clear();
+				list = new ArrayList<Problem>();
 				JSONArray jsonArray = jObject.getJSONArray("problems");
 				JSONObject jsonObject;
 				for (int i = 0; i < jsonArray.length(); i++) {
 					jsonObject = jsonArray.getJSONObject(i);
-					String id = jsonObject.getString("_id");
-					String avatarUrl = jsonObject.getString("avatarUrl");
-					String content = jsonObject.getString("content");
-					String image = jsonObject.getString("image");
-					String name = jsonObject.getString("name");
-					String user_id = jsonObject.getString("user_id");
-					int answerNum = jsonObject.getInt("answerNum");
-					int timestamp = jsonObject.getInt("timestamp");
-					int viewNum = jsonObject.getInt("viewNum");
-					int zan = jsonObject.getInt("zan");
-					Problem problem = new Problem(id, answerNum, avatarUrl,
-							content, image, name, timestamp, user_id, viewNum,
-							zan);
-					problems.add(problem);
+					list.add(Problem.analyzeJson(jsonObject));
 				}
-				Log.v(TAG, "problems:" + problems.toString());
-				adapter.notifyDataSetChanged();
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
+		return list;
 	}
 
 }
