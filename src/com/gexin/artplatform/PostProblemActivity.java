@@ -48,7 +48,6 @@ public class PostProblemActivity extends Activity {
 
 		@Override
 		protected void succeed(JSONObject jObject) {
-			super.succeed(jObject);
 			success(jObject);
 		}
 
