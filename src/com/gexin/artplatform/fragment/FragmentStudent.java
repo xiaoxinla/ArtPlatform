@@ -13,7 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.gexin.artplatform.Login;
+import com.gexin.artplatform.LoginActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.RegisterActivity;
 import com.gexin.artplatform.student.StudentChase;
@@ -56,7 +56,7 @@ public class FragmentStudent extends Fragment {
 				Editor editor = sp.edit();
 				editor.putString("login", "off");
 				editor.commit();
-				Intent intent = new Intent(getActivity(), Login.class);
+				Intent intent = new Intent(getActivity(), LoginActivity.class);
 				getActivity().finish();
 				startActivity(intent);
 			}

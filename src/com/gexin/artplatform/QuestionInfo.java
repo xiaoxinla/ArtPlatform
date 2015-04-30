@@ -10,6 +10,7 @@ import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.StringUtil;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ImageView;
@@ -70,21 +71,23 @@ public class QuestionInfo extends Activity {
 		try {
 			state = jObject.getInt("stat");
 			if (state == 1) {
-//				JSONObject jsonObject = jObject.getJSONObject("problem");
-//				problem = Problem.analyzeJson(jsonObject);
-//				int count = problem.getAnswerNum();
-//				int zan = problem.getZan();
-//				int viewNum = problem.getViewNum();
-//				String name = problem.getName();
-//				String time = StringUtil.convertTimestampToString(problem
-//						.getTimestamp());
-//				String content = problem.getContent();
-//				tvContent.setText(content);
-//				tvTime.setText(time);
-//				tvName.setText(name);
-//				tvCount.setText(count + "");
-//				tvViewNum.setText(viewNum + "");
-//				tvZan.setText(zan + "");
+				JSONObject jsonObject = jObject.getJSONObject("problem");
+				problem = Problem.analyzeJson(jsonObject);
+				int count = problem.getAnswerNum();
+				int zan = problem.getZan();
+				int viewNum = problem.getViewNum();
+				String name = problem.getName();
+				String time = StringUtil.convertTimestampToString(problem
+						.getTimestamp());
+				String content = problem.getContent();
+				Bitmap bitmap = null;
+				tvContent.setText(content);
+				tvTime.setText(time);
+				tvName.setText(name);
+				tvCount.setText(count + "");
+				tvViewNum.setText(viewNum + "");
+				tvZan.setText(zan + "");
+				ivPic.setImageBitmap(bitmap);
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

@@ -24,13 +24,14 @@ import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.SPUtil;
 
-public class Login extends Activity {
+public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
+	private static final String LOGIN_API = Constant.SERVER_URL
+			+ Constant.USER_API + "/login";
 	private Button login;
 	private EditText etUsername, etPassword;
 
-	private static final String LOGIN = "/login";
 	private String username, password;
 	private Handler handler = new HttpHandler(this) {
 
@@ -66,8 +67,7 @@ public class Login extends Activity {
 				list.add(new BasicNameValuePair("email", username));
 				list.add(new BasicNameValuePair("password", password));
 				Log.v(TAG, "param:" + list.toString());
-				new HttpConnectionUtils(handler).post(Constant.SERVER_URL
-						+ Constant.USER_API + LOGIN, list);
+				new HttpConnectionUtils(handler).post(LOGIN_API, list);
 			}
 		});
 
@@ -95,7 +95,8 @@ public class Login extends Activity {
 				String avatarUrl = jsonObject.getString("avatarUrl");
 				String province = jsonObject.getJSONObject("place").getString(
 						"province");
-				String city = jsonObject.getJSONObject("place").getString("city");
+				String city = jsonObject.getJSONObject("place").getString(
+						"city");
 
 				SPUtil.put(this, "subscriptionNum", subscriptionNum);
 				SPUtil.put(this, "followNum", followNum);
@@ -113,7 +114,7 @@ public class Login extends Activity {
 				SPUtil.put(this, "avatarUrl", avatarUrl);
 				SPUtil.put(this, "province", province);
 				SPUtil.put(this, "city", city);
-			}else {
+			} else {
 				Toast.makeText(this, "请检查用户名 或密码", Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -123,8 +124,8 @@ public class Login extends Activity {
 		}
 
 		Intent intent = new Intent();
-		intent.setClass(Login.this, MainActivity.class);
-		Login.this.finish();
+		intent.setClass(LoginActivity.this, MainActivity.class);
+		LoginActivity.this.finish();
 		startActivity(intent);
 		Log.v(TAG, "success");
 	}

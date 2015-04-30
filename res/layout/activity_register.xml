@@ -17,6 +17,11 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:hint="密码" />
+    
+    <Spinner android:id="@+id/sp_job_reg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
 
     <Button
         android:id="@+id/btn_confirm_reg"
