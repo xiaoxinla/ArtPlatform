@@ -1,38 +1,34 @@
 package com.gexin.artplatform;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.FileUtil;
-import com.gexin.artplatform.utils.HttpConnectionUtils;
-import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.ImageUtil;
 import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.TitleBar;
 
 public class PostProblemActivity extends Activity {
 
@@ -43,15 +39,9 @@ public class PostProblemActivity extends Activity {
 
 	private EditText etContent;
 	private ImageButton ibtnImage;
-	private Button btnConfirm;
-	private Handler handler = new HttpHandler(this) {
-
-		@Override
-		protected void succeed(JSONObject jObject) {
-			success(jObject);
-		}
-
-	};
+	private TextView tvWordleft;
+	private LinearLayout llLeft, llRight;
+	private TitleBar titleBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +54,9 @@ public class PostProblemActivity extends Activity {
 	private void initView() {
 		etContent = (EditText) findViewById(R.id.et_content_postproblem);
 		ibtnImage = (ImageButton) findViewById(R.id.ibtn_image_postproblem);
-		btnConfirm = (Button) findViewById(R.id.btn_confirm_postproblem);
+		tvWordleft = (TextView) findViewById(R.id.tv_wordleft_post_problem);
+		titleBar = (TitleBar) findViewById(R.id.tb_post_problem);
+		setTitleBtn();
 
 		ibtnImage.setOnClickListener(new OnClickListener() {
 
@@ -73,23 +65,76 @@ public class PostProblemActivity extends Activity {
 				showPicDialog();
 			}
 		});
-		btnConfirm.setOnClickListener(new OnClickListener() {
+		etContent.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {
+
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				String content = etContent.getText().toString();
+				tvWordleft.setText("还可以输入" + (140 - content.length()) + "字");
+			}
+		});
+	}
+
+	private void setTitleBtn() {
+		llLeft = new LinearLayout(this);
+		llLeft.setGravity(Gravity.CENTER_VERTICAL);
+		TextView tvLeft = new TextView(this);
+		tvLeft.setText("取消");
+		tvLeft.setTextSize(20);
+		tvLeft.setTextColor(Color.WHITE);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
+		params.setMargins(10, 0, 10, 0);
+		llLeft.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llLeft.addView(tvLeft, params);
+
+		llRight = new LinearLayout(this);
+		llRight.setGravity(Gravity.CENTER_VERTICAL);
+		TextView tvRight = new TextView(this);
+		tvRight.setText("下一步");
+		tvRight.setTextSize(20);
+		tvRight.setTextColor(Color.WHITE);
+		llRight.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llRight.addView(tvRight, params);
+		titleBar.setLeftView(llLeft);
+		titleBar.setRightView(llRight);
+
+		llLeft.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
+				Log.v(TAG, "LeftClick");
+				finish();
+			}
+		});
+
+		llRight.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Log.v(TAG, "RightClick");
 				String content = etContent.getText().toString();
 				if (content.isEmpty()) {
-					Toast.makeText(PostProblemActivity.this, "问题不能为空",
+					Toast.makeText(PostProblemActivity.this, "内容不能为空",
 							Toast.LENGTH_SHORT).show();
 					return;
 				}
-				hideSoftKeyboard();
-				List<NameValuePair> list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("content", content));
-				String userId = (String) SPUtil.get(PostProblemActivity.this,
-						"userId", "");
-				new HttpConnectionUtils(handler).post(Constant.SERVER_URL
-						+ Constant.USER_API + "/" + userId + "/problem", list);
+				Intent intent = new Intent(PostProblemActivity.this,
+						SelectTagActivity.class);
+				intent.putExtra("content", content);
+				startActivity(intent);
 			}
 		});
 	}
@@ -106,7 +151,7 @@ public class PostProblemActivity extends Activity {
 				bitmap = ImageUtil.getCompressedImage(imagePath, 50);
 				;
 				if (bitmap == null) {
-					ibtnImage.setImageResource(R.drawable.ic_menu_btn_add);
+					ibtnImage.setImageResource(R.drawable.add_icon);
 				} else {
 					ibtnImage.setImageBitmap(bitmap);
 				}
@@ -116,7 +161,7 @@ public class PostProblemActivity extends Activity {
 				String picName = "pic" + picCount + ".jpg";
 				bitmap = ImageUtil.getCompressedImage(IMAGEDIR + picName, 50);
 				if (bitmap == null) {
-					ibtnImage.setImageResource(R.drawable.ic_menu_btn_add);
+					ibtnImage.setImageResource(R.drawable.add_icon);
 				} else {
 					ibtnImage.setImageBitmap(bitmap);
 				}
@@ -181,26 +226,26 @@ public class PostProblemActivity extends Activity {
 				}).show();
 	}
 
-	protected void success(JSONObject jObject) {
-		try {
-			int state = jObject.getInt("stat");
-			if (state == 1) {
-				Toast.makeText(this, "提问成功", Toast.LENGTH_SHORT).show();
-				setResult(RESULT_OK);
-				finish();
-			} else {
-				Toast.makeText(this, "提问失败", Toast.LENGTH_SHORT).show();
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
+	// protected void success(JSONObject jObject) {
+	// try {
+	// int state = jObject.getInt("stat");
+	// if (state == 1) {
+	// Toast.makeText(this, "提问成功", Toast.LENGTH_SHORT).show();
+	// setResult(RESULT_OK);
+	// finish();
+	// } else {
+	// Toast.makeText(this, "提问失败", Toast.LENGTH_SHORT).show();
+	// }
+	// } catch (JSONException e) {
+	// e.printStackTrace();
+	// }
+	// }
 
-	private void hideSoftKeyboard() {
-		Log.v(TAG, "hideSoftKeyboard");
-		((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
-				.hideSoftInputFromWindow(PostProblemActivity.this
-						.getCurrentFocus().getWindowToken(),
-						InputMethodManager.HIDE_NOT_ALWAYS);
-	}
+	// private void hideSoftKeyboard() {
+	// Log.v(TAG, "hideSoftKeyboard");
+	// ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+	// .hideSoftInputFromWindow(PostProblemActivity.this
+	// .getCurrentFocus().getWindowToken(),
+	// InputMethodManager.HIDE_NOT_ALWAYS);
+	// }
 }

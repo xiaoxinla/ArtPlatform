@@ -9,12 +9,18 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
-import com.gexin.artplatform.fragment.FragmentStudent;
+import com.gexin.artplatform.fragment.DiscoverFragment;
+import com.gexin.artplatform.fragment.HomeFragment;
+import com.gexin.artplatform.fragment.OfflineFragment;
 import com.gexin.artplatform.fragment.QuestionFragment;
-import com.gexin.artplatform.fragment.TabFragment;
+import com.gexin.artplatform.fragment.StudentFragment;
+import com.gexin.artplatform.fragment.TeacherFragment;
+import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.ChangeColorIconWithText;
 
 public class MainActivity extends FragmentActivity implements
@@ -22,10 +28,13 @@ public class MainActivity extends FragmentActivity implements
 
 	private ViewPager mViewPager;
 	private List<Fragment> mTabs = new ArrayList<Fragment>();
-	private String[] mTitles = new String[] { "主页", "问答", "图库", "院校", "个人" };
+	private HomeFragment homeFragment;
 	private FragmentPagerAdapter mAdapter;
 	private QuestionFragment questionFragment;
-	FragmentStudent fragment_student_me = new FragmentStudent();
+	private DiscoverFragment discoverFragment;
+	private StudentFragment fragmentStudent;
+	private TeacherFragment fragmentTeacher;
+	private OfflineFragment offlineFragment;
 
 	private List<ChangeColorIconWithText> mTabIndicators = new ArrayList<ChangeColorIconWithText>();
 
@@ -33,7 +42,7 @@ public class MainActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		getActionBar().setDisplayShowHomeEnabled(false);
+//		getActionBar().setDisplayShowHomeEnabled(false);
 
 		initView();
 		initDatas();
@@ -52,21 +61,22 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void initDatas() {
-		for (String title : mTitles) {
-			if (title.equals("问答")) {
-				questionFragment = new QuestionFragment();
-				mTabs.add(questionFragment);
-				continue;
-			}
-			if (title == "个人") {
-				mTabs.add(fragment_student_me);
-				continue;
-			}
-			TabFragment tabFragment = new TabFragment();
-			Bundle bundle = new Bundle();
-			bundle.putString(TabFragment.TITLE, title);
-			tabFragment.setArguments(bundle);
-			mTabs.add(tabFragment);
+		homeFragment = new HomeFragment();
+		mTabs.add(homeFragment);
+		questionFragment = new QuestionFragment();
+		mTabs.add(questionFragment);
+		discoverFragment = new DiscoverFragment();
+		mTabs.add(discoverFragment);
+		String state = (String) SPUtil.get(this, "LOGIN", "NONE");
+		if(state.equals("STUDENT")){
+			fragmentStudent = new StudentFragment();
+			mTabs.add(fragmentStudent);
+		}else if (state.equals("TEACHER")) {
+			fragmentTeacher = new TeacherFragment();
+			mTabs.add(fragmentTeacher);
+		}else {
+			offlineFragment = new OfflineFragment();
+			mTabs.add(offlineFragment);
 		}
 
 		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -95,14 +105,11 @@ public class MainActivity extends FragmentActivity implements
 		mTabIndicators.add(three);
 		ChangeColorIconWithText four = (ChangeColorIconWithText) findViewById(R.id.id_indicator_four);
 		mTabIndicators.add(four);
-		ChangeColorIconWithText five = (ChangeColorIconWithText) findViewById(R.id.id_indicator_five);
-		mTabIndicators.add(five);
 
 		one.setOnClickListener(this);
 		two.setOnClickListener(this);
 		three.setOnClickListener(this);
 		four.setOnClickListener(this);
-		five.setOnClickListener(this);
 
 		one.setIconAlpha(1.0f);
 
@@ -138,10 +145,6 @@ public class MainActivity extends FragmentActivity implements
 		case R.id.id_indicator_four:
 			mTabIndicators.get(3).setIconAlpha(1.0f);
 			mViewPager.setCurrentItem(3, false);
-			break;
-		case R.id.id_indicator_five:
-			mTabIndicators.get(4).setIconAlpha(1.0f);
-			mViewPager.setCurrentItem(4, false);
 			break;
 		}
 	}
@@ -179,5 +182,26 @@ public class MainActivity extends FragmentActivity implements
 	public void onPageScrollStateChanged(int state) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private long exitTime = 0;
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// 实现按两下返回键退出功能
+		if (keyCode == KeyEvent.KEYCODE_BACK
+				&& event.getAction() == KeyEvent.ACTION_DOWN) {
+			if ((System.currentTimeMillis() - exitTime) > 2000) {
+				Toast.makeText(getApplicationContext(), "再按一次退出程序",
+						Toast.LENGTH_SHORT).show();
+				exitTime = System.currentTimeMillis();
+			} else {
+				moveTaskToBack(false);
+				finish();
+
+			}
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

@@ -12,7 +12,7 @@
         android:layout_weight="1" >
     </android.support.v4.view.ViewPager>
 
-   <LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/tab_bg"
@@ -24,10 +24,10 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:padding="5dp"
-            custom:icon="@drawable/ic_menu_star"
+            custom:icon="@drawable/ic_menu_home"
             custom:text="@string/tab_homepage"
             custom:text_size="12sp"
-            custom:color="#ff4f94cd" />
+            custom:color="#fffe6060" />
 
         <com.gexin.artplatform.view.ChangeColorIconWithText
             android:id="@+id/id_indicator_two"
@@ -35,10 +35,10 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:padding="5dp"
-            custom:icon="@drawable/ic_menu_star"
+            custom:icon="@drawable/question_icon_1"
             custom:text="@string/tab_question_answer"
             custom:text_size="12sp"
-            custom:color="#ff4f94cd" />
+            custom:color="#fffe6060" />
 
         <com.gexin.artplatform.view.ChangeColorIconWithText
             android:id="@+id/id_indicator_three"
@@ -47,21 +47,12 @@
             android:layout_weight="1"
             android:padding="5dp"
             custom:icon="@drawable/ic_menu_star"
-            custom:text="@string/tab_gallery"
+            custom:text="@string/tab_find"
             custom:text_size="12sp"
-            custom:color="#ff4f94cd" />
-         <com.gexin.artplatform.view.ChangeColorIconWithText
+            custom:color="#fffe6060" />
+
+        <com.gexin.artplatform.view.ChangeColorIconWithText
             android:id="@+id/id_indicator_four"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:padding="5dp"
-            custom:icon="@drawable/ic_menu_star"
-            custom:text="@string/tab_school"
-            custom:text_size="12sp"
-            custom:color="#ff4f94cd" />
-          <com.gexin.artplatform.view.ChangeColorIconWithText
-            android:id="@+id/id_indicator_five"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
@@ -69,9 +60,7 @@
             custom:icon="@drawable/ic_menu_star"
             custom:text="@string/tab_me"
             custom:text_size="12sp"
-            custom:color="#ff4f94cd" />
-
-
+            custom:color="#fffe6060" />
     </LinearLayout>
 
 </LinearLayout>

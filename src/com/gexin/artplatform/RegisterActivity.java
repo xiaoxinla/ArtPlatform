@@ -33,18 +33,8 @@ public class RegisterActivity extends Activity {
 	private Button btnConfirm;
 	private Spinner mSpinner;
 
-	private String[] jobs = {"学生","教师"};
+	private String[] jobs = { "学生", "教师" };
 	private ArrayAdapter<String> adapter;
-
-	private Handler handler = new HttpHandler(this) {
-
-		@Override
-		protected void succeed(JSONObject jObject) {
-			super.succeed(jObject);
-			Log.v(TAG, "succeed:" + jObject.toString());
-		}
-
-	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +57,35 @@ public class RegisterActivity extends Activity {
 			public void onClick(View arg0) {
 				String name = etUsername.getText().toString();
 				String password = etPassword.getText().toString();
+				int isTeacher = mSpinner.getSelectedItemPosition();
 				if (name.isEmpty() || password.isEmpty()) {
 					Toast.makeText(RegisterActivity.this, "请完整填写信息",
 							Toast.LENGTH_SHORT).show();
 				} else {
+					Handler handler = new HttpHandler(RegisterActivity.this) {
 
+						@Override
+						protected void succeed(JSONObject jObject) {
+							Log.v(TAG, "succeed:" + jObject.toString());
+							success(jObject);
+						}
+
+					};
 					HttpConnectionUtils httpConnectionUtils = new HttpConnectionUtils(
 							handler);
 					List<NameValuePair> list = new ArrayList<NameValuePair>();
 					list.add(new BasicNameValuePair("email", name));
 					list.add(new BasicNameValuePair("password", password));
-
+					list.add(new BasicNameValuePair("isTeacher", String
+							.valueOf(isTeacher)));
 					httpConnectionUtils.post(REGISTER_API, list);
 				}
 			}
 		});
+	}
+	
+	private void success(JSONObject jObject){
+		
 	}
 
 }

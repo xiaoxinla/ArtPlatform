@@ -3,13 +3,13 @@ package com.gexin.artplatform.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,23 +18,31 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gexin.artplatform.PostProblemActivity;
-import com.gexin.artplatform.QuestionInfo;
+import com.gexin.artplatform.QuestionInfoActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.adapter.QuestionAdapter;
+import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
-import com.gexin.artplatform.entity.Problem;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.NetUtil;
+import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.TitleBar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
@@ -51,11 +59,14 @@ public class QuestionFragment extends Fragment {
 	private static final int POST_REQUEST_CODE = 1;
 	private static final String PROBLEMS_API = Constant.SERVER_URL
 			+ Constant.PROBLEM_API + "s";
+	private Gson gson = new Gson();
 
 	private PullToRefreshListView mListView;
-	private Button btnAsk;
+	private TextView tvAsk;
 	private QuestionAdapter adapter;
 	private List<Problem> problems;
+	private LinearLayout llAsk;
+	private TitleBar titleBar;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -72,17 +83,8 @@ public class QuestionFragment extends Fragment {
 	 * @param view
 	 */
 	private void initView(View view) {
+		titleBar = (TitleBar) view.findViewById(R.id.tb_fragment_question);
 		mListView = (PullToRefreshListView) view.findViewById(R.id.lv_question);
-		btnAsk = (Button) view.findViewById(R.id.btn_ask_question);
-
-		btnAsk.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				startActivityForResult(new Intent(getActivity(),
-						PostProblemActivity.class), POST_REQUEST_CODE);
-			}
-		});
 		// 设置为上下两侧都可以拉动
 		mListView.setMode(Mode.BOTH);
 		mListView.setOnRefreshListener(new OnRefreshListener2<ListView>() {
@@ -108,6 +110,39 @@ public class QuestionFragment extends Fragment {
 			}
 		});
 
+		setRightView();
+
+	}
+
+	private void setRightView() {
+		llAsk = new LinearLayout(getActivity());
+		tvAsk = new TextView(getActivity());
+		tvAsk.setText("提问");
+		tvAsk.setTextSize(20);
+		tvAsk.setTextColor(Color.WHITE);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
+		params.setMargins(10, 0, 10, 0);
+		llAsk.setGravity(Gravity.CENTER_VERTICAL);
+		llAsk.addView(tvAsk, params);
+		llAsk.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		titleBar.setRightView(llAsk);
+
+		llAsk.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				String userId = (String) SPUtil
+						.get(getActivity(), "userId", "");
+				if (userId.isEmpty()) {
+					Toast.makeText(getActivity(), "请先登录才能提问",
+							Toast.LENGTH_SHORT).show();
+					return;
+				}
+				startActivityForResult(new Intent(getActivity(),
+						PostProblemActivity.class), POST_REQUEST_CODE);
+			}
+		});
 	}
 
 	@Override
@@ -119,9 +154,11 @@ public class QuestionFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				Problem problem = (Problem) adapter.getItem(arg2);
-				Intent intent = new Intent(getActivity(), QuestionInfo.class);
-				intent.putExtra("problemId", problem.getId());
+				Log.v(TAG, "positon:" + arg2);
+				Problem problem = (Problem) adapter.getItem(arg2 - 1);
+				Intent intent = new Intent(getActivity(),
+						QuestionInfoActivity.class);
+				intent.putExtra("problemId", problem.get_id());
 				startActivity(intent);
 			}
 		});
@@ -145,7 +182,14 @@ public class QuestionFragment extends Fragment {
 					try {
 						JSONObject jObject = new JSONObject(
 								response == null ? "" : response.trim());
-						success(jObject);
+						if (jObject != null) {
+							List<Problem> tempList = success(jObject);
+							if (tempList != null) {
+								problems.clear();
+								problems.addAll(tempList);
+								adapter.notifyDataSetChanged();
+							}
+						}
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
@@ -189,8 +233,9 @@ public class QuestionFragment extends Fragment {
 			try {
 				JSONObject jObject = new JSONObject(result == null ? ""
 						: result.trim());
-				List<Problem> tempList = analyzeJson(jObject);
+				List<Problem> tempList = success(jObject);
 				if (tempList != null) {
+					Log.v(TAG, "Problems:" + tempList.toString());
 					problems.clear();
 					problems.addAll(tempList);
 				}
@@ -223,7 +268,7 @@ public class QuestionFragment extends Fragment {
 			try {
 				JSONObject jObject = new JSONObject(result == null ? ""
 						: result.trim());
-				List<Problem> tempList = analyzeJson(jObject);
+				List<Problem> tempList = success(jObject);
 				if (tempList != null) {
 					problems.addAll(tempList);
 				}
@@ -249,34 +294,25 @@ public class QuestionFragment extends Fragment {
 	 * 获取后台数据成功执行的操作
 	 * 
 	 * @param jObject
+	 * @return
 	 */
-	private void success(JSONObject jObject) {
-		List<Problem> tempList = analyzeJson(jObject);
-		if (tempList != null) {
-			problems.clear();
-			problems.addAll(tempList);
-			adapter.notifyDataSetChanged();
-		}
-
-	}
-
-	private List<Problem> analyzeJson(JSONObject jObject) {
-		List<Problem> list = null;
+	private List<Problem> success(JSONObject jObject) {
+		int state = -1;
+		List<Problem> tempList = null;
+//		Log.v(TAG, "jObject:"+jObject.toString());
 		try {
-			int state = jObject.getInt("stat");
+			state = jObject.getInt("stat");
 			if (state == 1) {
-				list = new ArrayList<Problem>();
-				JSONArray jsonArray = jObject.getJSONArray("problems");
-				JSONObject jsonObject;
-				for (int i = 0; i < jsonArray.length(); i++) {
-					jsonObject = jsonArray.getJSONObject(i);
-					list.add(Problem.analyzeJson(jsonObject));
-				}
+				tempList = gson.fromJson(jObject.getJSONArray("problems")
+						.toString(), new TypeToken<List<Problem>>() {
+				}.getType());
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return list;
+//		Log.v(TAG, "success:" + tempList);
+		return tempList;
+
 	}
 
 }

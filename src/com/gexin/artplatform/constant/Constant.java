@@ -8,7 +8,7 @@ public class Constant {
 			+ "/gexin/";
 
 	// 服务器地址
-	public static String SERVER_URL = "http://198.58.117.134:5001";
+	public static String SERVER_URL = "http://120.26.192.176/msq";
 	// 用户相关API
 	public static String USER_API = "/api/user";
 	// 问答相关API

@@ -17,13 +17,15 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
+            android:launchMode="singleTask"
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Black.NoTitleBar" >
         </activity>
         <activity
             android:name=".WelcomeActivity"
-            android:label="@string/title_activity_welcome"
-            android:theme="@android:style/Theme.Black.NoTitleBar" >
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,7 +34,8 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="登录" >
+            android:label="@string/login"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
             android:name=".student.StudentChase"
@@ -67,16 +70,23 @@
             android:label="我的作品" >
         </activity>
         <activity
-            android:name=".QuestionInfo"
-            android:label="@string/title_activity_question_info" >
+            android:name=".QuestionInfoActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
         </activity>
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/title_activity_register" >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".PostProblemActivity"
-            android:label="@string/title_activity_post_problem" >
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".SelectTagActivity"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:label="@string/app_name" >
         </activity>
     </application>
 
