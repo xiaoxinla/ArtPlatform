@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -26,6 +25,7 @@ import android.widget.Toast;
 
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.imagecache.utils.ImageCache;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.SPUtil;
@@ -53,6 +53,7 @@ public class QuestionInfoActivity extends Activity {
 
 	private Problem problem;
 	private Gson gson = new Gson();
+	private ImageCache imageCache;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +61,12 @@ public class QuestionInfoActivity extends Activity {
 		setContentView(R.layout.activity_question_info);
 
 		initView();
+		imageCache = ImageCache.getInstance(this);
 
 		Handler handler = new HttpHandler(this) {
 			@Override
 			protected void succeed(JSONObject jObject) {
 				Log.v(TAG, "jObject:" + jObject.toString());
-				tvContent.setText(jObject.toString());
 				setDataToView(jObject);
 			}
 		};
@@ -114,9 +115,7 @@ public class QuestionInfoActivity extends Activity {
 			@Override
 			protected void succeed(JSONObject jObject) {
 				Log.v(TAG, "succeed:" + jObject.toString());
-				Toast.makeText(QuestionInfoActivity.this,
-						"info:" + jObject.toString(), Toast.LENGTH_LONG).show();
-				etComment.setText("");
+				commentSucceed(jObject);
 			}
 
 		};
@@ -127,6 +126,21 @@ public class QuestionInfoActivity extends Activity {
 		list.add(new BasicNameValuePair("content", content));
 		list.add(new BasicNameValuePair("problemId", problem.get_id()));
 		new HttpConnectionUtils(handler).post(commentAPI, list);
+	}
+
+	private void commentSucceed(JSONObject jObject) {
+		int state = -1;
+		try {
+			state = jObject.getInt("stat");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		if (state == 1) {
+			Toast.makeText(this, "∆¿¬€≥…π¶", Toast.LENGTH_SHORT).show();
+			etComment.setText("");
+		} else {
+			Toast.makeText(this, "∆¿¬€ ß∞‹", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	private void initTitleBar() {
@@ -162,19 +176,42 @@ public class QuestionInfoActivity extends Activity {
 				int ansNum = problem.getAnswerNum();
 				int zan = problem.getZan();
 				String name = problem.getName();
+				String avatarUrl = problem.getAvatarUrl();
 				String time = TimeUtil.getStandardDate(problem.getTimestamp());
+				String tag = "";
+				if(problem.getTag()!=null&&problem.getTag().size()!=0){
+					String tmpStr = problem.getTag().toString();
+					try{
+						tag = tmpStr.substring(1, tmpStr.length()-1);
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}else {
+					tag = "Œ¥…Ë÷√";
+				}
 				String content = problem.getContent();
-				Bitmap bitmap = null;
+				String imageUrl = problem.getImage();
+				String commentor = "XXXª≠ “";
 				tvContent.setText(content);
 				tvTime.setText(time);
 				tvName.setText(name);
+				tvType.setText(tag);
 				tvAnsNum.setText(ansNum + "");
 				tvZan.setText(zan + "");
-				ivPic.setImageBitmap(bitmap);
+				tvCommentor.setText(commentor);
+				imageCache.displayImage(ivHeader, avatarUrl,
+						R.drawable.ic_contact_picture);
+				if (imageUrl != null && !imageUrl.isEmpty()) {
+					ivPic.setVisibility(View.VISIBLE);
+					imageCache.displayImage(ivPic, imageUrl,
+							R.drawable.ic_menu_emoticons);
+				} else {
+					ivPic.setVisibility(View.GONE);
+				}
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 }

@@ -20,6 +20,7 @@
         android:id="@+id/lv_question"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:scrollbars="none"
         android:divider="@drawable/list_divider" >
     </com.handmark.pulltorefresh.library.PullToRefreshListView>
 

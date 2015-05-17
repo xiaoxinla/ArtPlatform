@@ -5,7 +5,7 @@ public class Comment {
 	private String _id;
 	private String problemId;
 	private String content;
-	private String replyTo;
+	private String toUserId;
 	private String fromUser;
 	private long timestamp;
 
@@ -33,14 +33,6 @@ public class Comment {
 		this.content = content;
 	}
 
-	public String getReplyTo() {
-		return replyTo;
-	}
-
-	public void setReplyTo(String replyTo) {
-		this.replyTo = replyTo;
-	}
-
 	public String getFromUser() {
 		return fromUser;
 	}
@@ -57,10 +49,18 @@ public class Comment {
 		this.timestamp = timestamp;
 	}
 
+	public String getToUserId() {
+		return toUserId;
+	}
+
+	public void setToUserId(String toUserId) {
+		this.toUserId = toUserId;
+	}
+
 	@Override
 	public String toString() {
 		return "Comment [_id=" + _id + ", problemId=" + problemId
-				+ ", content=" + content + ", replyTo=" + replyTo
+				+ ", content=" + content + ", toUserId=" + toUserId
 				+ ", fromUser=" + fromUser + ", timestamp=" + timestamp + "]";
 	}
 

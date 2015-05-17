@@ -4,6 +4,8 @@ import android.os.Environment;
 
 public class Constant {
 
+	public static final String CACHE_DIR = "imagecache/";
+
 	public static String APP_PATH = Environment.getExternalStorageDirectory()
 			+ "/gexin/";
 

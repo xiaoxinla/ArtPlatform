@@ -16,7 +16,7 @@ public class Problem {
 	private String userId;
 	private List<Comment> commentList;
 	private String askTo;
-	private String tag;
+	private List<String> tag;
 
 	public Problem() {
 	}
@@ -134,13 +134,12 @@ public class Problem {
 	public void setAskTo(String askTo) {
 		this.askTo = askTo;
 	}
-	
 
-	public String getTag() {
+	public List<String> getTag() {
 		return tag;
 	}
 
-	public void setTag(String tag) {
+	public void setTag(List<String> tag) {
 		this.tag = tag;
 	}
 

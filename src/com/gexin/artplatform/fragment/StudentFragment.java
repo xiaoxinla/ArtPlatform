@@ -1,10 +1,6 @@
 package com.gexin.artplatform.fragment;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,16 +10,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.gexin.artplatform.LoginActivity;
 import com.gexin.artplatform.MainActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.RegisterActivity;
 import com.gexin.artplatform.student.StudentChase;
 import com.gexin.artplatform.student.StudentComment;
 import com.gexin.artplatform.student.StudentFans;
 import com.gexin.artplatform.student.StudentFavorite;
 import com.gexin.artplatform.student.StudentFocus;
-import com.gexin.artplatform.student.StudentFriend;
 import com.gexin.artplatform.student.StudentGallery;
 import com.gexin.artplatform.student.StudentSubscribe;
 import com.gexin.artplatform.utils.SPUtil;
@@ -53,7 +46,7 @@ public class StudentFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				SPUtil.put(getActivity(), "LOGIN", "OFF");
+				SPUtil.put(getActivity(), "LOGIN", "NONE");
 				Intent intent = new Intent(getActivity(), MainActivity.class);
 				getActivity().finish();
 				startActivity(intent);

@@ -6,14 +6,15 @@ import java.util.List;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import com.gexin.artplatform.adapter.FragmentVPAdapter;
 import com.gexin.artplatform.fragment.DiscoverFragment;
 import com.gexin.artplatform.fragment.HomeFragment;
 import com.gexin.artplatform.fragment.OfflineFragment;
@@ -26,10 +27,13 @@ import com.gexin.artplatform.view.ChangeColorIconWithText;
 public class MainActivity extends FragmentActivity implements
 		OnPageChangeListener, OnClickListener {
 
+	private static final String TAG = "MainActivity";
+	private String state = "";
+	
 	private ViewPager mViewPager;
 	private List<Fragment> mTabs = new ArrayList<Fragment>();
 	private HomeFragment homeFragment;
-	private FragmentPagerAdapter mAdapter;
+	private FragmentVPAdapter mAdapter;
 	private QuestionFragment questionFragment;
 	private DiscoverFragment discoverFragment;
 	private StudentFragment fragmentStudent;
@@ -40,6 +44,7 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 //		getActionBar().setDisplayShowHomeEnabled(false);
@@ -67,7 +72,7 @@ public class MainActivity extends FragmentActivity implements
 		mTabs.add(questionFragment);
 		discoverFragment = new DiscoverFragment();
 		mTabs.add(discoverFragment);
-		String state = (String) SPUtil.get(this, "LOGIN", "NONE");
+		state = (String) SPUtil.get(this, "LOGIN", "NONE");
 		if(state.equals("STUDENT")){
 			fragmentStudent = new StudentFragment();
 			mTabs.add(fragmentStudent);
@@ -79,18 +84,8 @@ public class MainActivity extends FragmentActivity implements
 			mTabs.add(offlineFragment);
 		}
 
-		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
-
-			@Override
-			public int getCount() {
-				return mTabs.size();
-			}
-
-			@Override
-			public Fragment getItem(int position) {
-				return mTabs.get(position);
-			}
-		};
+		mAdapter = new FragmentVPAdapter(getSupportFragmentManager(),mTabs);
+		
 	}
 
 	private void initView() {
@@ -203,5 +198,39 @@ public class MainActivity extends FragmentActivity implements
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	protected void onResume() {
+		Log.v(TAG, "onResume");
+		updateLoginState();
+		super.onResume();
+	}
+	
+	private void updateLoginState(){
+		String tmpstate = (String) SPUtil.get(this, "LOGIN", "NONE");
+		if(tmpstate.equals(state)){
+			return ;
+		}
+		Log.v(TAG, "tmpstate:"+tmpstate);
+		mTabs.clear();
+		homeFragment = new HomeFragment();
+		mTabs.add(homeFragment);
+		questionFragment = new QuestionFragment();
+		mTabs.add(questionFragment);
+		discoverFragment = new DiscoverFragment();
+		mTabs.add(discoverFragment);
+		state = (String) SPUtil.get(this, "LOGIN", "NONE");
+		if(state.equals("STUDENT")){
+			fragmentStudent = new StudentFragment();
+			mTabs.add(fragmentStudent);
+		}else if (state.equals("TEACHER")) {
+			fragmentTeacher = new TeacherFragment();
+			mTabs.add(fragmentTeacher);
+		}else {
+			offlineFragment = new OfflineFragment();
+			mTabs.add(offlineFragment);
+		}
+		mAdapter.notifyDataSetChanged();
 	}
 }

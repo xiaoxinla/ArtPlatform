@@ -299,13 +299,17 @@ public class QuestionFragment extends Fragment {
 	private List<Problem> success(JSONObject jObject) {
 		int state = -1;
 		List<Problem> tempList = null;
-//		Log.v(TAG, "jObject:"+jObject.toString());
+		Log.v(TAG, "jObject:"+jObject.toString());
 		try {
 			state = jObject.getInt("stat");
 			if (state == 1) {
-				tempList = gson.fromJson(jObject.getJSONArray("problems")
-						.toString(), new TypeToken<List<Problem>>() {
-				}.getType());
+				try {
+					tempList = gson.fromJson(jObject.getJSONArray("problems")
+							.toString(), new TypeToken<List<Problem>>() {
+					}.getType());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

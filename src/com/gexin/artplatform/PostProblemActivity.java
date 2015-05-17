@@ -20,13 +20,14 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.FileUtil;
 import com.gexin.artplatform.utils.ImageUtil;
+import com.gexin.artplatform.utils.NetUtil;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.TitleBar;
 
@@ -36,6 +37,7 @@ public class PostProblemActivity extends Activity {
 	protected static final int ALBUM_REQUEST_CODE = 0;
 	protected static final int CAMERA_REQUEST_CODE = 1;
 	private static final String IMAGEDIR = Constant.APP_PATH + "image/";
+	private String imagePath = "";
 
 	private EditText etContent;
 	private ImageButton ibtnImage;
@@ -134,6 +136,7 @@ public class PostProblemActivity extends Activity {
 				Intent intent = new Intent(PostProblemActivity.this,
 						SelectTagActivity.class);
 				intent.putExtra("content", content);
+				intent.putExtra("image", imagePath);
 				startActivity(intent);
 			}
 		});
@@ -145,11 +148,10 @@ public class PostProblemActivity extends Activity {
 			Bitmap bitmap;
 			switch (requestCode) {
 			case ALBUM_REQUEST_CODE:
-				String imagePath = FileUtil.getRealFilePath(this,
+				imagePath = FileUtil.getRealFilePath(this,
 						data.getData());
 				Log.v(TAG, imagePath);
 				bitmap = ImageUtil.getCompressedImage(imagePath, 50);
-				;
 				if (bitmap == null) {
 					ibtnImage.setImageResource(R.drawable.add_icon);
 				} else {
@@ -159,7 +161,8 @@ public class PostProblemActivity extends Activity {
 			case CAMERA_REQUEST_CODE:
 				int picCount = (Integer) SPUtil.get(this, "picCount", 0);
 				String picName = "pic" + picCount + ".jpg";
-				bitmap = ImageUtil.getCompressedImage(IMAGEDIR + picName, 50);
+				imagePath = IMAGEDIR + picName;
+				bitmap = ImageUtil.getCompressedImage(imagePath, 50);
 				if (bitmap == null) {
 					ibtnImage.setImageResource(R.drawable.add_icon);
 				} else {

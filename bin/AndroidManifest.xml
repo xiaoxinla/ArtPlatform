@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name="com.gexin.artplatform.imagecache.utils.CrashApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -71,6 +72,7 @@
         </activity>
         <activity
             android:name=".QuestionInfoActivity"
+            android:windowSoftInputMode="stateHidden"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
         </activity>
