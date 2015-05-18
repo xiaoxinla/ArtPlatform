@@ -6,6 +6,7 @@ import java.util.List;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
@@ -14,31 +15,24 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-import com.gexin.artplatform.adapter.FragmentVPAdapter;
 import com.gexin.artplatform.fragment.DiscoverFragment;
 import com.gexin.artplatform.fragment.HomeFragment;
-import com.gexin.artplatform.fragment.OfflineFragment;
+import com.gexin.artplatform.fragment.MineFragment;
 import com.gexin.artplatform.fragment.QuestionFragment;
-import com.gexin.artplatform.fragment.StudentFragment;
-import com.gexin.artplatform.fragment.TeacherFragment;
-import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.ChangeColorIconWithText;
 
 public class MainActivity extends FragmentActivity implements
 		OnPageChangeListener, OnClickListener {
 
 	private static final String TAG = "MainActivity";
-	private String state = "";
 	
 	private ViewPager mViewPager;
 	private List<Fragment> mTabs = new ArrayList<Fragment>();
 	private HomeFragment homeFragment;
-	private FragmentVPAdapter mAdapter;
+	private FragmentPagerAdapter mAdapter;
 	private QuestionFragment questionFragment;
 	private DiscoverFragment discoverFragment;
-	private StudentFragment fragmentStudent;
-	private TeacherFragment fragmentTeacher;
-	private OfflineFragment offlineFragment;
+	private MineFragment mineFragment;
 
 	private List<ChangeColorIconWithText> mTabIndicators = new ArrayList<ChangeColorIconWithText>();
 
@@ -72,19 +66,21 @@ public class MainActivity extends FragmentActivity implements
 		mTabs.add(questionFragment);
 		discoverFragment = new DiscoverFragment();
 		mTabs.add(discoverFragment);
-		state = (String) SPUtil.get(this, "LOGIN", "NONE");
-		if(state.equals("STUDENT")){
-			fragmentStudent = new StudentFragment();
-			mTabs.add(fragmentStudent);
-		}else if (state.equals("TEACHER")) {
-			fragmentTeacher = new TeacherFragment();
-			mTabs.add(fragmentTeacher);
-		}else {
-			offlineFragment = new OfflineFragment();
-			mTabs.add(offlineFragment);
-		}
+		mineFragment = new MineFragment();
+		mTabs.add(mineFragment);
 
-		mAdapter = new FragmentVPAdapter(getSupportFragmentManager(),mTabs);
+		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()){
+
+			@Override
+			public Fragment getItem(int arg0) {
+				return mTabs.get(arg0);
+			}
+
+			@Override
+			public int getCount() {
+				return mTabs.size();
+			}
+		};
 		
 	}
 
@@ -200,37 +196,4 @@ public class MainActivity extends FragmentActivity implements
 		return super.onKeyDown(keyCode, event);
 	}
 	
-	@Override
-	protected void onResume() {
-		Log.v(TAG, "onResume");
-		updateLoginState();
-		super.onResume();
-	}
-	
-	private void updateLoginState(){
-		String tmpstate = (String) SPUtil.get(this, "LOGIN", "NONE");
-		if(tmpstate.equals(state)){
-			return ;
-		}
-		Log.v(TAG, "tmpstate:"+tmpstate);
-		mTabs.clear();
-		homeFragment = new HomeFragment();
-		mTabs.add(homeFragment);
-		questionFragment = new QuestionFragment();
-		mTabs.add(questionFragment);
-		discoverFragment = new DiscoverFragment();
-		mTabs.add(discoverFragment);
-		state = (String) SPUtil.get(this, "LOGIN", "NONE");
-		if(state.equals("STUDENT")){
-			fragmentStudent = new StudentFragment();
-			mTabs.add(fragmentStudent);
-		}else if (state.equals("TEACHER")) {
-			fragmentTeacher = new TeacherFragment();
-			mTabs.add(fragmentTeacher);
-		}else {
-			offlineFragment = new OfflineFragment();
-			mTabs.add(offlineFragment);
-		}
-		mAdapter.notifyDataSetChanged();
-	}
 }

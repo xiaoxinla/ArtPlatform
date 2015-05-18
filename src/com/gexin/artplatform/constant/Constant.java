@@ -15,4 +15,6 @@ public class Constant {
 	public static String USER_API = "/api/user";
 	// 问答相关API
 	public static String PROBLEM_API = "/api/problem";
+	// 发现页相关API
+	public static String Discover_API = "/api/classification";
 }

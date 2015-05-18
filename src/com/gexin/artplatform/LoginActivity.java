@@ -23,7 +23,6 @@ import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.JSONUtil;
-import com.gexin.artplatform.utils.SPUtil;
 
 public class LoginActivity extends Activity {
 
@@ -63,7 +62,6 @@ public class LoginActivity extends Activity {
 
 				};
 				List<NameValuePair> list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("isTeacher", String.valueOf(0)));
 				list.add(new BasicNameValuePair("email", username));
 				list.add(new BasicNameValuePair("password", password));
 				Log.v(TAG, "param:" + list.toString());
@@ -90,7 +88,10 @@ public class LoginActivity extends Activity {
 			if (state == 1) {
 				JSONUtil.analyseLoginJSON(this, jObject.getJSONObject("user")
 						.toString());
-
+				Log.v(TAG, "success");
+				Toast.makeText(this, "登陆成功", Toast.LENGTH_SHORT).show();
+				setResult(RESULT_OK);
+				finish();
 			} else {
 				Toast.makeText(this, "请检查用户名 或密码", Toast.LENGTH_SHORT).show();
 				return;
@@ -98,10 +99,5 @@ public class LoginActivity extends Activity {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		SPUtil.put(this, "LOGIN", "STUDENT");
-		Intent intent = new Intent();
-		intent.setClass(LoginActivity.this, MainActivity.class);
-		startActivity(intent);
-		Log.v(TAG, "success");
 	}
 }

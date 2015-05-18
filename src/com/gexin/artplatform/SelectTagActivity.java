@@ -47,6 +47,7 @@ public class SelectTagActivity extends Activity {
 			"书法", "吐槽" };
 	private List<Boolean> checkFlags = new ArrayList<Boolean>();
 	private List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+	private List<String> choosenTags = new ArrayList<String>();
 
 	private ListView mListView;
 	private TitleBar titleBar;
@@ -80,11 +81,6 @@ public class SelectTagActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				// if (checkFlags.get(arg2)) {
-				// checkFlags.set(arg2, false);
-				// } else {
-				// checkFlags.set(arg2, true);
-				// }
 				list.clear();
 				for (int i = 0; i < tagNames.length; i++) {
 					if (i == arg2) {
@@ -150,29 +146,30 @@ public class SelectTagActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				Log.v(TAG, "RightClick");
-				postProblem();
-				Toast.makeText(SelectTagActivity.this, "提交问题中...",
-						Toast.LENGTH_SHORT).show();
-				startActivity(new Intent(SelectTagActivity.this,
-						MainActivity.class));
+				if (postProblem()) {
+					Toast.makeText(SelectTagActivity.this, "提交问题中...",
+							Toast.LENGTH_SHORT).show();
+					startActivity(new Intent(SelectTagActivity.this,
+							MainActivity.class));
+				}
 			}
 		});
 	}
 
 	@SuppressLint("HandlerLeak")
-	private void postProblem() {
+	private boolean postProblem() {
 		String userId = (String) SPUtil.get(this, "userId", "");
-		String tmptag = "";
+		choosenTags.clear();
 		for (int i = 0; i < checkFlags.size(); i++) {
 			if (checkFlags.get(i)) {
-				tmptag = tagNames[i];
+				choosenTags.add(tagNames[i]);
 				break;
 			}
 		}
-		final String tag = tmptag;
+		final String tag = choosenTags.toString();
 		if (tag.isEmpty()) {
 			Toast.makeText(this, "请为问题添加标签", Toast.LENGTH_SHORT).show();
-			return;
+			return false;
 		}
 		final String postProblemAPI = Constant.SERVER_URL + Constant.USER_API
 				+ "/" + userId + "/problem";
@@ -249,22 +246,7 @@ public class SelectTagActivity extends Activity {
 				new HttpConnectionUtils(handler).post(postProblemAPI, list);
 			}
 		}).start();
+		return true;
 	}
-
-	// private void success(JSONObject jObject) {
-	// try {
-	// int state = jObject.getInt("stat");
-	// if (state == 1) {
-	// Toast.makeText(this, "提问成功", Toast.LENGTH_SHORT).show();
-	// startActivity(new Intent(SelectTagActivity.this,
-	// MainActivity.class));
-	// finish();
-	// } else {
-	// Toast.makeText(this, "提问失败", Toast.LENGTH_SHORT).show();
-	// }
-	// } catch (JSONException e) {
-	// e.printStackTrace();
-	// }
-	// }
 
 }

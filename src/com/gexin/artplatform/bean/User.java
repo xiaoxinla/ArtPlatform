@@ -21,6 +21,7 @@ public class User {
 	private int commentNum;
 	private int askMeNum;
 	private int answerNum;
+	private int isTeacher;
 	private long phone;
 	private Place place;
 
@@ -160,6 +161,14 @@ public class User {
 		this.place = place;
 	}
 
+	public int getIsTeacher() {
+		return isTeacher;
+	}
+
+	public void setIsTeacher(int isTeacher) {
+		this.isTeacher = isTeacher;
+	}
+
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", name=" + name + ", avatarUrl="
@@ -169,10 +178,11 @@ public class User {
 				+ ", subscriptionNum=" + subscriptionNum + ", workNum="
 				+ workNum + ", askNum=" + askNum + ", commentNum=" + commentNum
 				+ ", askMeNum=" + askMeNum + ", answerNum=" + answerNum
-				+ ", phone=" + phone + ", place=" + place + "]";
+				+ ", isTeacher=" + isTeacher + ", phone=" + phone + ", place="
+				+ place + "]";
 	}
-	
-	public void putToSP(Context context){
+
+	public void putToSP(Context context) {
 		SPUtil.put(context, "userId", this.userId);
 		SPUtil.put(context, "name", this.name);
 		SPUtil.put(context, "avatarUrl", this.avatarUrl);
@@ -191,6 +201,11 @@ public class User {
 		SPUtil.put(context, "phone", this.phone);
 		SPUtil.put(context, "province", this.place.province);
 		SPUtil.put(context, "city", this.place.city);
+		if(isTeacher==0){
+			SPUtil.put(context, "LOGIN", "STUDENT");
+		}else {
+			SPUtil.put(context, "LOGIN", "TEACHER");
+		}
 	}
 
 	private static class Place {
