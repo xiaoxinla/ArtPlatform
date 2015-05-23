@@ -5,54 +5,66 @@ public class Classification {
 	private String title;
 	private String icon;
 	private String ID;
+	private String superior;
 
 	public Classification() {
 
-	}
+	};
 
-	public Classification(String herf, String title, String img, String superior) {
-		this.href = herf;
-		this.icon = img;
+	public Classification(String href, String title, String icon, String iD,
+			String superior) {
+		super();
+		this.href = href;
 		this.title = title;
-		this.ID = superior;
+		this.icon = icon;
+		ID = iD;
+		this.superior = superior;
 	}
 
 	public String getHref() {
 		return href;
 	}
 
+	public void setHref(String href) {
+		this.href = href;
+	}
+
 	public String getTitle() {
 		return title;
-	}
-
-	public String getIcon() {
-		return icon;
-	}
-
-	public String getID() {
-		return ID;
-	}
-
-	public void setHref(String herf) {
-		this.href = herf;
-	}
-
-	public void setIcon(String img) {
-		this.icon = img;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
-	public void setID(String superior) {
-		this.ID = superior;
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getID() {
+		return ID;
+	}
+
+	public void setID(String iD) {
+		ID = iD;
+	}
+
+	public String getSuperior() {
+		return superior;
+	}
+
+	public void setSuperior(String superior) {
+		this.superior = superior;
 	}
 
 	@Override
 	public String toString() {
 		return "Classification [href=" + href + ", title=" + title + ", icon="
-				+ icon + ", ID=" + ID + "]";
+				+ icon + ", ID=" + ID + ", superior=" + superior + "]";
 	}
 
 }
