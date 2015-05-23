@@ -187,6 +187,7 @@
                     android:background="@android:drawable/btn_default_small"
                     android:src="@drawable/interest_icon_1" />
             </RelativeLayout>
+        
         </LinearLayout>
     </ScrollView>
 

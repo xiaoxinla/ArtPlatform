@@ -13,5 +13,7 @@
     <string name="login">登录</string>
     <string name="post_hint">拍照更容易获得答案哦</string>
     <string name="wordleft_hint">还可以输入140字</string>
+    <string name="large_image_title">大图</string>
+    <string name="title_activity_large_image">LargeImageActivity</string>
 
 </resources>

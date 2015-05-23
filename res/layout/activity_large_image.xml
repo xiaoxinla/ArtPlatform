@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.gexin.artplatform.view.TitleBar
+        android:id="@+id/tb_large_image"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#445bc8"
+        custom:titleColor="#ffffff"
+        custom:titleSize="13sp"
+        custom:titleText="@string/large_image_title" >
+    </com.gexin.artplatform.view.TitleBar>
+    <ImageView android:id="@+id/iv_large_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        />
+
+</LinearLayout>

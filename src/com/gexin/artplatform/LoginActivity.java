@@ -62,7 +62,7 @@ public class LoginActivity extends Activity {
 
 				};
 				List<NameValuePair> list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("email", username));
+				list.add(new BasicNameValuePair("account", username));
 				list.add(new BasicNameValuePair("password", password));
 				Log.v(TAG, "param:" + list.toString());
 				new HttpConnectionUtils(handler).post(LOGIN_API, list);

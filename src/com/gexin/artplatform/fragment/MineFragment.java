@@ -2,6 +2,7 @@ package com.gexin.artplatform.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,6 @@ import android.widget.Toast;
 
 import com.gexin.artplatform.LoginActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.imagecache.utils.ImageCache;
 import com.gexin.artplatform.student.StudentChase;
 import com.gexin.artplatform.student.StudentComment;
 import com.gexin.artplatform.student.StudentFans;
@@ -27,6 +27,8 @@ import com.gexin.artplatform.student.StudentFocus;
 import com.gexin.artplatform.student.StudentGallery;
 import com.gexin.artplatform.student.StudentSubscribe;
 import com.gexin.artplatform.utils.SPUtil;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class MineFragment extends Fragment {
 
@@ -39,7 +41,6 @@ public class MineFragment extends Fragment {
 	private ImageView ivHeader;
 
 	private int job = -1;// -1为未登录，0为学生，1为教师
-	private ImageCache imageCache;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -108,7 +109,7 @@ public class MineFragment extends Fragment {
 	}
 
 	private void setDataToView() {
-		String name = (String) SPUtil.get(getActivity(), "name", "未设置");
+		String name = (String) SPUtil.get(getActivity(), "name", "");
 		String avatarUrl = (String) SPUtil.get(getActivity(), "avatarUrl", "");
 		int followNum = (Integer) SPUtil.get(getActivity(), "followNum", 0);
 		int fanNum = (Integer) SPUtil.get(getActivity(), "fanNum", 0);
@@ -142,12 +143,20 @@ public class MineFragment extends Fragment {
 			tvSubscribe.setText("我的订阅("+subscriptionNum+")");
 		}
 		if(job!=-1){
-			imageCache.displayImage(ivHeader, avatarUrl, R.drawable.ic_contact_picture);
+			DisplayImageOptions options = new DisplayImageOptions.Builder()
+			.showImageOnLoading(R.drawable.ic_contact_picture)
+			.showImageForEmptyUri(R.drawable.ic_contact_picture)
+			.showImageOnFail(R.drawable.ic_contact_picture)
+			.cacheInMemory(true)
+			.cacheOnDisk(true)
+			.considerExifParams(true)
+			.bitmapConfig(Bitmap.Config.RGB_565)
+			.build();
+			ImageLoader.getInstance().displayImage(avatarUrl, ivHeader,options);
 		}
 	}
 
 	private void initData() {
-		imageCache = ImageCache.getInstance(getActivity());
 		String state = (String) SPUtil.get(getActivity(), "LOGIN", "NONE");
 		if (state.equals("STUDENT")) {
 			job = 0;

@@ -9,6 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,13 +27,14 @@ import android.widget.Toast;
 
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
-import com.gexin.artplatform.imagecache.utils.ImageCache;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.utils.TimeUtil;
 import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class QuestionInfoActivity extends Activity {
 
@@ -53,7 +56,6 @@ public class QuestionInfoActivity extends Activity {
 
 	private Problem problem;
 	private Gson gson = new Gson();
-	private ImageCache imageCache;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,6 @@ public class QuestionInfoActivity extends Activity {
 		setContentView(R.layout.activity_question_info);
 
 		initView();
-		imageCache = ImageCache.getInstance(this);
 
 		Handler handler = new HttpHandler(this) {
 			@Override
@@ -100,6 +101,7 @@ public class QuestionInfoActivity extends Activity {
 				}
 			}
 		});
+
 	}
 
 	protected void postComment(String content, String replyTo) {
@@ -179,18 +181,18 @@ public class QuestionInfoActivity extends Activity {
 				String avatarUrl = problem.getAvatarUrl();
 				String time = TimeUtil.getStandardDate(problem.getTimestamp());
 				String tag = "";
-				if(problem.getTag()!=null&&problem.getTag().size()!=0){
+				if (problem.getTag() != null && problem.getTag().size() != 0) {
 					String tmpStr = problem.getTag().toString();
-					try{
-						tag = tmpStr.substring(1, tmpStr.length()-1);
-					}catch(Exception e){
+					try {
+						tag = tmpStr.substring(1, tmpStr.length() - 1);
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}else {
+				} else {
 					tag = "Œ¥…Ë÷√";
 				}
 				String content = problem.getContent();
-				String imageUrl = problem.getImage();
+				final String imageUrl = problem.getImage();
 				String commentor = "XXXª≠ “";
 				tvContent.setText(content);
 				tvTime.setText(time);
@@ -199,15 +201,41 @@ public class QuestionInfoActivity extends Activity {
 				tvAnsNum.setText(ansNum + "");
 				tvZan.setText(zan + "");
 				tvCommentor.setText(commentor);
-				imageCache.displayImage(ivHeader, avatarUrl,
-						R.drawable.ic_contact_picture);
+				DisplayImageOptions headerOptions = new DisplayImageOptions.Builder()
+						.showImageOnLoading(R.drawable.ic_contact_picture)
+						.showImageForEmptyUri(R.drawable.ic_contact_picture)
+						.showImageOnFail(R.drawable.ic_error)
+						.cacheInMemory(true).cacheOnDisk(true)
+						.considerExifParams(true)
+						.bitmapConfig(Bitmap.Config.RGB_565).build();
+				DisplayImageOptions picOptions = new DisplayImageOptions.Builder()
+						.showImageOnLoading(R.drawable.ic_empty)
+						.showImageOnFail(R.drawable.ic_error)
+						.cacheInMemory(true).cacheOnDisk(true)
+						.considerExifParams(true)
+						.bitmapConfig(Bitmap.Config.RGB_565).build();
+				ImageLoader.getInstance().displayImage(avatarUrl, ivHeader,
+						headerOptions);
 				if (imageUrl != null && !imageUrl.isEmpty()) {
 					ivPic.setVisibility(View.VISIBLE);
-					imageCache.displayImage(ivPic, imageUrl,
-							R.drawable.ic_menu_emoticons);
+					ImageLoader.getInstance().displayImage(imageUrl, ivPic,
+							picOptions);
 				} else {
 					ivPic.setVisibility(View.GONE);
 				}
+				ivPic.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						if (imageUrl != null && !imageUrl.isEmpty()) {
+							Intent intent = new Intent(
+									QuestionInfoActivity.this,
+									LargeImageActivity.class);
+							intent.putExtra("url", imageUrl);
+							startActivity(intent);
+						}
+					}
+				});
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

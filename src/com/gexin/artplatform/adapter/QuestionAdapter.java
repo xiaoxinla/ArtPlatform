@@ -5,10 +5,11 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -22,26 +23,38 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gexin.artplatform.LargeImageActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
-import com.gexin.artplatform.imagecache.utils.ImageCache;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
-import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.TimeUtil;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class QuestionAdapter extends BaseAdapter {
 
 	private static final String TAG = "QuestionAdapter";
 	private Context mContext;
 	private List<Problem> mList;
-	private ImageCache imageCache;
+	private DisplayImageOptions avatarOptions;
+	private DisplayImageOptions picOptions;
 
 	public QuestionAdapter(Context mContext, List<Problem> mList) {
 		super();
 		this.mContext = mContext;
 		this.mList = mList;
-		this.imageCache = ImageCache.getInstance(mContext);
+		avatarOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_contact_picture)
+				.showImageForEmptyUri(R.drawable.ic_contact_picture)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		picOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_stub)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
 	}
 
 	@Override
@@ -62,10 +75,8 @@ public class QuestionAdapter extends BaseAdapter {
 	@SuppressLint("InflateParams")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// Log.v(TAG, "getView");
 		ViewHolder holder = null;
 		Problem item = mList.get(position);
-		// Log.v(TAG, "item:" + item.toString());
 		if (convertView == null) {
 			convertView = LayoutInflater.from(mContext).inflate(
 					R.layout.question_item, null);
@@ -102,27 +113,26 @@ public class QuestionAdapter extends BaseAdapter {
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		int header = R.drawable.ic_contact_picture;
 		int ansNum = item.getAnswerNum();
 		int zan = item.getZan();
 		final String id = item.get_id();
 		String name = item.getName();
 		String time = TimeUtil.getStandardDate(item.getTimestamp());
 		String type = "";
-		if(item.getTag()!=null&&item.getTag().size()!=0){
+		String avatarUrl = item.getAvatarUrl();
+		if (item.getTag() != null && item.getTag().size() != 0) {
 			String tmpStr = item.getTag().toString();
-			try{
-			type = tmpStr.substring(1, tmpStr.length()-1);
-			}catch(Exception e){
+			try {
+				type = tmpStr.substring(1, tmpStr.length() - 1);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else {
+		} else {
 			type = "Œ¥…Ë÷√";
 		}
 		String content = item.getContent();
 		String commentor = "";
-		String imageUrl = item.getImage();
-		holder.ivHeader.setImageResource(header);
+		final String imageUrl = item.getImage();
 		holder.tvName.setText(name);
 		holder.tvTime.setText(time);
 		holder.tvType.setText(type);
@@ -144,33 +154,47 @@ public class QuestionAdapter extends BaseAdapter {
 				postZan(id);
 			}
 		});
-//		holder.llAns.setOnClickListener(new OnClickListener() {
-//
-//			@Override
-//			public void onClick(View arg0) {
-//				Log.v(TAG, "AnsClick");
-//			}
-//		});
+		// holder.llAns.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View arg0) {
+		// Log.v(TAG, "AnsClick");
+		// }
+		// });
+		ImageLoader.getInstance().displayImage(avatarUrl, holder.ivHeader,
+				avatarOptions);
 		if (imageUrl != null && !imageUrl.isEmpty()) {
 			holder.ivPic.setVisibility(View.VISIBLE);
-			imageCache.displayImage(holder.ivPic, imageUrl,
-					R.drawable.ic_menu_notifications);
+			ImageLoader.getInstance().displayImage(imageUrl, holder.ivPic,
+					picOptions);
 		} else {
 			holder.ivPic.setVisibility(View.GONE);
 		}
+		holder.ivPic.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				if(imageUrl != null && !imageUrl.isEmpty()){
+					Intent intent = new Intent(mContext,LargeImageActivity.class);
+					intent.putExtra("url", imageUrl);
+					mContext.startActivity(intent);
+				}
+			}
+		});
 
 		return convertView;
 	}
 
-	@SuppressLint("HandlerLeak") private void postZan(String id) {
-		String zanAPI = Constant.SERVER_URL + "/api/problem/"+id+"/zan";
-		Handler handler = new Handler(){
+	@SuppressLint("HandlerLeak")
+	private void postZan(String id) {
+		String zanAPI = Constant.SERVER_URL + "/api/problem/" + id + "/zan";
+		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case HttpConnectionUtils.DID_SUCCEED:
 					Toast.makeText(mContext, "‘ﬁ≥…π¶", Toast.LENGTH_SHORT).show();
-					Log.v(TAG, (String)msg.obj);
+					Log.v(TAG, (String) msg.obj);
 					break;
 
 				default:

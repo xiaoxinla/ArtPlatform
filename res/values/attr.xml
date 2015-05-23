@@ -13,4 +13,5 @@
         <attr name="titleSize" format="dimension"></attr>
         <attr name="titleColor" format="color"></attr>
     </declare-styleable>
+    
 </resources>

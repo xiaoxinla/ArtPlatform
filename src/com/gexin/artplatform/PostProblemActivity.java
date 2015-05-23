@@ -3,8 +3,6 @@ package com.gexin.artplatform;
 import java.io.File;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -27,8 +25,9 @@ import android.widget.Toast;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.FileUtil;
 import com.gexin.artplatform.utils.ImageUtil;
-import com.gexin.artplatform.utils.NetUtil;
 import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.ActionSheet;
+import com.gexin.artplatform.view.ActionSheet.MenuItemClickListener;
 import com.gexin.artplatform.view.TitleBar;
 
 public class PostProblemActivity extends Activity {
@@ -49,7 +48,7 @@ public class PostProblemActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post_problem);
-
+		setTheme(R.style.ActionSheetStyleIOS7);
 		initView();
 	}
 
@@ -148,8 +147,7 @@ public class PostProblemActivity extends Activity {
 			Bitmap bitmap;
 			switch (requestCode) {
 			case ALBUM_REQUEST_CODE:
-				imagePath = FileUtil.getRealFilePath(this,
-						data.getData());
+				imagePath = FileUtil.getRealFilePath(this, data.getData());
 				Log.v(TAG, imagePath);
 				bitmap = ImageUtil.getCompressedImage(imagePath, 50);
 				if (bitmap == null) {
@@ -178,77 +176,93 @@ public class PostProblemActivity extends Activity {
 	}
 
 	protected void showPicDialog() {
-		new AlertDialog.Builder(this)
-				.setTitle("选择图片")
-				.setNegativeButton("相册", new DialogInterface.OnClickListener() {
+		ActionSheet menuView = new ActionSheet(this);
+		menuView.setCancelButtonTitle("取消");
+		menuView.addItems("拍照", "从相册中选择");
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// 让对话框消失
-						dialog.dismiss();
-						// ACTION_PICK，从数据集合中选择一个返回，官方文档解释如下
-						// Activity Action:
-						// Pick an item from the data, returning what was
-						// selected.
-						Intent intent = new Intent(Intent.ACTION_PICK, null);
-						// 设置数据来源和类型
-						intent.setDataAndType(
-								MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-								"image/*");
-						startActivityForResult(intent, ALBUM_REQUEST_CODE);
-					}
-				})
-				.setPositiveButton("拍照", new DialogInterface.OnClickListener() {
+		menuView.setItemClickListener(new MenuItemClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int arg1) {
-						dialog.dismiss();
-						/**
-						 * 下面这句还是老样子，调用快速拍照功能，至于为什么叫快速拍照，大家可以参考如下官方
-						 * 文档，you_sdk_path/docs/guide/topics/media/camera.html
-						 */
-						Intent intent = new Intent(
-								MediaStore.ACTION_IMAGE_CAPTURE);
-						// 打开图片所在目录，如果该目录不存在，则创建该目录
-						File dirFile = new File(IMAGEDIR);
-						if (!dirFile.exists()) {
-							dirFile.mkdirs();
-						}
-						int picCount = (Integer) SPUtil.get(
-								PostProblemActivity.this, "picCount", 0);
-						picCount++;
-						// 将图片保存到该目录下
-						intent.putExtra(
-								MediaStore.EXTRA_OUTPUT,
-								Uri.fromFile(new File(IMAGEDIR, "pic"
-										+ picCount + ".jpg")));
-						SPUtil.put(PostProblemActivity.this, "picCount",
-								picCount);
-						startActivityForResult(intent, CAMERA_REQUEST_CODE);
+			@Override
+			public void onItemClick(int itemPosition) {
+				if (itemPosition == 1) {
+					Intent intent = new Intent(Intent.ACTION_PICK, null);
+					// 设置数据来源和类型
+					intent.setDataAndType(
+							MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+							"image/*");
+					startActivityForResult(intent, ALBUM_REQUEST_CODE);
+				}
+				if (itemPosition == 0) {
+					Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					// 打开图片所在目录，如果该目录不存在，则创建该目录
+					File dirFile = new File(IMAGEDIR);
+					if (!dirFile.exists()) {
+						dirFile.mkdirs();
 					}
-				}).show();
+					int picCount = (Integer) SPUtil.get(
+							PostProblemActivity.this, "picCount", 0);
+					picCount++;
+					// 将图片保存到该目录下
+					intent.putExtra(
+							MediaStore.EXTRA_OUTPUT,
+							Uri.fromFile(new File(IMAGEDIR, "pic" + picCount
+									+ ".jpg")));
+					SPUtil.put(PostProblemActivity.this, "picCount", picCount);
+					startActivityForResult(intent, CAMERA_REQUEST_CODE);
+				}
+			}
+
+		});
+		menuView.showMenu();
+		// new AlertDialog.Builder(this)
+		// .setTitle("选择图片")
+		// .setNegativeButton("相册", new DialogInterface.OnClickListener() {
+		//
+		// @Override
+		// public void onClick(DialogInterface dialog, int which) {
+		// // 让对话框消失
+		// dialog.dismiss();
+		// // ACTION_PICK，从数据集合中选择一个返回，官方文档解释如下
+		// // Activity Action:
+		// // Pick an item from the data, returning what was
+		// // selected.
+		// Intent intent = new Intent(Intent.ACTION_PICK, null);
+		// // 设置数据来源和类型
+		// intent.setDataAndType(
+		// MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+		// "image/*");
+		// startActivityForResult(intent, ALBUM_REQUEST_CODE);
+		// }
+		// })
+		// .setPositiveButton("拍照", new DialogInterface.OnClickListener() {
+		//
+		// @Override
+		// public void onClick(DialogInterface dialog, int arg1) {
+		// dialog.dismiss();
+		// /**
+		// * 下面这句还是老样子，调用快速拍照功能，至于为什么叫快速拍照，大家可以参考如下官方
+		// * 文档，you_sdk_path/docs/guide/topics/media/camera.html
+		// */
+		// Intent intent = new Intent(
+		// MediaStore.ACTION_IMAGE_CAPTURE);
+		// // 打开图片所在目录，如果该目录不存在，则创建该目录
+		// File dirFile = new File(IMAGEDIR);
+		// if (!dirFile.exists()) {
+		// dirFile.mkdirs();
+		// }
+		// int picCount = (Integer) SPUtil.get(
+		// PostProblemActivity.this, "picCount", 0);
+		// picCount++;
+		// // 将图片保存到该目录下
+		// intent.putExtra(
+		// MediaStore.EXTRA_OUTPUT,
+		// Uri.fromFile(new File(IMAGEDIR, "pic"
+		// + picCount + ".jpg")));
+		// SPUtil.put(PostProblemActivity.this, "picCount",
+		// picCount);
+		// startActivityForResult(intent, CAMERA_REQUEST_CODE);
+		// }
+		// }).show();
 	}
 
-	// protected void success(JSONObject jObject) {
-	// try {
-	// int state = jObject.getInt("stat");
-	// if (state == 1) {
-	// Toast.makeText(this, "提问成功", Toast.LENGTH_SHORT).show();
-	// setResult(RESULT_OK);
-	// finish();
-	// } else {
-	// Toast.makeText(this, "提问失败", Toast.LENGTH_SHORT).show();
-	// }
-	// } catch (JSONException e) {
-	// e.printStackTrace();
-	// }
-	// }
-
-	// private void hideSoftKeyboard() {
-	// Log.v(TAG, "hideSoftKeyboard");
-	// ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
-	// .hideSoftInputFromWindow(PostProblemActivity.this
-	// .getCurrentFocus().getWindowToken(),
-	// InputMethodManager.HIDE_NOT_ALWAYS);
-	// }
 }
