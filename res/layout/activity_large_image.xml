@@ -13,10 +13,11 @@
         custom:titleSize="13sp"
         custom:titleText="@string/large_image_title" >
     </com.gexin.artplatform.view.TitleBar>
-    <ImageView android:id="@+id/iv_large_image"
+
+    <ImageView
+        android:id="@+id/iv_large_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        />
+        android:scaleType="fitCenter" />
 
 </LinearLayout>

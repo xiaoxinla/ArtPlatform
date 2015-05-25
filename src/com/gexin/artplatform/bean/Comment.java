@@ -8,6 +8,8 @@ public class Comment {
 	private String toUserId;
 	private String fromUser;
 	private long timestamp;
+	private String fromUserAvatarUrl;
+	private String fromUserName;
 
 	public String get_id() {
 		return _id;
@@ -57,11 +59,29 @@ public class Comment {
 		this.toUserId = toUserId;
 	}
 
+	public String getFromUserAvatarUrl() {
+		return fromUserAvatarUrl;
+	}
+
+	public void setFromUserAvatarUrl(String fromUserAvatarUrl) {
+		this.fromUserAvatarUrl = fromUserAvatarUrl;
+	}
+
+	public String getFromUserName() {
+		return fromUserName;
+	}
+
+	public void setFromUserName(String fromUserName) {
+		this.fromUserName = fromUserName;
+	}
+
 	@Override
 	public String toString() {
 		return "Comment [_id=" + _id + ", problemId=" + problemId
 				+ ", content=" + content + ", toUserId=" + toUserId
-				+ ", fromUser=" + fromUser + ", timestamp=" + timestamp + "]";
+				+ ", fromUser=" + fromUser + ", timestamp=" + timestamp
+				+ ", fromUserAvatarUrl=" + fromUserAvatarUrl
+				+ ", fromUserName=" + fromUserName + "]";
 	}
 
 }

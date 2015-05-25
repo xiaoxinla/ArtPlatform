@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -28,6 +30,7 @@ import com.gexin.artplatform.R;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.utils.TimeUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -74,9 +77,9 @@ public class QuestionAdapter extends BaseAdapter {
 
 	@SuppressLint("InflateParams")
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
-		Problem item = mList.get(position);
+		final Problem item = mList.get(position);
 		if (convertView == null) {
 			convertView = LayoutInflater.from(mContext).inflate(
 					R.layout.question_item, null);
@@ -87,6 +90,8 @@ public class QuestionAdapter extends BaseAdapter {
 			// .findViewById(R.id.iv_iscomment_question_item);
 			holder.ivPic = (ImageView) convertView
 					.findViewById(R.id.iv_pic_question_item);
+			holder.ivZan = (ImageView) convertView
+					.findViewById(R.id.iv_zan_question_item);
 			// holder.tvArea = (TextView) convertView
 			// .findViewById(R.id.tv_area_question_item);
 			holder.tvCommentor = (TextView) convertView
@@ -146,12 +151,20 @@ public class QuestionAdapter extends BaseAdapter {
 			holder.tvCommentor.setVisibility(View.VISIBLE);
 			holder.tvCommentor.setText(commentor);
 		}
+
+		if (item.getIsZan() == 1) {
+			holder.ivZan.setImageResource(R.drawable.zan_icon_2);
+		} else {
+			holder.ivZan.setImageResource(R.drawable.zan_icon_1);
+		}
+		final ImageView tmpIvZan = holder.ivZan;
+		final TextView tmpTvZan = holder.tvZan;
 		holder.llZan.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				Log.v(TAG, "ZanClick");
-				postZan(id);
+				postZan(id, item.getIsZan(), position, tmpIvZan, tmpTvZan);
 			}
 		});
 		// holder.llAns.setOnClickListener(new OnClickListener() {
@@ -171,11 +184,12 @@ public class QuestionAdapter extends BaseAdapter {
 			holder.ivPic.setVisibility(View.GONE);
 		}
 		holder.ivPic.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
-				if(imageUrl != null && !imageUrl.isEmpty()){
-					Intent intent = new Intent(mContext,LargeImageActivity.class);
+				if (imageUrl != null && !imageUrl.isEmpty()) {
+					Intent intent = new Intent(mContext,
+							LargeImageActivity.class);
 					intent.putExtra("url", imageUrl);
 					mContext.startActivity(intent);
 				}
@@ -186,15 +200,47 @@ public class QuestionAdapter extends BaseAdapter {
 	}
 
 	@SuppressLint("HandlerLeak")
-	private void postZan(String id) {
+	private void postZan(String id, final int isZan, final int position,
+			final ImageView tmpIvZan, final TextView tmpTvZan) {
 		String zanAPI = Constant.SERVER_URL + "/api/problem/" + id + "/zan";
+		String userId = (String) SPUtil.get(mContext, "userId", "");
+		if (userId.isEmpty()) {
+			Toast.makeText(mContext, "请先登录", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case HttpConnectionUtils.DID_SUCCEED:
-					Toast.makeText(mContext, "赞成功", Toast.LENGTH_SHORT).show();
 					Log.v(TAG, (String) msg.obj);
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							int zanNum = Integer.parseInt(tmpTvZan.getText()
+									.toString());
+							if (isZan == 1) {
+								zanNum--;
+								mList.get(position).setIsZan(0);
+								mList.get(position).setZan(zanNum);
+								Toast.makeText(mContext, "取消赞成功",
+										Toast.LENGTH_SHORT).show();
+								tmpIvZan.setImageResource(R.drawable.zan_icon_1);
+								tmpTvZan.setText(zanNum + "");
+							} else {
+								zanNum++;
+								mList.get(position).setIsZan(1);
+								mList.get(position).setZan(zanNum);
+								Toast.makeText(mContext, "赞成功",
+										Toast.LENGTH_SHORT).show();
+								tmpIvZan.setImageResource(R.drawable.zan_icon_2);
+								tmpTvZan.setText(zanNum + "");
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
 					break;
 
 				default:
@@ -204,14 +250,25 @@ public class QuestionAdapter extends BaseAdapter {
 			}
 		};
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
-		list.add(new BasicNameValuePair("zan", "1"));
+		list.add(new BasicNameValuePair("userId", userId));
+		if (isZan == 1) {
+			list.add(new BasicNameValuePair("zan", "-1"));
+		} else {
+			list.add(new BasicNameValuePair("zan", "1"));
+		}
 		new HttpConnectionUtils(handler).put(zanAPI, list);
+	}
+	
+	public void updateData(List<Problem> list){
+		this.mList = list;
+		notifyDataSetChanged();
 	}
 
 	private final class ViewHolder {
 		ImageView ivHeader;
 		// ImageView ivComment;
 		ImageView ivPic;
+		ImageView ivZan;
 		TextView tvName;
 		TextView tvCommentor;
 		TextView tvTime;

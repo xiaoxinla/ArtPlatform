@@ -7,13 +7,24 @@
     <string name="tab_me">个人</string>
     <string name="tab_gallery">图库</string>
     <string name="tab_find">发现</string>
-    <string name="timefirst">时间↑</string>
-    <string name="hotfirst">热度↑</string>
+    <string name="timefirst">时间</string>
+    <string name="hotfirst">热度</string>
     <string name="post_problem">详细描述问题</string>
     <string name="login">登录</string>
     <string name="post_hint">拍照更容易获得答案哦</string>
     <string name="wordleft_hint">还可以输入140字</string>
     <string name="large_image_title">大图</string>
+    <string name="city_inflate_title">选择地区</string>
+    <string name="room_detail_phone">联系电话：</string>
+    <string name="room_detail_environment">画室环境：</string>
+    <string name="room_detail_grade">学生成绩：</string>
+    <string name="room_detail_fair">收费标准：</string>
+    <string name="dial">拨打</string>
+    <string name="detail">详情</string>
     <string name="title_activity_large_image">LargeImageActivity</string>
+    <string name="title_activity_city_inflate">CityInflateActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_home_item_info">HomeItemInfoActivity</string>
+    <string name="title_activity_room_detail">RoomDetailActivity</string>
 
 </resources>

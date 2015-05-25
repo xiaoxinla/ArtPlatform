@@ -169,6 +169,11 @@ public class QuestionFragment extends Fragment {
 	 */
 	@SuppressLint("HandlerLeak")
 	private void initData() {
+		String userId = (String) SPUtil.get(getActivity(), "userId", "");
+		String api = PROBLEMS_API;
+		if(!userId.isEmpty()){
+			api+="?userId="+userId;
+		}
 		problems = new ArrayList<Problem>();
 		adapter = new QuestionAdapter(getActivity(), problems);
 		mListView.setAdapter(adapter);
@@ -202,7 +207,7 @@ public class QuestionFragment extends Fragment {
 
 		};
 
-		new HttpConnectionUtils(handler).get(PROBLEMS_API);
+		new HttpConnectionUtils(handler).get(api);
 	}
 
 	@Override
@@ -227,8 +232,14 @@ public class QuestionFragment extends Fragment {
 		@Override
 		protected List<Problem> doInBackground(Void... params) {
 			// Simulates a background job.
+			String userId = (String) SPUtil.get(getActivity(), "userId", "");
+			String api = PROBLEMS_API;
+			if(!userId.isEmpty()){
+				api+="?userId="+userId;
+			}
 			String result = "";
-			result = NetUtil.connect(NetUtil.GET, PROBLEMS_API, null);
+			Log.v(TAG, api);
+			result = NetUtil.connect(NetUtil.GET, api, null);
 			// Log.v(TAG, "result:" + result);
 			try {
 				JSONObject jObject = new JSONObject(result == null ? ""
@@ -262,8 +273,17 @@ public class QuestionFragment extends Fragment {
 		protected List<Problem> doInBackground(Void... params) {
 			// Simulates a background job.
 			String result = "";
-			String prm = "?skip=" + problems.size();
-			result = NetUtil.connect(NetUtil.GET, PROBLEMS_API + prm, null);
+//			String prm = "?skip=" + problems.size();
+			if(problems==null||problems.size()==0){
+				return new ArrayList<Problem>();
+			}
+			String userId = (String) SPUtil.get(getActivity(), "userId", "");
+			String api = PROBLEMS_API;
+			if(!userId.isEmpty()){
+				api+="?userId="+userId;
+			}
+			String prm = "?timestamp="+problems.get(problems.size()-1).getTimestamp();
+			result = NetUtil.connect(NetUtil.GET, api + prm, null);
 			// Log.v(TAG, "result:" + result);
 			try {
 				JSONObject jObject = new JSONObject(result == null ? ""

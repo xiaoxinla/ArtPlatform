@@ -3,6 +3,7 @@ package com.gexin.artplatform;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -13,13 +14,15 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gexin.artplatform.fragment.DiscoverFragment;
 import com.gexin.artplatform.fragment.HomeFragment;
 import com.gexin.artplatform.fragment.MineFragment;
 import com.gexin.artplatform.fragment.QuestionFragment;
-import com.gexin.artplatform.view.ChangeColorIconWithText;
 
 public class MainActivity extends FragmentActivity implements
 		OnPageChangeListener, OnClickListener {
@@ -28,13 +31,15 @@ public class MainActivity extends FragmentActivity implements
 	
 	private ViewPager mViewPager;
 	private List<Fragment> mTabs = new ArrayList<Fragment>();
-	private HomeFragment homeFragment;
 	private FragmentPagerAdapter mAdapter;
+	private HomeFragment homeFragment;
 	private QuestionFragment questionFragment;
 	private DiscoverFragment discoverFragment;
 	private MineFragment mineFragment;
 
-	private List<ChangeColorIconWithText> mTabIndicators = new ArrayList<ChangeColorIconWithText>();
+	private List<TextView> tvIndicators = new ArrayList<TextView>();
+	private List<ImageView> ivIndicators = new ArrayList<ImageView>();
+	private List<LinearLayout> llIndicators = new ArrayList<LinearLayout>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,93 +91,125 @@ public class MainActivity extends FragmentActivity implements
 
 	private void initView() {
 		mViewPager = (ViewPager) findViewById(R.id.id_viewpager);
-		mViewPager.setOffscreenPageLimit(4);
+		mViewPager.setOffscreenPageLimit(3);
 
-		ChangeColorIconWithText one = (ChangeColorIconWithText) findViewById(R.id.id_indicator_one);
-		mTabIndicators.add(one);
-		ChangeColorIconWithText two = (ChangeColorIconWithText) findViewById(R.id.id_indicator_two);
-		mTabIndicators.add(two);
-		ChangeColorIconWithText three = (ChangeColorIconWithText) findViewById(R.id.id_indicator_three);
-		mTabIndicators.add(three);
-		ChangeColorIconWithText four = (ChangeColorIconWithText) findViewById(R.id.id_indicator_four);
-		mTabIndicators.add(four);
+		LinearLayout llOne = (LinearLayout) findViewById(R.id.ll_indicator_one_main);
+		LinearLayout llTwo = (LinearLayout) findViewById(R.id.ll_indicator_two_main);
+		LinearLayout llThree = (LinearLayout) findViewById(R.id.ll_indicator_three_main);
+		LinearLayout llFour = (LinearLayout) findViewById(R.id.ll_indicator_four_main);
+		TextView tvOne = (TextView) findViewById(R.id.tv_indicator_icon_one_main);
+		TextView tvTwo = (TextView) findViewById(R.id.tv_indicator_icon_two_main);
+		TextView tvThree = (TextView) findViewById(R.id.tv_indicator_icon_three_main);
+		TextView tvFour = (TextView) findViewById(R.id.tv_indicator_icon_four_main);
+		ImageView ivOne = (ImageView) findViewById(R.id.iv_indicator_icon_one_main);
+		ImageView ivTwo = (ImageView) findViewById(R.id.iv_indicator_icon_two_main);
+		ImageView ivThree = (ImageView) findViewById(R.id.iv_indicator_icon_three_main);
+		ImageView ivFour = (ImageView) findViewById(R.id.iv_indicator_icon_four_main);
+		llIndicators.add(llOne);
+		llIndicators.add(llTwo);
+		llIndicators.add(llThree);
+		llIndicators.add(llFour);
+		tvIndicators.add(tvOne);
+		tvIndicators.add(tvTwo);
+		tvIndicators.add(tvThree);
+		tvIndicators.add(tvFour);
+		ivIndicators.add(ivOne);
+		ivIndicators.add(ivTwo);
+		ivIndicators.add(ivThree);
+		ivIndicators.add(ivFour);
 
-		one.setOnClickListener(this);
-		two.setOnClickListener(this);
-		three.setOnClickListener(this);
-		four.setOnClickListener(this);
-
-		one.setIconAlpha(1.0f);
+		llOne.setOnClickListener(this);
+		llTwo.setOnClickListener(this);
+		llThree.setOnClickListener(this);
+		llFour.setOnClickListener(this);
 
 	}
 
 	@Override
 	public void onClick(View v) {
-		clickTab(v);
-
-	}
-
-	/**
-	 * 点击Tab按钮
-	 * 
-	 * @param v
-	 */
-	private void clickTab(View v) {
-		resetOtherTabs();
-
 		switch (v.getId()) {
-		case R.id.id_indicator_one:
-			mTabIndicators.get(0).setIconAlpha(1.0f);
+		case R.id.ll_indicator_one_main:
 			mViewPager.setCurrentItem(0, false);
+			setIndicators(0);
 			break;
-		case R.id.id_indicator_two:
-			mTabIndicators.get(1).setIconAlpha(1.0f);
+		case R.id.ll_indicator_two_main:
 			mViewPager.setCurrentItem(1, false);
+			setIndicators(1);
 			break;
-		case R.id.id_indicator_three:
-			mTabIndicators.get(2).setIconAlpha(1.0f);
+		case R.id.ll_indicator_three_main:
 			mViewPager.setCurrentItem(2, false);
+			setIndicators(2);
 			break;
-		case R.id.id_indicator_four:
-			mTabIndicators.get(3).setIconAlpha(1.0f);
+		case R.id.ll_indicator_four_main:
 			mViewPager.setCurrentItem(3, false);
+			setIndicators(3);
 			break;
-		}
-	}
-
-	/**
-	 * 重置其他的TabIndicator的颜色
-	 */
-	private void resetOtherTabs() {
-		for (int i = 0; i < mTabIndicators.size(); i++) {
-			mTabIndicators.get(i).setIconAlpha(0);
 		}
 	}
 
 	@Override
-	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
-		// Log.e("TAG", "position = " + position + " ,positionOffset =  "
-		// + positionOffset);
-		if (positionOffset > 0) {
-			ChangeColorIconWithText left = mTabIndicators.get(position);
-			ChangeColorIconWithText right = mTabIndicators.get(position + 1);
-			left.setIconAlpha(1 - positionOffset);
-			right.setIconAlpha(positionOffset);
-		}
-
+	public void onPageScrolled(int arg0, float arg1, int arg2) {
+		// TODO Auto-generated method stub
+		
 	}
-
+	
 	@Override
 	public void onPageSelected(int position) {
-		// TODO Auto-generated method stub
-
+		setIndicators(position);
 	}
 
 	@Override
 	public void onPageScrollStateChanged(int state) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private void setIndicators(int pos){
+		switch (pos) {
+		case 0:
+			ivIndicators.get(0).setImageResource(R.drawable.home_icon_2);
+			tvIndicators.get(0).setTextColor(Color.parseColor("#cdfe6060"));
+			ivIndicators.get(1).setImageResource(R.drawable.question_icon_1);
+			tvIndicators.get(1).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(2).setImageResource(R.drawable.discover_icon_1);
+			tvIndicators.get(2).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(3).setImageResource(R.drawable.me_icon_1);
+			tvIndicators.get(3).setTextColor(Color.parseColor("#cd504f4f"));
+			break;
+		case 1:
+			ivIndicators.get(0).setImageResource(R.drawable.home_icon_1);
+			tvIndicators.get(0).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(1).setImageResource(R.drawable.question_icon_2);
+			tvIndicators.get(1).setTextColor(Color.parseColor("#cdfe6060"));
+			ivIndicators.get(2).setImageResource(R.drawable.discover_icon_1);
+			tvIndicators.get(2).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(3).setImageResource(R.drawable.me_icon_1);
+			tvIndicators.get(3).setTextColor(Color.parseColor("#cd504f4f"));
+			break;
+		case 2:
+			ivIndicators.get(0).setImageResource(R.drawable.home_icon_1);
+			tvIndicators.get(0).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(1).setImageResource(R.drawable.question_icon_1);
+			tvIndicators.get(1).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(2).setImageResource(R.drawable.discover_icon_2);
+			tvIndicators.get(2).setTextColor(Color.parseColor("#cdfe6060"));
+			ivIndicators.get(3).setImageResource(R.drawable.me_icon_1);
+			tvIndicators.get(3).setTextColor(Color.parseColor("#cd504f4f"));
+			break;
+		case 3:
+			ivIndicators.get(0).setImageResource(R.drawable.home_icon_1);
+			tvIndicators.get(0).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(1).setImageResource(R.drawable.question_icon_1);
+			tvIndicators.get(1).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(2).setImageResource(R.drawable.discover_icon_1);
+			tvIndicators.get(2).setTextColor(Color.parseColor("#cd504f4f"));
+			ivIndicators.get(3).setImageResource(R.drawable.me_icon_2);
+			tvIndicators.get(3).setTextColor(Color.parseColor("#cdfe6060"));
+			break;
+
+		default:
+			break;
+		}
 	}
 	
 	private long exitTime = 0;
@@ -195,5 +232,5 @@ public class MainActivity extends FragmentActivity implements
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 }

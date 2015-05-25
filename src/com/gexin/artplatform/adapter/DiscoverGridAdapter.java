@@ -6,6 +6,7 @@ import java.util.Map;
 import com.gexin.artplatform.R;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,7 @@ public class DiscoverGridAdapter extends BaseAdapter {
 		return arg0;
 	}
 
-	@Override
+	@SuppressLint("InflateParams") @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
 		Map<String, Object> map = mList.get(position);

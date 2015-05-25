@@ -8,23 +8,29 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gexin.artplatform.bean.Answer;
+import com.gexin.artplatform.bean.Comment;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
@@ -39,9 +45,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 public class QuestionInfoActivity extends Activity {
 
 	private static final String TAG = "QuestionInfoActivity";
+	private String userId = "";
 
 	private ImageView ivHeader;
 	private ImageView ivPic;
+	private ImageView ivZan;
 	private TextView tvName;
 	private TextView tvTime;
 	private TextView tvCommentor;
@@ -52,7 +60,11 @@ public class QuestionInfoActivity extends Activity {
 	private TitleBar titleBar;
 	private LinearLayout llBack;
 	private EditText etComment;
+	private LinearLayout llComment;
+	private LinearLayout llAnswer;
+	private LinearLayout llZan;
 	private Button btnSubmit;
+	private ImageButton ibtnFocus;
 
 	private Problem problem;
 	private Gson gson = new Gson();
@@ -72,13 +84,19 @@ public class QuestionInfoActivity extends Activity {
 			}
 		};
 		String problemId = getIntent().getStringExtra("problemId");
-		new HttpConnectionUtils(handler).get(Constant.SERVER_URL
-				+ Constant.PROBLEM_API + "/" + problemId);
+		String userId = (String) SPUtil.get(this, "userId", "");
+		String api = Constant.SERVER_URL + Constant.PROBLEM_API + "/"
+				+ problemId;
+		if (!userId.isEmpty()) {
+			api+="?userId="+userId;
+		}
+		new HttpConnectionUtils(handler).get(api);
 	}
 
 	private void initView() {
 		ivHeader = (ImageView) findViewById(R.id.iv_header_question_info);
 		ivPic = (ImageView) findViewById(R.id.iv_pic_question_info);
+		ivZan = (ImageView) findViewById(R.id.iv_zan_question_info);
 		tvContent = (TextView) findViewById(R.id.tv_content_question_info);
 		tvCommentor = (TextView) findViewById(R.id.tv_commentor_question_info);
 		tvAnsNum = (TextView) findViewById(R.id.tv_ans_question_info);
@@ -89,6 +107,10 @@ public class QuestionInfoActivity extends Activity {
 		titleBar = (TitleBar) findViewById(R.id.tb_question_info);
 		etComment = (EditText) findViewById(R.id.et_comment_question_info);
 		btnSubmit = (Button) findViewById(R.id.btn_comment_question_info);
+		ibtnFocus = (ImageButton) findViewById(R.id.ibtn_interest_question_info);
+		llComment = (LinearLayout) findViewById(R.id.ll_area_comment_question_info);
+		llAnswer = (LinearLayout) findViewById(R.id.ll_area_answer_question_info);
+		llZan = (LinearLayout) findViewById(R.id.ll_zan_question_info);
 		initTitleBar();
 		btnSubmit.setOnClickListener(new OnClickListener() {
 
@@ -102,16 +124,60 @@ public class QuestionInfoActivity extends Activity {
 			}
 		});
 
+		ibtnFocus.setOnClickListener(new OnClickListener() {
+
+			@SuppressLint("HandlerLeak")
+			@Override
+			public void onClick(View arg0) {
+				String followApi = Constant.SERVER_URL + "/api/user/" + userId
+						+ "/follow";
+				Handler handler = new Handler() {
+					@Override
+					public void handleMessage(Message msg) {
+						switch (msg.what) {
+						case HttpConnectionUtils.DID_SUCCEED:
+							try {
+								JSONObject jsonObject = new JSONObject(
+										(String) msg.obj);
+								if (jsonObject.getInt("stat") == 1) {
+									Toast.makeText(QuestionInfoActivity.this,
+											"¹Ø×¢³É¹¦", Toast.LENGTH_SHORT).show();
+								} else {
+									Toast.makeText(QuestionInfoActivity.this,
+											"¹Ø×¢Ê§°Ü", Toast.LENGTH_SHORT).show();
+								}
+							} catch (JSONException e) {
+								e.printStackTrace();
+								Toast.makeText(QuestionInfoActivity.this,
+										"¹Ø×¢Ê§°Ü", Toast.LENGTH_SHORT).show();
+							}
+							break;
+
+						default:
+							break;
+						}
+						super.handleMessage(msg);
+					}
+				};
+				List<NameValuePair> list = new ArrayList<NameValuePair>();
+				list.add(new BasicNameValuePair("userId", userId));
+				list.add(new BasicNameValuePair("follow", 1 + ""));
+				new HttpConnectionUtils(handler).post(followApi, list);
+			}
+		});
 	}
 
 	protected void postComment(String content, String replyTo) {
 		String userId = (String) SPUtil.get(this, "userId", "");
+		String status = (String) SPUtil.get(this, "LOGIN", "NONE");
 		if (userId.isEmpty()) {
 			Toast.makeText(this, "ÇëÏÈµÇÂ¼ÔÙÆÀÂÛ", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		final String commentAPI = Constant.SERVER_URL + "/api/user/" + userId
 				+ "/comment";
+		final String answerAPI = Constant.SERVER_URL + "/api/user/" + userId
+				+ "/answer";
 		Handler handler = new HttpHandler(this) {
 
 			@Override
@@ -127,7 +193,11 @@ public class QuestionInfoActivity extends Activity {
 		}
 		list.add(new BasicNameValuePair("content", content));
 		list.add(new BasicNameValuePair("problemId", problem.get_id()));
-		new HttpConnectionUtils(handler).post(commentAPI, list);
+		if (status.equals("STUDENT")) {
+			new HttpConnectionUtils(handler).post(commentAPI, list);
+		} else {
+			new HttpConnectionUtils(handler).post(answerAPI, list);
+		}
 	}
 
 	private void commentSucceed(JSONObject jObject) {
@@ -181,6 +251,9 @@ public class QuestionInfoActivity extends Activity {
 				String avatarUrl = problem.getAvatarUrl();
 				String time = TimeUtil.getStandardDate(problem.getTimestamp());
 				String tag = "";
+				userId = problem.getUserId();
+				List<Comment> commentList = problem.getCommentList();
+				List<Answer> answerList = problem.getAnswerList();
 				if (problem.getTag() != null && problem.getTag().size() != 0) {
 					String tmpStr = problem.getTag().toString();
 					try {
@@ -201,6 +274,11 @@ public class QuestionInfoActivity extends Activity {
 				tvAnsNum.setText(ansNum + "");
 				tvZan.setText(zan + "");
 				tvCommentor.setText(commentor);
+				if (problem.getIsZan() == 1) {
+					ivZan.setImageResource(R.drawable.zan_icon_2);
+				} else {
+					ivZan.setImageResource(R.drawable.zan_icon_1);
+				}
 				DisplayImageOptions headerOptions = new DisplayImageOptions.Builder()
 						.showImageOnLoading(R.drawable.ic_contact_picture)
 						.showImageForEmptyUri(R.drawable.ic_contact_picture)
@@ -223,6 +301,14 @@ public class QuestionInfoActivity extends Activity {
 				} else {
 					ivPic.setVisibility(View.GONE);
 				}
+				llZan.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						postZan();
+					}
+				});
+
 				ivPic.setOnClickListener(new OnClickListener() {
 
 					@Override
@@ -236,10 +322,119 @@ public class QuestionInfoActivity extends Activity {
 						}
 					}
 				});
+
+				if (commentList != null && !commentList.isEmpty()) {
+					setComment(commentList);
+				}
+				if (answerList != null && !answerList.isEmpty()) {
+					setAnswer(answerList);
+				}
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 
+	@SuppressLint("HandlerLeak")
+	private void postZan() {
+		String zanAPI = Constant.SERVER_URL + "/api/problem/"
+				+ problem.get_id() + "/zan";
+		String userId = (String) SPUtil.get(this, "userId", "");
+		if (userId.isEmpty()) {
+			Toast.makeText(this, "ÇëÏÈµÇÂ¼", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							if (problem.getIsZan() == 1) {
+								problem.setIsZan(0);
+								ivZan.setImageResource(R.drawable.zan_icon_1);
+								problem.setZan(problem.getZan()-1);
+								tvZan.setText(problem.getZan()+"");
+							} else {
+								problem.setIsZan(1);
+								ivZan.setImageResource(R.drawable.zan_icon_2);
+								problem.setZan(problem.getZan()-1);
+								tvZan.setText(problem.getZan());
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("userId", userId));
+		if (problem.getIsZan() == 1) {
+			list.add(new BasicNameValuePair("zan", "-1"));
+		} else {
+			list.add(new BasicNameValuePair("zan", "1"));
+		}
+		new HttpConnectionUtils(handler).put(zanAPI, list);
+	}
+
+	@SuppressLint("InflateParams")
+	private void setAnswer(List<Answer> answerList) {
+		DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_contact_picture)
+				.showImageForEmptyUri(R.drawable.ic_contact_picture)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		for (Answer answer : answerList) {
+			View view = LayoutInflater.from(this).inflate(
+					R.layout.problem_answer_item, null);
+			ImageView tmpIvHeader = (ImageView) view
+					.findViewById(R.id.iv_header_answer_item);
+			TextView tmpTvName = (TextView) view
+					.findViewById(R.id.tv_name_answer_item);
+			TextView tmpTvContent = (TextView) view
+					.findViewById(R.id.tv_content_answer_item);
+			tmpTvContent.setText(answer.getContent().toString());
+			ImageLoader.getInstance().displayImage(answer.getAvatarUrl(),
+					tmpIvHeader, imageOptions);
+			llAnswer.addView(view);
+		}
+	}
+
+	@SuppressLint("InflateParams")
+	private void setComment(List<Comment> list) {
+		DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_contact_picture)
+				.showImageForEmptyUri(R.drawable.ic_contact_picture)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		for (Comment comment : list) {
+			View view = LayoutInflater.from(this).inflate(
+					R.layout.comment_item, null);
+			ImageView tmpIvHeader = (ImageView) view
+					.findViewById(R.id.iv_header_comment_item);
+			TextView tmpTvName = (TextView) view
+					.findViewById(R.id.tv_name_comment_item);
+			TextView tmpTvTime = (TextView) view
+					.findViewById(R.id.tv_time_comment_item);
+			TextView tmpTvContent = (TextView) view
+					.findViewById(R.id.tv_content_comment_item);
+			tmpTvContent.setText(comment.getContent());
+			tmpTvName.setText(comment.getFromUserName());
+			tmpTvTime.setText(TimeUtil.getStandardDate(comment.getTimestamp()));
+			ImageLoader.getInstance().displayImage(
+					comment.getFromUserAvatarUrl(), tmpIvHeader, imageOptions);
+			llComment.addView(view);
+		}
+	}
 }

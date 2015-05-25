@@ -13,31 +13,12 @@ public class Problem {
 	private long timestamp;
 	private int viewNum;
 	private int zan;
+	private int isZan;
 	private String userId;
 	private List<Comment> commentList;
+	private List<Answer> answerList;
 	private String askTo;
 	private List<String> tag;
-
-	public Problem() {
-	}
-
-	public Problem(String _id, int answerNum, String avatarUrl, String content,
-			String image, String name, long timestamp, int viewNum, int zan,
-			String userId, List<Comment> commentList, String askTo) {
-		super();
-		this._id = _id;
-		this.answerNum = answerNum;
-		this.avatarUrl = avatarUrl;
-		this.content = content;
-		this.image = image;
-		this.name = name;
-		this.timestamp = timestamp;
-		this.viewNum = viewNum;
-		this.zan = zan;
-		this.userId = userId;
-		this.commentList = commentList;
-		this.askTo = askTo;
-	}
 
 	public int getAnswerNum() {
 		return answerNum;
@@ -143,14 +124,31 @@ public class Problem {
 		this.tag = tag;
 	}
 
+	public int getIsZan() {
+		return isZan;
+	}
+
+	public void setIsZan(int isZan) {
+		this.isZan = isZan;
+	}
+
+	public List<Answer> getAnswerList() {
+		return answerList;
+	}
+
+	public void setAnswerList(List<Answer> answerList) {
+		this.answerList = answerList;
+	}
+
 	@Override
 	public String toString() {
 		return "Problem [_id=" + _id + ", answerNum=" + answerNum
 				+ ", avatarUrl=" + avatarUrl + ", content=" + content
 				+ ", image=" + image + ", name=" + name + ", timestamp="
 				+ timestamp + ", viewNum=" + viewNum + ", zan=" + zan
-				+ ", userId=" + userId + ", commentList=" + commentList
-				+ ", askTo=" + askTo + ", tag=" + tag + "]";
+				+ ", isZan=" + isZan + ", userId=" + userId + ", commentList="
+				+ commentList + ", answerList=" + answerList + ", askTo="
+				+ askTo + ", tag=" + tag + "]";
 	}
 
 }

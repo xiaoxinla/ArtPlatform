@@ -15,52 +15,79 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/tab_bg"
+        android:background="#d0f6f6f6"
         android:orientation="horizontal" >
 
-        <com.gexin.artplatform.view.ChangeColorIconWithText
-            android:id="@+id/id_indicator_one"
+        <LinearLayout android:id="@+id/ll_indicator_one_main"
             android:layout_width="0dp"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:padding="5dp"
-            custom:icon="@drawable/ic_menu_home"
-            custom:text="@string/tab_homepage"
-            custom:text_size="12sp"
-            custom:color="#fffe6060" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView android:id="@+id/iv_indicator_icon_one_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/home_icon_2"/>
+            <TextView android:id="@+id/tv_indicator_icon_one_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#cdfe6060"
+                android:textSize="15sp"
+                android:text="@string/tab_homepage"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/ll_indicator_two_main"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView android:id="@+id/iv_indicator_icon_two_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/question_icon_1"/>
+            <TextView android:id="@+id/tv_indicator_icon_two_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#cd504f4f"
+                android:textSize="15sp"
+                android:text="@string/tab_question_answer"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/ll_indicator_three_main"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView android:id="@+id/iv_indicator_icon_three_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/discover_icon_1"/>
+            <TextView android:id="@+id/tv_indicator_icon_three_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#cd504f4f"
+                android:textSize="15sp"
+                android:text="@string/tab_homepage"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/ll_indicator_four_main"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView android:id="@+id/iv_indicator_icon_four_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/me_icon_1"/>
+            <TextView android:id="@+id/tv_indicator_icon_four_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#cd504f4f"
+                android:textSize="15sp"
+                android:text="@string/tab_me"/>
+        </LinearLayout>
 
-        <com.gexin.artplatform.view.ChangeColorIconWithText
-            android:id="@+id/id_indicator_two"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:padding="5dp"
-            custom:icon="@drawable/question_icon_1"
-            custom:text="@string/tab_question_answer"
-            custom:text_size="12sp"
-            custom:color="#fffe6060" />
-
-        <com.gexin.artplatform.view.ChangeColorIconWithText
-            android:id="@+id/id_indicator_three"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:padding="5dp"
-            custom:icon="@drawable/ic_menu_star"
-            custom:text="@string/tab_find"
-            custom:text_size="12sp"
-            custom:color="#fffe6060" />
-
-        <com.gexin.artplatform.view.ChangeColorIconWithText
-            android:id="@+id/id_indicator_four"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:padding="5dp"
-            custom:icon="@drawable/ic_menu_star"
-            custom:text="@string/tab_me"
-            custom:text_size="12sp"
-            custom:color="#fffe6060" />
+        
     </LinearLayout>
 
 </LinearLayout>
