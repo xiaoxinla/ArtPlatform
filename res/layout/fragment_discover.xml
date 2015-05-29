@@ -12,7 +12,7 @@
         android:layout_height="50dp"
         android:background="#445bc8"
         custom:titleColor="#ffffff"
-        custom:titleSize="8sp"
+        custom:titleSize="7sp"
         custom:titleText="@string/tab_find" >
     </com.gexin.artplatform.view.TitleBar>
     <LinearLayout android:id="@+id/ll_find_discover_fragment"
