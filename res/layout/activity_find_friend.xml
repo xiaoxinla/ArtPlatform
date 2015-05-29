@@ -11,7 +11,7 @@
         android:layout_height="50dp"
         android:background="#445bc8"
         custom:titleColor="#ffffff"
-        custom:titleSize="8sp"
+        custom:titleSize="7sp"
         custom:titleText="发现好友" >
     </com.gexin.artplatform.view.TitleBar>
     
