@@ -24,6 +24,8 @@ public class User {
 	private int isTeacher;
 	private long phone;
 	private Place place;
+	private Weibo weibo;
+	private int grade;
 
 	public String getUserId() {
 		return userId;
@@ -169,6 +171,22 @@ public class User {
 		this.isTeacher = isTeacher;
 	}
 
+	public Weibo getWeibo() {
+		return weibo;
+	}
+
+	public void setWeibo(Weibo weibo) {
+		this.weibo = weibo;
+	}
+
+	public int getGrade() {
+		return grade;
+	}
+
+	public void setGrade(int grade) {
+		this.grade = grade;
+	}
+
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", name=" + name + ", avatarUrl="
@@ -179,7 +197,7 @@ public class User {
 				+ workNum + ", askNum=" + askNum + ", commentNum=" + commentNum
 				+ ", askMeNum=" + askMeNum + ", answerNum=" + answerNum
 				+ ", isTeacher=" + isTeacher + ", phone=" + phone + ", place="
-				+ place + "]";
+				+ place + ", weibo=" + weibo + ", grade=" + grade + "]";
 	}
 
 	public void putToSP(Context context) {
@@ -187,7 +205,6 @@ public class User {
 		SPUtil.put(context, "name", this.name);
 		SPUtil.put(context, "avatarUrl", this.avatarUrl);
 		SPUtil.put(context, "school", this.school);
-		SPUtil.put(context, "email", this.email);
 		SPUtil.put(context, "collectionNum", this.collectionNum);
 		SPUtil.put(context, "fanNum", this.fanNum);
 		SPUtil.put(context, "followNum", this.followNum);
@@ -199,11 +216,27 @@ public class User {
 		SPUtil.put(context, "askMeNum", this.askMeNum);
 		SPUtil.put(context, "answerNum", this.answerNum);
 		SPUtil.put(context, "phone", this.phone);
-		SPUtil.put(context, "province", this.place.province);
-		SPUtil.put(context, "city", this.place.city);
-		if(isTeacher==0){
+		SPUtil.put(context, "grade", this.grade);
+		if (this.place.province != null) {
+			SPUtil.put(context, "province", this.place.province);
+		}
+		if (this.place.city != null) {
+			SPUtil.put(context, "city", this.place.city);
+		}
+		if (this.email != null) {
+			SPUtil.put(context, "email", this.email);
+		}
+		if (this.weibo != null) {
+			if (this.weibo.pToken != null) {
+				SPUtil.put(context, "pToken", this.weibo.pToken);
+			}
+			if (this.weibo.pId != null) {
+				SPUtil.put(context, "pID", this.weibo.pId);
+			}
+		}
+		if (isTeacher == 0) {
 			SPUtil.put(context, "LOGIN", "STUDENT");
-		}else {
+		} else {
 			SPUtil.put(context, "LOGIN", "TEACHER");
 		}
 	}
@@ -217,5 +250,15 @@ public class User {
 			return "Place [province=" + province + ", city=" + city + "]";
 		}
 
+	}
+
+	private static class Weibo {
+		public String pToken;
+		public String pId;
+
+		@Override
+		public String toString() {
+			return "Place [pToken=" + pToken + ", pId=" + pId + "]";
+		}
 	}
 }

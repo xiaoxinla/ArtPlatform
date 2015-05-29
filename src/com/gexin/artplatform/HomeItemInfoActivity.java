@@ -1,21 +1,46 @@
 package com.gexin.artplatform;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.gexin.artplatform.bean.Article;
+import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.HttpHandler;
+import com.gexin.artplatform.utils.TimeUtil;
+import com.gexin.artplatform.view.FlowLayout;
 import com.gexin.artplatform.view.TitleBar;
+import com.google.gson.Gson;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class HomeItemInfoActivity extends Activity {
 
+	private Gson gson = new Gson();
+	private Article article = null;
+	private DisplayImageOptions avatarOptions;
+	private DisplayImageOptions picOptions;
+
 	private TextView tvName;
+	private TextView tvContent;
+	private TextView tvTime;
+	private TextView tvClickNum;
+	private ImageView ivHeader;
+	private FlowLayout flPics;
 	private LinearLayout llBack;
 	private TitleBar titleBar;
 
@@ -24,9 +49,42 @@ public class HomeItemInfoActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home_item_info);
 
-		titleBar=(TitleBar) findViewById(R.id.tb_home_item_info);
-		initTitleBar();
+		initView();
+		initData();
+	}
+
+	private void initData() {
+		avatarOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_contact_picture)
+				.showImageForEmptyUri(R.drawable.ic_contact_picture)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		picOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_stub)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		String articleId = getIntent().getStringExtra("id");
+		final String api = Constant.SERVER_URL + "/api/article/" + articleId;
+		Handler handler = new HttpHandler(this) {
+			@Override
+			protected void succeed(JSONObject jObject) {
+				dealResponse(jObject);
+			}
+		};
+		new HttpConnectionUtils(handler).get(api);
+	}
+
+	private void initView() {
+		titleBar = (TitleBar) findViewById(R.id.tb_home_item_info);
 		tvName = (TextView) findViewById(R.id.tv_name_home_item_info);
+		tvContent = (TextView) findViewById(R.id.tv_content_home_item_info);
+		tvTime = (TextView) findViewById(R.id.tv_time_home_item_info);
+		tvClickNum = (TextView) findViewById(R.id.tv_clicknum_home_item_info);
+		ivHeader = (ImageView) findViewById(R.id.iv_header_home_item_info);
+		flPics = (FlowLayout) findViewById(R.id.fl_pics_home_item_info);
+		initTitleBar();
 		tvName.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -56,5 +114,34 @@ public class HomeItemInfoActivity extends Activity {
 				finish();
 			}
 		});
+	}
+
+	protected void dealResponse(JSONObject jObject) {
+		try {
+			int state = jObject.getInt("stat");
+			if (state == 1) {
+				article = gson.fromJson(jObject.getJSONObject("article")
+						.toString(), Article.class);
+				tvName.setText(article.getStudioName());
+				tvContent.setText(article.getContent());
+				tvTime.setText(TimeUtil.getDateString(article.getCreateTime()));
+				tvClickNum.setText("µã»÷" + article.getViewNum());
+				ImageLoader.getInstance().displayImage(
+						article.getStudioAvatarUrl(), ivHeader, avatarOptions);
+				for(String url:article.getImages()){
+					ImageView imageView = new ImageView(this);
+					imageView.setMaxHeight(120);
+					imageView.setMaxWidth(150);
+					imageView.setAdjustViewBounds(true);
+					MarginLayoutParams lp = new MarginLayoutParams(
+							LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+					lp.setMargins(5, 5, 5, 5);
+					ImageLoader.getInstance().displayImage(url, imageView, picOptions);
+					flPics.addView(imageView,lp);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }

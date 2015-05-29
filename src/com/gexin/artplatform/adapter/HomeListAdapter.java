@@ -1,30 +1,51 @@
 package com.gexin.artplatform.adapter;
 
 import java.util.List;
-import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.RoomDetailActivity;
+import com.gexin.artplatform.bean.Article;
+import com.gexin.artplatform.utils.TimeUtil;
+import com.gexin.artplatform.view.FlowLayout;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class HomeListAdapter extends BaseAdapter {
 
-	private List<Map<String, Object>> mList;
+	private List<Article> mList;
 	private Context mContext;
+	private DisplayImageOptions avatarOptions;
+	private DisplayImageOptions picOptions;
 
-	public HomeListAdapter(List<Map<String, Object>> mList, Context mContext) {
+	public HomeListAdapter(List<Article> mList, Context mContext) {
 		super();
 		this.mList = mList;
 		this.mContext = mContext;
+		avatarOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_menu_home)
+				.showImageForEmptyUri(R.drawable.ic_menu_home)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		picOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_stub)
+				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
 	}
 
 	@Override
@@ -42,10 +63,11 @@ public class HomeListAdapter extends BaseAdapter {
 		return arg0;
 	}
 
-	@SuppressLint("InflateParams") @Override
+	@SuppressLint("InflateParams")
+	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
-		Map<String, Object> map = mList.get(position);
+		final Article article = mList.get(position);
 		if (convertView == null) {
 			holder = new ViewHolder();
 			convertView = LayoutInflater.from(mContext).inflate(
@@ -56,21 +78,47 @@ public class HomeListAdapter extends BaseAdapter {
 					.findViewById(R.id.tv_content_home_item);
 			holder.tvName = (TextView) convertView
 					.findViewById(R.id.tv_name_home_item);
+			holder.tvTime = (TextView) convertView
+					.findViewById(R.id.tv_time_home_item);
+			holder.tvTitle = (TextView) convertView
+					.findViewById(R.id.tv_title_home_item);
+			holder.flPics = (FlowLayout) convertView
+					.findViewById(R.id.fl_pics_home_item);
+			holder.ivHeader = (ImageView) convertView
+					.findViewById(R.id.iv_header_home_item);
 			convertView.setTag(holder);
-		}else {
+		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		holder.tvClickNum.setText("µã»÷"+map.get("clickNum"));
-		holder.tvContent.setText((String)map.get("content"));
-		holder.tvName.setText((String)map.get("name"));
+		holder.tvClickNum.setText("µã»÷" + article.getViewNum());
+		holder.tvContent.setText((article.getContent()));
+		holder.tvName.setText(article.getStudioName());
+		holder.tvTime.setText(TimeUtil.getDateString(article.getCreateTime()));
+		holder.tvTitle.setText(article.getTitle());
 		holder.tvName.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
-				mContext.startActivity(new Intent(mContext,RoomDetailActivity.class));
+				Intent intent = new Intent(mContext, RoomDetailActivity.class);
+				intent.putExtra("studioId", article.getStudioId());
+				mContext.startActivity(intent);
 			}
 		});
-		
+		ImageLoader.getInstance().displayImage(article.getStudioAvatarUrl(),
+				holder.ivHeader, avatarOptions);
+		holder.flPics.removeAllViews();
+		for (String url : article.getImages()) {
+			ImageView imageView = new ImageView(mContext);
+			imageView.setMaxHeight(120);
+			imageView.setMaxWidth(150);
+			imageView.setAdjustViewBounds(true);
+			MarginLayoutParams lp = new MarginLayoutParams(
+					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			lp.setMargins(5, 5, 5, 5);
+			ImageLoader.getInstance().displayImage(url, imageView, picOptions);
+			holder.flPics.addView(imageView, lp);
+		}
+
 		return convertView;
 	}
 
@@ -78,6 +126,10 @@ public class HomeListAdapter extends BaseAdapter {
 		TextView tvName;
 		TextView tvContent;
 		TextView tvClickNum;
+		TextView tvTime;
+		TextView tvTitle;
+		FlowLayout flPics;
+		ImageView ivHeader;
 	}
 
 }

@@ -21,10 +21,19 @@
     <string name="room_detail_fair">收费标准：</string>
     <string name="dial">拨打</string>
     <string name="detail">详情</string>
+    <string name="userinfo">个人信息</string>
+    <string name="header">头像</string>
+    <string name="find_friend">发现并添加好友</string>
     <string name="title_activity_large_image">LargeImageActivity</string>
     <string name="title_activity_city_inflate">CityInflateActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_home_item_info">HomeItemInfoActivity</string>
     <string name="title_activity_room_detail">RoomDetailActivity</string>
+    <string name="title_activity_sub_class">SubClassActivity</string>
+    <string name="title_activity_user_info">UserInfoActivity</string>
+    <string name="title_activity_find_friend">FindFriendActivity</string>
+    <string name="title_activity_modify_user_info">ModifyUserInfoActivity</string>
+    <string name="title_activity_teacher_detail">TeacherDetailActivity</string>
+    <string name="title_activity_video_detail">VideoDetailActivity</string>
 
 </resources>

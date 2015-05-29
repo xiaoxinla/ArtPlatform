@@ -3,14 +3,19 @@ package com.gexin.artplatform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.content.ClipboardManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
@@ -32,17 +37,25 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gexin.artplatform.bean.Studio;
+import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.fragment.RoomAnswerFragment;
 import com.gexin.artplatform.fragment.RoomGalleryFragment;
 import com.gexin.artplatform.fragment.RoomHireFragment;
 import com.gexin.artplatform.fragment.RoomTeacherFragment;
 import com.gexin.artplatform.fragment.RoomVideoFragment;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.ActionSheet;
 import com.gexin.artplatform.view.ActionSheet.MenuItemClickListener;
 import com.gexin.artplatform.view.TitleBar;
+import com.google.gson.Gson;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class RoomDetailActivity extends FragmentActivity implements OnClickListener {
+public class RoomDetailActivity extends FragmentActivity implements
+		OnClickListener {
 
 	private static final String TAG = "RoomDetailActivity";
 	private int selectPos = 0; // 从做到右的五个选项卡
@@ -54,6 +67,10 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 	private RoomHireFragment roomHireFragment;
 	private RoomVideoFragment roomVideoFragment;
 	private List<TextView> tvList;
+	private Gson gson = new Gson();
+	private Studio studio;
+	private String studioId;
+	private DisplayImageOptions logoOptions;
 
 	private TextView tvAnswer;
 	private TextView tvGallery;
@@ -67,12 +84,20 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 	private LinearLayout llBack;
 	private LinearLayout llAsk;
 	private ViewPager mViewPager;
+	private TextView tvDescribe;
+	private TextView tvAnswerNum;
+	private TextView tvFocusNum;
+	private TextView tvFanNum;
+	private ImageView ivHeader;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_room_detail);
 		setTheme(R.style.ActionSheetStyleIOS7);
+
+		studioId = getIntent().getStringExtra("studioId");
+
 		initView();
 		initData();
 	}
@@ -83,19 +108,19 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 		roomTeacherFragment = new RoomTeacherFragment();
 		roomHireFragment = new RoomHireFragment();
 		roomVideoFragment = new RoomVideoFragment();
-		
+
 		mTabs.add(roomAnswerFragment);
 		mTabs.add(roomGalleryFragment);
 		mTabs.add(roomTeacherFragment);
 		mTabs.add(roomHireFragment);
 		mTabs.add(roomVideoFragment);
 		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
-			
+
 			@Override
 			public int getCount() {
 				return mTabs.size();
 			}
-			
+
 			@Override
 			public Fragment getItem(int arg0) {
 				return mTabs.get(arg0);
@@ -103,30 +128,70 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 		};
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-			
+
 			@Override
 			public void onPageSelected(int arg0) {
-				Log.v(TAG,"onPageSelected:"+arg0);
-				for(int i=0;i<tvList.size();i++){
-					if(i==arg0){
-						tvList.get(i).setTextColor(Color.parseColor("#80fe6060"));
-					}else {
+				Log.v(TAG, "onPageSelected:" + arg0);
+				for (int i = 0; i < tvList.size(); i++) {
+					if (i == arg0) {
+						tvList.get(i).setTextColor(
+								Color.parseColor("#80fe6060"));
+					} else {
 						tvList.get(i).setTextColor(Color.parseColor("#959595"));
 					}
 				}
-				
+
 			}
-			
+
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
-				
+
 			}
-			
+
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 
 			}
 		});
+
+		getStudioInfo();
+	}
+
+	private void getStudioInfo() {
+		String url = Constant.SERVER_URL + "/api/studio/" + studioId;
+		Handler handler = new HttpHandler(this) {
+			@Override
+			protected void succeed(JSONObject jObject) {
+				try {
+					int state = jObject.getInt("stat");
+					if (state == 1) {
+						studio = gson.fromJson(jObject.getJSONObject("studio")
+								.toString(), Studio.class);
+						setDataToView();
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		new HttpConnectionUtils(handler).get(url);
+	}
+
+	protected void setDataToView() {
+		tvName.setText(studio.getName());
+		tvPhone.setText(studio.getPhone());
+		tvDescribe.setText(studio.getDescription());
+		tvAnswerNum.setText("回答 "+studio.getAnswerNum());
+		tvFocusNum.setText("关注 "+studio.getFollowNum());
+		tvFanNum.setText("粉丝 "+studio.getFanNum());
+
+		logoOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_menu_home)
+				.showImageOnFail(R.drawable.ic_menu_home).cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		ImageLoader.getInstance().displayImage(studio.getAvatarUrl(), ivHeader,
+				logoOptions);
 	}
 
 	private void initView() {
@@ -140,14 +205,19 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 		titleBar = (TitleBar) findViewById(R.id.tb_activity_room_detail);
 		btnDial = (Button) findViewById(R.id.btn_dial_room_detail);
 		mViewPager = (ViewPager) findViewById(R.id.vp_activity_room_detail);
-		
+		tvDescribe = (TextView) findViewById(R.id.tv_describe_room_detail);
+		tvAnswerNum = (TextView) findViewById(R.id.tv_answernum_room_detail);
+		tvFocusNum = (TextView) findViewById(R.id.tv_focusnum_room_detail);
+		tvFanNum = (TextView) findViewById(R.id.tv_fannum_room_detail);
+		ivHeader = (ImageView) findViewById(R.id.iv_roomlogo_room_detail);
+
 		tvAnswer.setOnClickListener(this);
 		tvGallery.setOnClickListener(this);
 		tvTeacher.setOnClickListener(this);
 		tvHire.setOnClickListener(this);
 		tvVideo.setOnClickListener(this);
 		btnDial.setOnClickListener(this);
-		
+
 		tvList = new ArrayList<TextView>();
 		tvList.add(tvAnswer);
 		tvList.add(tvGallery);
@@ -176,6 +246,8 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 		tvAsk.setText("提问");
 		tvAsk.setTextSize(20);
 		tvAsk.setTextColor(Color.WHITE);
+		params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
 		params.setMargins(10, 0, 10, 0);
 		llAsk.setGravity(Gravity.CENTER_VERTICAL);
 		llAsk.addView(tvAsk, params);
@@ -305,24 +377,23 @@ public class RoomDetailActivity extends FragmentActivity implements OnClickListe
 		values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
 		values.put(StructuredName.GIVEN_NAME, name);
 		getContentResolver().insert(ContactsContract.Data.CONTENT_URI, values);
-		
-		values.clear();  
-        values.put(Data.RAW_CONTACT_ID, rawContactId);  
-        values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);  
-        values.put(Phone.NUMBER, phone);  
-        values.put(Phone.TYPE, Phone.TYPE_MOBILE);  
-        getContentResolver().insert(ContactsContract.Data.CONTENT_URI,  
-                values);  
-        
-        Toast.makeText(this, "成功添加到通讯录", Toast.LENGTH_SHORT).show();
-        
+
+		values.clear();
+		values.put(Data.RAW_CONTACT_ID, rawContactId);
+		values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+		values.put(Phone.NUMBER, phone);
+		values.put(Phone.TYPE, Phone.TYPE_MOBILE);
+		getContentResolver().insert(ContactsContract.Data.CONTENT_URI, values);
+
+		Toast.makeText(this, "成功添加到通讯录", Toast.LENGTH_SHORT).show();
+
 	}
 
 	private void showDetailList(int pos) {
 		selectPos = pos;
-		if(selectPos<mTabs.size()){
-			mViewPager.setCurrentItem(selectPos,false);
-			Log.v(TAG, "pos:"+selectPos);
+		if (selectPos < mTabs.size()) {
+			mViewPager.setCurrentItem(selectPos, false);
+			Log.v(TAG, "pos:" + selectPos);
 		}
 	}
 }

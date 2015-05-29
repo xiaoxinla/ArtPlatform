@@ -49,24 +49,20 @@
         android:textColor="#959595"
         android:layout_toRightOf="@id/iv_header_home_item_info"
         android:layout_alignBottom="@id/iv_header_home_item_info"/>
-    <ImageView
-        android:id="@+id/iv_pic_home_item_info"
-        android:layout_width="wrap_content"
+    <com.gexin.artplatform.view.FlowLayout
+        android:id="@+id/fl_pics_home_item_info"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_content_home_item_info"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:adjustViewBounds="true"
-        android:maxHeight="150dp"
-        android:scaleType="fitStart"
-        android:src="@drawable/ic_menu_emoticons" />
+        android:layout_marginTop="10dp"/>
     <TextView android:id="@+id/tv_clicknum_home_item_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="点击2000次"
         android:textColor="#959595"
         android:layout_marginLeft="10dp"
-        android:layout_below="@id/iv_pic_home_item_info"/>
+        android:layout_below="@id/fl_pics_home_item_info"/>
 
 </RelativeLayout>

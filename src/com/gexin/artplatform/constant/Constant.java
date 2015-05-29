@@ -28,4 +28,11 @@ public class Constant {
 		public static final String FRAGMENT_INDEX = "com.nostra13.example.universalimageloader.FRAGMENT_INDEX";
 		public static final String IMAGE_POSITION = "com.nostra13.example.universalimageloader.IMAGE_POSITION";
 	}
+	
+	public static String SINA_CONSUMER_KEY = "3394076065";
+
+	public static String SINA_OAUTH = "https://api.weibo.com/oauth2/authorize?client_id="
+			+ SINA_CONSUMER_KEY
+			+ "&response_type=code&redirect_uri=http://120.26.192.176/msq/api/user/weibo/auth"
+			+ "&display=mobile";
 }

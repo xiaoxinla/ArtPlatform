@@ -1,5 +1,9 @@
 package com.gexin.artplatform.utils;
 
+import android.annotation.SuppressLint;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
 public class TimeUtil {
 
 	/**
@@ -49,5 +53,12 @@ public class TimeUtil {
 			sb.append("ǰ");
 		}
 		return sb.toString();
+	}
+	
+	@SuppressLint("SimpleDateFormat")
+	public static String getDateString(long timestamp){
+		Timestamp stamp= new Timestamp(timestamp);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+		return sdf.format(stamp);
 	}
 }

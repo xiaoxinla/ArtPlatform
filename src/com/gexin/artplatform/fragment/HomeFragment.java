@@ -1,15 +1,20 @@
 package com.gexin.artplatform.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,16 +31,23 @@ import com.gexin.artplatform.CityInflateActivity;
 import com.gexin.artplatform.HomeItemInfoActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.adapter.HomeListAdapter;
+import com.gexin.artplatform.bean.Article;
+import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.TitleBar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class HomeFragment extends Fragment {
 
 	private static final String TAG = "HomeFragment";
-	private int sortStyle = 0;// 0表示热度优先，1表示时间优先
-	private List<Map<String, Object>> dataList;
+	private static final String ARTICLE_API = Constant.SERVER_URL
+			+ "/api/articles";
+	private List<Article> dataList = new ArrayList<Article>();
 	private HomeListAdapter adapter;
+	private Gson gson = new Gson();
 
 	private TitleBar titleBar;
 	private LinearLayout llAddr;
@@ -62,15 +74,6 @@ public class HomeFragment extends Fragment {
 	}
 
 	private void initData() {
-		dataList = new ArrayList<Map<String, Object>>();
-		for (int i = 0; i < 10; i++) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("name", "画室" + i);
-			map.put("clickNum", 200 * i);
-			map.put("id", 100 + i);
-			map.put("content", map.hashCode()+"");
-			dataList.add(map);
-		}
 		adapter = new HomeListAdapter(dataList, getActivity());
 		mListView.setAdapter(adapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
@@ -78,9 +81,60 @@ public class HomeFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				startActivity(new Intent(getActivity(),HomeItemInfoActivity.class));
+				Intent intent = new Intent(getActivity(),
+						HomeItemInfoActivity.class);
+				intent.putExtra("id", dataList.get(arg2-1).getArticleId());
+				startActivity(intent);
 			}
 		});
+		getData(1);
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private void getData(int option){
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					dealResponse((String) msg.obj);
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		String api = genApiUrl(option, 0);
+		new HttpConnectionUtils(handler).get(api);
+	}
+
+	private String genApiUrl(int i, long timestamp) {
+		String api = ARTICLE_API + "?sort=" + i;
+		if (timestamp != 0) {
+			api += "?timestamp=" + timestamp;
+		}
+		return api;
+	}
+
+	private void dealResponse(String obj) {
+		int state = 0;
+		try {
+			JSONObject jsonObject = new JSONObject(obj);
+			state = jsonObject.getInt("stat");
+			if (state == 1) {
+				List<Article> tmpList = gson.fromJson(jsonObject.getJSONArray("articles")
+						.toString(), new TypeToken<List<Article>>() {
+				}.getType());
+				dataList.clear();
+				dataList.addAll(tmpList);
+				Log.v(TAG,"dataList:"+dataList.toString());
+				adapter.notifyDataSetChanged();
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void initView(View view) {
@@ -107,7 +161,7 @@ public class HomeFragment extends Fragment {
 				vLeftLine.setVisibility(View.VISIBLE);
 				tvTimeFirst.setTextColor(Color.parseColor("#cd504f4f"));
 				vRightLine.setVisibility(View.GONE);
-				sortStyle = 0;
+				getData(1);
 			}
 		});
 		llTimeFirst.setOnClickListener(new OnClickListener() {
@@ -118,7 +172,7 @@ public class HomeFragment extends Fragment {
 				vLeftLine.setVisibility(View.GONE);
 				tvTimeFirst.setTextColor(Color.parseColor("#cdfe6060"));
 				vRightLine.setVisibility(View.VISIBLE);
-				sortStyle = 1;
+				getData(0);
 			}
 		});
 

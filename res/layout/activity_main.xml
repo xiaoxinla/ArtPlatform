@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="#cd504f4f"
                 android:textSize="15sp"
-                android:text="@string/tab_homepage"/>
+                android:text="@string/tab_find"/>
         </LinearLayout>
         <LinearLayout android:id="@+id/ll_indicator_four_main"
             android:layout_width="0dp"

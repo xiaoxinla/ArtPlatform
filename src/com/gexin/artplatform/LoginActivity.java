@@ -23,33 +23,45 @@ import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.JSONUtil;
+import com.gexin.artplatform.utils.SPUtil;
 
 public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
 	private static final String LOGIN_API = Constant.SERVER_URL
 			+ Constant.USER_API + "/login";
-	private Button login, reg;
+	protected static final int WEIBO_LOGIN_REQUEST = 0;
+	// private int mode = 0; //0表示登录模式，1表示注册模式
+
+	private Button btnLogin, btnReg, btnWeiboLog;
 	private EditText etUsername, etPassword;
 	private String username, password;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.activity_login);
 
-		login = (Button) findViewById(R.id.login_login_btn);
-		reg = (Button) findViewById(R.id.login_reg_btn);
+		initView();
+
+	}
+
+	private void initView() {
+		btnLogin = (Button) findViewById(R.id.login_login_btn);
+		btnReg = (Button) findViewById(R.id.login_reg_btn);
+		btnWeiboLog = (Button) findViewById(R.id.btn_weibolog_activity_login);
 		etUsername = (EditText) findViewById(R.id.login_user_edit);
 		etPassword = (EditText) findViewById(R.id.login_passwd_edit);
 
-		login.setOnClickListener(new OnClickListener() {
+		btnLogin.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				username = etUsername.getText().toString();
 				password = etPassword.getText().toString();
 				if (username.isEmpty() || password.isEmpty()) {
+					Toast.makeText(LoginActivity.this, "请完整填写账号和密码",
+							Toast.LENGTH_SHORT).show();
 					return;
 				}
 				Handler handler = new HttpHandler(LoginActivity.this) {
@@ -69,7 +81,7 @@ public class LoginActivity extends Activity {
 			}
 		});
 
-		reg.setOnClickListener(new OnClickListener() {
+		btnReg.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -79,8 +91,35 @@ public class LoginActivity extends Activity {
 			}
 		});
 
+		btnWeiboLog.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent=new Intent();   
+			    intent.setClass(LoginActivity.this, WeiboLoginActivity.class);
+			    startActivityForResult(intent, WEIBO_LOGIN_REQUEST); 
+			}
+		});
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case WEIBO_LOGIN_REQUEST:
+			if(resultCode==RESULT_OK){
+				setResult(RESULT_OK);
+				int isTeacher = (Integer) SPUtil.get(this, "isTeacher", 8);
+				Log.v(TAG, "isTeacher:"+isTeacher);
+				finish();
+			}
+			break;
+
+		default:
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
 	private void success(JSONObject jObject) {
 
 		try {
@@ -93,7 +132,7 @@ public class LoginActivity extends Activity {
 				setResult(RESULT_OK);
 				finish();
 			} else {
-				Toast.makeText(this, "请检查用户名 或密码", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "请检查账号或密码", Toast.LENGTH_SHORT).show();
 				return;
 			}
 		} catch (JSONException e) {

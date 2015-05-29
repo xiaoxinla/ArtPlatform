@@ -1,10 +1,6 @@
 package com.gexin.artplatform.adapter;
 
 import java.util.List;
-import java.util.Map;
-
-import com.gexin.artplatform.R;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,12 +11,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gexin.artplatform.R;
+import com.gexin.artplatform.bean.Classification;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 public class DiscoverGridAdapter extends BaseAdapter {
 
-	private List<Map<String, Object>> mList;
+	private List<Classification> mList;
 	private Context mContext;
 
-	public DiscoverGridAdapter(Context context, List<Map<String, Object>> list) {
+	public DiscoverGridAdapter(Context context, List<Classification> list) {
 		this.mContext = context;
 		this.mList = list;
 	}
@@ -43,7 +43,7 @@ public class DiscoverGridAdapter extends BaseAdapter {
 	@SuppressLint("InflateParams") @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
-		Map<String, Object> map = mList.get(position);
+		Classification classification = mList.get(position);
 		if (convertView == null) {
 			convertView = LayoutInflater.from(mContext).inflate(
 					R.layout.discover_item, null);
@@ -56,8 +56,8 @@ public class DiscoverGridAdapter extends BaseAdapter {
 		}else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		String title = (String) map.get("title");
-		String url = (String) map.get("icon");
+		String title = classification.getName();
+		String url = classification.getIcon();
 		holder.tvTitle.setText(title);
 		ImageLoader.getInstance().displayImage(url, holder.ivIcon);
 		return convertView;

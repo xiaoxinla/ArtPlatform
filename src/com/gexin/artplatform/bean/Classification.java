@@ -1,40 +1,37 @@
 package com.gexin.artplatform.bean;
 
+import java.util.List;
+
 public class Classification {
-	private String href;
-	private String title;
+	private String name;
 	private String icon;
-	private String ID;
+	private String _id;
 	private String superior;
+	private int type;
+	private List<ImageItem> image;
+	private List<Classification> subclass;
 
-	public Classification() {
-
-	};
-
-	public Classification(String href, String title, String icon, String iD,
-			String superior) {
-		super();
-		this.href = href;
-		this.title = title;
-		this.icon = icon;
-		ID = iD;
-		this.superior = superior;
+	@Override
+	public String toString() {
+		return "Classification [name=" + name + ", icon=" + icon + ", _id="
+				+ _id + ", superior=" + superior + ", type=" + type
+				+ ", image=" + image + ", subclass=" + subclass + "]";
 	}
 
-	public String getHref() {
-		return href;
+	public List<Classification> getSubclass() {
+		return subclass;
 	}
 
-	public void setHref(String href) {
-		this.href = href;
+	public void setSubclass(List<Classification> subclass) {
+		this.subclass = subclass;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getIcon() {
@@ -45,12 +42,12 @@ public class Classification {
 		this.icon = icon;
 	}
 
-	public String getID() {
-		return ID;
+	public String get_id() {
+		return _id;
 	}
 
-	public void setID(String iD) {
-		ID = iD;
+	public void set_id(String _id) {
+		this._id = _id;
 	}
 
 	public String getSuperior() {
@@ -61,10 +58,20 @@ public class Classification {
 		this.superior = superior;
 	}
 
-	@Override
-	public String toString() {
-		return "Classification [href=" + href + ", title=" + title + ", icon="
-				+ icon + ", ID=" + ID + ", superior=" + superior + "]";
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public List<ImageItem> getImage() {
+		return image;
+	}
+
+	public void setImage(List<ImageItem> image) {
+		this.image = image;
 	}
 
 }

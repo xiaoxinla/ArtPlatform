@@ -145,7 +145,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:visibility="gone" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -181,7 +182,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:visibility="gone" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -217,7 +219,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:visibility="gone" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -236,6 +239,26 @@
             android:textColor="#2e2e2e"
             android:textSize="14sp" />
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="介绍："
+        android:layout_marginLeft="10dp"
+        android:textColor="#2e2e2e"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tv_describe_room_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="false"
+        android:text="这是描述"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="#2e2e2e"
+        android:textSize="14sp" />
 
     <View
         android:layout_width="match_parent"

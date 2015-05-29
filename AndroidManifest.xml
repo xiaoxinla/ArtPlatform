@@ -42,35 +42,35 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name=".student.StudentChase"
+            android:name=".mine.MyFollowActivity"
             android:label="我的追问" >
         </activity>
         <activity
-            android:name=".student.StudentSubscribe"
+            android:name=".mine.MySubscribeActivity"
             android:label="我的订阅" >
         </activity>
         <activity
-            android:name=".student.StudentComment"
+            android:name=".mine.MyCommentActivity"
             android:label="我的评论" >
         </activity>
         <activity
-            android:name=".student.StudentFans"
+            android:name=".mine.MyFansActivity"
             android:label="我的粉丝" >
         </activity>
         <activity
-            android:name=".student.StudentFavorite"
+            android:name=".mine.MyCollectActivity"
             android:label="我的收藏" >
         </activity>
         <activity
-            android:name=".student.StudentFocus"
+            android:name=".mine.MyFocusActivity"
             android:label="我的关注" >
         </activity>
         <activity
-            android:name=".student.StudentFriend"
+            android:name=".mine.StudentFriend"
             android:label="我的好友" >
         </activity>
         <activity
-            android:name=".student.StudentGallery"
+            android:name=".mine.MyWorkActivity"
             android:label="我的作品" >
         </activity>
         <activity
@@ -112,6 +112,41 @@
         <activity
             android:name=".RoomDetailActivity"
             android:label="@string/title_activity_room_detail"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".SubClassActivity"
+            android:label="@string/title_activity_sub_class"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".UserInfoActivity"
+            android:label="@string/title_activity_user_info"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".WeiboLoginActivity"
+            android:label="@string/title_activity_user_info"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".FindFriendActivity"
+            android:label="@string/title_activity_find_friend"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".ModifyUserInfoActivity"
+            android:label="@string/title_activity_modify_user_info"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".TeacherDetailActivity"
+            android:label="@string/title_activity_teacher_detail"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".VideoDetailActivity"
+            android:label="@string/title_activity_video_detail"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
     </application>

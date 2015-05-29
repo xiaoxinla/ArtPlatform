@@ -1,16 +1,22 @@
 package com.gexin.artplatform.fragment;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -19,28 +25,34 @@ import android.widget.Toast;
 
 import com.gexin.artplatform.LoginActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.student.StudentChase;
-import com.gexin.artplatform.student.StudentComment;
-import com.gexin.artplatform.student.StudentFans;
-import com.gexin.artplatform.student.StudentFavorite;
-import com.gexin.artplatform.student.StudentFocus;
-import com.gexin.artplatform.student.StudentGallery;
-import com.gexin.artplatform.student.StudentSubscribe;
+import com.gexin.artplatform.UserInfoActivity;
+import com.gexin.artplatform.bean.User;
+import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.mine.MyCollectActivity;
+import com.gexin.artplatform.mine.MyCommentActivity;
+import com.gexin.artplatform.mine.MyFansActivity;
+import com.gexin.artplatform.mine.MyFocusActivity;
+import com.gexin.artplatform.mine.MyFollowActivity;
+import com.gexin.artplatform.mine.MySubscribeActivity;
+import com.gexin.artplatform.mine.MyWorkActivity;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.SPUtil;
+import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class MineFragment extends Fragment {
 
 	private static final int LOGIN_REQUEST = 0;
-	private Button btnExit;
+	private static final int MODIFY_REQUEST = 1;
 	private LinearLayout llFocus, llFans, llCollect;
-	private RelativeLayout rlWork, rlPump, rlComment, rlSubscribe;
+	private RelativeLayout rlWork, rlPump, rlComment, rlSubscribe, rlHeader;
 	private TextView tvFocus, tvFans, tvCollect, tvWork, tvPump, tvComment,
 			tvSubscribe, tvName;
 	private ImageView ivHeader;
 
 	private int job = -1;// -1为未登录，0为学生，1为教师
+	private Gson gson = new Gson();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -62,6 +74,8 @@ public class MineFragment extends Fragment {
 				.findViewById(R.id.rl_comment_fragment_mine);
 		rlSubscribe = (RelativeLayout) view
 				.findViewById(R.id.rl_subscribe_fragment_mine);
+		rlHeader = (RelativeLayout) view
+				.findViewById(R.id.rl_userinfo_fragment_mine);
 		tvFocus = (TextView) view.findViewById(R.id.tv_focusnum_fragment_mine);
 		tvFans = (TextView) view.findViewById(R.id.tv_fansnum_fragment_mine);
 		tvCollect = (TextView) view
@@ -72,7 +86,6 @@ public class MineFragment extends Fragment {
 		tvSubscribe = (TextView) view
 				.findViewById(R.id.tv_subscribe_fragment_mine);
 		tvName = (TextView) view.findViewById(R.id.tv_name_fragment_mine);
-		btnExit = (Button) view.findViewById(R.id.btn_exit_fragment_mine);
 		ivHeader = (ImageView) view.findViewById(R.id.iv_header_fragment_mine);
 	}
 
@@ -88,20 +101,25 @@ public class MineFragment extends Fragment {
 		case LOGIN_REQUEST:
 			if (resultCode == Activity.RESULT_CANCELED) {
 				job = -1;
-				SPUtil.put(getActivity(), "LOGIN", "NONE");
-				btnExit.setText("登录");
 			} else if (resultCode == Activity.RESULT_OK) {
-				String state = (String) SPUtil.get(getActivity(), "LOGIN", "NONE");
-				if(state.equals("STUDENT")){
-					job=0;
-				}else if(state.equals("TEACHER")){
-					job=1;
+				String state = (String) SPUtil.get(getActivity(), "LOGIN",
+						"NONE");
+				if (state.equals("STUDENT")) {
+					job = 0;
+				} else if (state.equals("TEACHER")) {
+					job = 1;
+				} else {
+					job = -1;
 				}
-				btnExit.setText("退出登录");
-				setDataToView();
 			}
+			setDataToView();
 			break;
-
+		case MODIFY_REQUEST:
+			if (resultCode == Activity.RESULT_OK) {
+				job = -1;
+			}
+			setDataToView();
+			break;
 		default:
 			break;
 		}
@@ -120,39 +138,38 @@ public class MineFragment extends Fragment {
 		int commentNum = (Integer) SPUtil.get(getActivity(), "commentNum", 0);
 		int subscriptionNum = (Integer) SPUtil.get(getActivity(),
 				"subscriptionNum", 0);
-		if(name.isEmpty()){
+		if (name.isEmpty()) {
 			name = "未设置";
 		}
-		if(job==-1){
+		if (job == -1) {
 			name = "未登录";
 		}
 		tvName.setText(name);
-		tvFocus.setText(""+followNum);
-		tvFans.setText(""+fanNum);
-		tvCollect.setText(""+collectionNum);
-		if(workNum!=0&&job!=-1){
-			tvWork.setText("我的作品("+workNum+")");
+		tvFocus.setText("" + followNum);
+		tvFans.setText("" + fanNum);
+		tvCollect.setText("" + collectionNum);
+		if (workNum != 0 && job != -1) {
+			tvWork.setText("我的作品(" + workNum + ")");
 		}
-		if(askNum!=0&&job!=-1){
-			tvPump.setText("我的追问("+askNum+")");
+		if (askNum != 0 && job != -1) {
+			tvPump.setText("我的追问(" + askNum + ")");
 		}
-		if(commentNum!=0&&job!=-1){
-			tvComment.setText("我的评论("+commentNum+")");
+		if (commentNum != 0 && job != -1) {
+			tvComment.setText("我的评论(" + commentNum + ")");
 		}
-		if(subscriptionNum!=0&&job!=-1){
-			tvSubscribe.setText("我的订阅("+subscriptionNum+")");
+		if (subscriptionNum != 0 && job != -1) {
+			tvSubscribe.setText("我的订阅(" + subscriptionNum + ")");
 		}
-		if(job!=-1){
+		if (job != -1) {
 			DisplayImageOptions options = new DisplayImageOptions.Builder()
-			.showImageOnLoading(R.drawable.ic_contact_picture)
-			.showImageForEmptyUri(R.drawable.ic_contact_picture)
-			.showImageOnFail(R.drawable.ic_contact_picture)
-			.cacheInMemory(true)
-			.cacheOnDisk(true)
-			.considerExifParams(true)
-			.bitmapConfig(Bitmap.Config.RGB_565)
-			.build();
-			ImageLoader.getInstance().displayImage(avatarUrl, ivHeader,options);
+					.showImageOnLoading(R.drawable.ic_contact_picture)
+					.showImageForEmptyUri(R.drawable.ic_contact_picture)
+					.showImageOnFail(R.drawable.ic_contact_picture)
+					.cacheInMemory(true).cacheOnDisk(true)
+					.considerExifParams(true)
+					.bitmapConfig(Bitmap.Config.RGB_565).build();
+			ImageLoader.getInstance()
+					.displayImage(avatarUrl, ivHeader, options);
 		}
 	}
 
@@ -164,28 +181,18 @@ public class MineFragment extends Fragment {
 			job = 1;
 		}
 		if (job == -1) {
-			btnExit.setText("登录");
+			setDataToView();
 		} else {
-			btnExit.setText("退出登录");
+			getUserInfo();
 		}
-		setDataToView();
-		btnExit.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				SPUtil.put(getActivity(), "LOGIN", "NONE");
-				Intent intent = new Intent(getActivity(), LoginActivity.class);
-				startActivityForResult(intent, LOGIN_REQUEST);
-				SPUtil.clear(getActivity());
-			}
-		});
 		rlPump.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							StudentChase.class);
+							MyFollowActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -199,7 +206,7 @@ public class MineFragment extends Fragment {
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							StudentComment.class);
+							MyCommentActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -212,7 +219,8 @@ public class MineFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (job != -1) {
-					Intent intent = new Intent(getActivity(), StudentFans.class);
+					Intent intent = new Intent(getActivity(),
+							MyFansActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -226,7 +234,7 @@ public class MineFragment extends Fragment {
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							StudentFavorite.class);
+							MyCollectActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -240,7 +248,7 @@ public class MineFragment extends Fragment {
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							StudentFocus.class);
+							MyFocusActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -255,7 +263,7 @@ public class MineFragment extends Fragment {
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							StudentSubscribe.class);
+							MySubscribeActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -269,7 +277,7 @@ public class MineFragment extends Fragment {
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							StudentGallery.class);
+							MyWorkActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_SHORT)
@@ -277,5 +285,57 @@ public class MineFragment extends Fragment {
 				}
 			}
 		});
+		rlHeader.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				if (job == -1) {
+					Intent intent = new Intent(getActivity(),
+							LoginActivity.class);
+					startActivityForResult(intent, LOGIN_REQUEST);
+				} else {
+					Intent intent = new Intent(getActivity(),
+							UserInfoActivity.class);
+					startActivityForResult(intent, MODIFY_REQUEST);
+				}
+			}
+		});
+	}
+
+	@SuppressLint("HandlerLeak")
+	private void getUserInfo() {
+		String userId = (String) SPUtil.get(getActivity(), "userId", "");
+		String url = Constant.SERVER_URL + "/api/user/" + userId;
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					dealResponse((String) msg.obj);
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		new HttpConnectionUtils(handler).get(url);
+	}
+
+	protected void dealResponse(String obj) {
+		Log.v("MineFragment", "Response:"+obj);
+		try {
+			JSONObject jsonObject = new JSONObject(obj);
+			int state = jsonObject.getInt("stat");
+			if (state == 1) {
+				User user = gson.fromJson(jsonObject.getJSONObject("user")
+						.toString(), User.class);
+				user.putToSP(getActivity());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		setDataToView();
 	}
 }

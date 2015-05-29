@@ -1,14 +1,13 @@
 package com.gexin.artplatform.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,10 +16,16 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 
+import com.gexin.artplatform.FindFriendActivity;
 import com.gexin.artplatform.R;
+import com.gexin.artplatform.SubClassActivity;
 import com.gexin.artplatform.adapter.DiscoverGridAdapter;
 import com.gexin.artplatform.bean.Classification;
 import com.gexin.artplatform.constant.Constant;
@@ -31,18 +36,14 @@ import com.google.gson.reflect.TypeToken;
 public class DiscoverFragment extends Fragment {
 
 	private static final String TAG = "DiscoverFragment";
-	private List<Map<String, Object>> discoverList = new ArrayList<Map<String,Object>>();
-	// private int[] discoverIcons = { R.drawable.discover_icon1,
-	// R.drawable.discover_icon2, R.drawable.discover_icon3,
-	// R.drawable.discover_icon4, R.drawable.discover_icon5,
-	// R.drawable.discover_icon6, R.drawable.discover_icon7 };
-
-	private GridView mGridView;
+	private static final String Discover_API = Constant.SERVER_URL
+			+ Constant.Discover_API + "/index";
+	private List<Classification> discoverList = new ArrayList<Classification>();
 	private Gson gson = new Gson();
 	private DiscoverGridAdapter adapter;
 
-	private static final String Discover_API = Constant.SERVER_URL
-			+ Constant.Discover_API + "/index";
+	private GridView mGridView;
+	private LinearLayout llFindFriend;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -55,11 +56,33 @@ public class DiscoverFragment extends Fragment {
 
 	private void initView(View view) {
 		mGridView = (GridView) view.findViewById(R.id.gv_discover_fragment);
+		llFindFriend = (LinearLayout) view
+				.findViewById(R.id.ll_find_discover_fragment);
+		llFindFriend.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(getActivity(),
+						FindFriendActivity.class));
+			}
+		});
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Intent intent = new Intent(getActivity(),
+						SubClassActivity.class);
+				intent.putExtra("name", discoverList.get(arg2).getName());
+				intent.putExtra("classId", discoverList.get(arg2).get_id());
+				startActivity(intent);
+			}
+		});
 	}
 
 	@SuppressLint("HandlerLeak")
 	private void initData() {
-		adapter = new DiscoverGridAdapter(getActivity(),discoverList);
+		adapter = new DiscoverGridAdapter(getActivity(), discoverList);
 		mGridView.setAdapter(adapter);
 		Handler handler = new Handler() {
 
@@ -91,7 +114,7 @@ public class DiscoverFragment extends Fragment {
 	private void success(JSONObject jObject) {
 		int state = -1;
 		List<Classification> tempList = null;
-		 Log.i(TAG, "jObject:"+jObject.toString());
+		Log.i(TAG, "jObject:" + jObject.toString());
 		try {
 			state = jObject.getInt("stat");
 			if (state == 1) {
@@ -99,12 +122,7 @@ public class DiscoverFragment extends Fragment {
 						.toString(), new TypeToken<List<Classification>>() {
 				}.getType());
 				if (tempList != null) {
-					for (int i = 0; i < tempList.size(); i++) {
-						Map<String, Object> map = new HashMap<String, Object>();
-						map.put("title", tempList.get(i).getTitle());
-						map.put("icon", tempList.get(i).getIcon());
-						discoverList.add(map);
-					}
+					discoverList.addAll(tempList);
 					adapter.notifyDataSetChanged();
 				}
 			}
@@ -121,6 +139,5 @@ public class DiscoverFragment extends Fragment {
 
 		initData();
 	}
-
 
 }
