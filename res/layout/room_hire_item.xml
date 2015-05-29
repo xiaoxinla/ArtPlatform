@@ -9,6 +9,9 @@
         android:layout_height="wrap_content"
         android:text="校长助理"
         android:textColor="#2e2e2e"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:textSize="15sp"/>
     <TextView android:id="@+id/tv_salary_room_hire"
         android:layout_width="wrap_content"
@@ -16,6 +19,8 @@
         android:text="10k~15k"
         android:textColor="#959595"
         android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:textSize="13sp"/>
     <TextView android:id="@+id/tv_require_room_hire"
         android:layout_width="wrap_content"
@@ -23,6 +28,9 @@
         android:text="会画画"
         android:textColor="#959595"
         android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
         android:textSize="13sp"/>
 
 </LinearLayout>

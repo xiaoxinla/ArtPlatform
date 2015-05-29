@@ -191,10 +191,9 @@ int id ibtn_image_postproblem 0x7f05003a
 int id ibtn_interest_question_info 0x7f05004a
 int id ibtn_interest_room_detail 0x7f050056
 int id id_viewpager 0x7f050024
-int id imageView1 0x7f0500f2
 int id inquire 0x7f0500b7
 int id iv_arrow_header 0x7f0500c0
-int id iv_arrow_user_info_item 0x7f0500f4
+int id iv_arrow_user_info_item 0x7f0500f2
 int id iv_check_tag_item 0x7f0500f0
 int id iv_comment_fragment_mine 0x7f0500b2
 int id iv_discover_item 0x7f050092
@@ -224,7 +223,7 @@ int id iv_pic_question_item 0x7f0500dd
 int id iv_pump_fragment_mine 0x7f0500af
 int id iv_room_gallery_item 0x7f0500e8
 int id iv_roomlogo_room_detail 0x7f050054
-int id iv_select_user_modify_item 0x7f0500f7
+int id iv_select_user_modify_item 0x7f0500f5
 int id iv_shot_video_detail 0x7f050082
 int id iv_subscribe_fragment_mine 0x7f0500b5
 int id iv_work_fragment_mine 0x7f0500ac
@@ -309,7 +308,6 @@ int id tb_post_problem 0x7f050037
 int id tb_question_info 0x7f05003b
 int id tb_select_tag 0x7f050068
 int id tb_student_me 0x7f0500a1
-int id tb_teacher_me 0x7f0500f1
 int id tb_userinfo_activity 0x7f05007c
 int id textView1 0x7f0500cb
 int id tv_addr_teacher_detail 0x7f050070
@@ -334,7 +332,7 @@ int id tv_content_home_item 0x7f0500c5
 int id tv_content_home_item_info 0x7f050018
 int id tv_content_question_info 0x7f050041
 int id tv_content_question_item 0x7f0500dc
-int id tv_content_user_info_item 0x7f0500f5
+int id tv_content_user_info_item 0x7f0500f3
 int id tv_describe_room_detail 0x7f050061
 int id tv_describe_video_detail 0x7f050087
 int id tv_discover_item 0x7f050093
@@ -393,11 +391,11 @@ int id tv_timefirst_fragment_home 0x7f05009e
 int id tv_tip_header 0x7f0500be
 int id tv_title_city_header 0x7f05008a
 int id tv_title_home_item 0x7f0500c4
-int id tv_title_user_info_item 0x7f0500f3
+int id tv_title_user_info_item 0x7f0500f1
 int id tv_title_video_detail 0x7f050083
 int id tv_type_question_info 0x7f050044
 int id tv_type_question_item 0x7f0500df
-int id tv_value_user_modify_item 0x7f0500f6
+int id tv_value_user_modify_item 0x7f0500f4
 int id tv_video_room_detail 0x7f050066
 int id tv_wordleft_post_problem 0x7f050039
 int id tv_work_fragment_mine 0x7f0500ad
@@ -458,9 +456,8 @@ int layout student_friend 0x7f03002e
 int layout student_gallery 0x7f03002f
 int layout student_subscribe 0x7f030030
 int layout tag_item 0x7f030031
-int layout teacher_me 0x7f030032
-int layout user_info_item 0x7f030033
-int layout user_modify_item 0x7f030034
+int layout user_info_item 0x7f030032
+int layout user_modify_item 0x7f030033
 int string action_settings 0x7f070008
 int string app_name 0x7f070006
 int string city_inflate_title 0x7f070015

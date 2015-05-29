@@ -108,6 +108,9 @@ public class RoomDetailActivity extends FragmentActivity implements
 		roomTeacherFragment = new RoomTeacherFragment();
 		roomHireFragment = new RoomHireFragment();
 		roomVideoFragment = new RoomVideoFragment();
+		
+		roomTeacherFragment.setStudioId(studioId);
+		roomHireFragment.setStudioId(studioId);
 
 		mTabs.add(roomAnswerFragment);
 		mTabs.add(roomGalleryFragment);

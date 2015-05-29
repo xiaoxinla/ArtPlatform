@@ -449,10 +449,9 @@ containing a value of this type.
         public static final int ibtn_interest_question_info=0x7f05004a;
         public static final int ibtn_interest_room_detail=0x7f050056;
         public static final int id_viewpager=0x7f050024;
-        public static final int imageView1=0x7f0500f2;
         public static final int inquire=0x7f0500b7;
         public static final int iv_arrow_header=0x7f0500c0;
-        public static final int iv_arrow_user_info_item=0x7f0500f4;
+        public static final int iv_arrow_user_info_item=0x7f0500f2;
         public static final int iv_check_tag_item=0x7f0500f0;
         public static final int iv_comment_fragment_mine=0x7f0500b2;
         public static final int iv_discover_item=0x7f050092;
@@ -482,7 +481,7 @@ containing a value of this type.
         public static final int iv_pump_fragment_mine=0x7f0500af;
         public static final int iv_room_gallery_item=0x7f0500e8;
         public static final int iv_roomlogo_room_detail=0x7f050054;
-        public static final int iv_select_user_modify_item=0x7f0500f7;
+        public static final int iv_select_user_modify_item=0x7f0500f5;
         public static final int iv_shot_video_detail=0x7f050082;
         public static final int iv_subscribe_fragment_mine=0x7f0500b5;
         public static final int iv_work_fragment_mine=0x7f0500ac;
@@ -567,7 +566,6 @@ containing a value of this type.
         public static final int tb_question_info=0x7f05003b;
         public static final int tb_select_tag=0x7f050068;
         public static final int tb_student_me=0x7f0500a1;
-        public static final int tb_teacher_me=0x7f0500f1;
         public static final int tb_userinfo_activity=0x7f05007c;
         public static final int textView1=0x7f0500cb;
         public static final int tv_addr_teacher_detail=0x7f050070;
@@ -592,7 +590,7 @@ containing a value of this type.
         public static final int tv_content_home_item_info=0x7f050018;
         public static final int tv_content_question_info=0x7f050041;
         public static final int tv_content_question_item=0x7f0500dc;
-        public static final int tv_content_user_info_item=0x7f0500f5;
+        public static final int tv_content_user_info_item=0x7f0500f3;
         public static final int tv_describe_room_detail=0x7f050061;
         public static final int tv_describe_video_detail=0x7f050087;
         public static final int tv_discover_item=0x7f050093;
@@ -651,11 +649,11 @@ containing a value of this type.
         public static final int tv_tip_header=0x7f0500be;
         public static final int tv_title_city_header=0x7f05008a;
         public static final int tv_title_home_item=0x7f0500c4;
-        public static final int tv_title_user_info_item=0x7f0500f3;
+        public static final int tv_title_user_info_item=0x7f0500f1;
         public static final int tv_title_video_detail=0x7f050083;
         public static final int tv_type_question_info=0x7f050044;
         public static final int tv_type_question_item=0x7f0500df;
-        public static final int tv_value_user_modify_item=0x7f0500f6;
+        public static final int tv_value_user_modify_item=0x7f0500f4;
         public static final int tv_video_room_detail=0x7f050066;
         public static final int tv_wordleft_post_problem=0x7f050039;
         public static final int tv_work_fragment_mine=0x7f0500ad;
@@ -718,9 +716,8 @@ containing a value of this type.
         public static final int student_gallery=0x7f03002f;
         public static final int student_subscribe=0x7f030030;
         public static final int tag_item=0x7f030031;
-        public static final int teacher_me=0x7f030032;
-        public static final int user_info_item=0x7f030033;
-        public static final int user_modify_item=0x7f030034;
+        public static final int user_info_item=0x7f030032;
+        public static final int user_modify_item=0x7f030033;
     }
     public static final class string {
         public static final int action_settings=0x7f070008;

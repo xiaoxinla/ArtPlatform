@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -88,6 +89,9 @@ public class TitleBar extends RelativeLayout {
 		titleText = ta.getString(R.styleable.Titlebar_titleText);
 		infoTextColor = ta.getColor(R.styleable.Titlebar_titleColor, 0);
 		infoTextSize = ta.getDimension(R.styleable.Titlebar_titleSize, 0);
+		infoTextSize = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_SP, infoTextSize, getResources()
+						.getDisplayMetrics());
 		ta.recycle();
 	}
 
