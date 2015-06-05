@@ -175,6 +175,7 @@ public class SelectTagActivity extends Activity {
 				+ "/" + userId + "/problem";
 		final String content = getIntent().getStringExtra("content");
 		final String imagePath = getIntent().getStringExtra("image");
+		final String teacherId = getIntent().getStringExtra("teacherId");
 		new Thread(new Runnable() {
 			private String imageUrl = "";
 
@@ -240,6 +241,9 @@ public class SelectTagActivity extends Activity {
 				List<NameValuePair> list = new ArrayList<NameValuePair>();
 				list.add(new BasicNameValuePair("content", content));
 				list.add(new BasicNameValuePair("tag", tag));
+				if (teacherId != null && !teacherId.isEmpty()) {
+					list.add(new BasicNameValuePair("teacherId", teacherId));
+				}
 				if (imageUrl != null && !imageUrl.isEmpty()) {
 					list.add(new BasicNameValuePair("image", imageUrl));
 				}

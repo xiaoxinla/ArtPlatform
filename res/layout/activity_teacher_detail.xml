@@ -33,30 +33,16 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@id/iv_header_teacher_detail"/>
-        <TextView android:id="@+id/tv_level_teacher_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="一级名师"
-            android:textColor="#959595"
-            android:layout_toRightOf="@id/iv_header_teacher_detail"
-            android:layout_alignBottom="@id/iv_header_teacher_detail"
-            android:layout_marginLeft="10dp"/>
+        
         <TextView android:id="@+id/tv_addr_teacher_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="北京"
             android:textColor="#959595"
-            android:layout_toRightOf="@id/tv_level_teacher_detail"
+            android:layout_toRightOf="@id/iv_header_teacher_detail"
             android:layout_alignBottom="@id/iv_header_teacher_detail"
             android:layout_marginLeft="10dp"/>
-        <TextView android:id="@+id/tv_id_teacher_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ID:12345667"
-            android:textColor="#959595"
-            android:layout_toRightOf="@id/tv_name_teacher_detail"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"/>
+        
         
         <ImageView android:id="@+id/iv_focus_teacher_detail"
             android:layout_width="wrap_content"
@@ -120,18 +106,6 @@
         <TextView 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="群组"
-            android:textColor="#959595"/>
-        <TextView android:id="@+id/tv_groupnum_teacher_detial"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="123"
-            android:layout_weight="1"
-            android:layout_marginLeft="5dp"
-            android:textColor="#2e2e2e"/>
-        <TextView 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="粉丝"
             android:textColor="#959595"/>
         <TextView android:id="@+id/tv_fannum_teacher_detial"
@@ -145,13 +119,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="关注"
+            android:layout_marginLeft="30dp"
             android:textColor="#959595"/>
         <TextView android:id="@+id/tv_focusnum_teacher_detial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:text="123"
+            android:layout_weight="1"
             android:textColor="#2e2e2e"/>
+        <View android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
     </LinearLayout>
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -179,13 +158,14 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#ffffff"></ListView>
-    
-    <Button android:id="@+id/btn_msg_room_detail"
+
+    <!-- <Button
+        android:id="@+id/btn_msg_room_detail"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="我要发消息"
-        android:textColor="#ffffff"
         android:layout_margin="10dp"
-        android:background="#445bc8"/>
+        android:background="#445bc8"
+        android:text="我要发消息"
+        android:textColor="#ffffff" /> -->
 
 </LinearLayout>

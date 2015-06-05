@@ -37,6 +37,7 @@ public class PostProblemActivity extends Activity {
 	protected static final int CAMERA_REQUEST_CODE = 1;
 	private static final String IMAGEDIR = Constant.APP_PATH + "image/";
 	private String imagePath = "";
+	private String teacherId = "";
 
 	private EditText etContent;
 	private ImageButton ibtnImage;
@@ -49,6 +50,7 @@ public class PostProblemActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post_problem);
 		setTheme(R.style.ActionSheetStyleIOS7);
+		teacherId = getIntent().getStringExtra("teacherId");
 		initView();
 	}
 
@@ -136,6 +138,7 @@ public class PostProblemActivity extends Activity {
 						SelectTagActivity.class);
 				intent.putExtra("content", content);
 				intent.putExtra("image", imagePath);
+				intent.putExtra("teacherId", teacherId);
 				startActivity(intent);
 			}
 		});

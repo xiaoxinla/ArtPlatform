@@ -10,6 +10,15 @@ public class Comment {
 	private long timestamp;
 	private String fromUserAvatarUrl;
 	private String fromUserName;
+	private Problem problem;
+
+	public Problem get_problem() {
+		return problem;
+	}
+
+	public void set_problem(Problem problem) {
+		this.problem = problem;
+	}
 
 	public String get_id() {
 		return _id;
@@ -83,5 +92,4 @@ public class Comment {
 				+ ", fromUserAvatarUrl=" + fromUserAvatarUrl
 				+ ", fromUserName=" + fromUserName + "]";
 	}
-
 }

@@ -142,6 +142,9 @@ public class Problem {
 
 	@Override
 	public String toString() {
+		if(this==null){
+			return "";
+		}
 		return "Problem [_id=" + _id + ", answerNum=" + answerNum
 				+ ", avatarUrl=" + avatarUrl + ", content=" + content
 				+ ", image=" + image + ", name=" + name + ", timestamp="

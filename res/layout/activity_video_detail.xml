@@ -13,6 +13,7 @@
         custom:titleColor="#ffffff"
         custom:titleSize="7sp" >
     </com.gexin.artplatform.view.TitleBar>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,6 +24,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
+            <FrameLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
             <ImageView
                 android:id="@+id/iv_shot_video_detail"
                 android:layout_width="match_parent"
@@ -30,7 +34,17 @@
                 android:layout_margin="10dp"
                 android:background="#ffffff"
                 android:src="@drawable/welcompage1" />
-
+            <ImageButton android:id="@+id/ibtn_play_video_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_media_embed_play"
+                android:layout_gravity="center"/>
+            </FrameLayout>
+			<ProgressBar android:id="@+id/pb_activity_video_detail"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:visibility="gone"
+			    style="?android:attr/progressBarStyleHorizontal"/>
             <TextView
                 android:id="@+id/tv_title_video_detail"
                 android:layout_width="match_parent"
@@ -107,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
                 android:padding="10dp"
-                android:text="主讲："
+                android:text="简介："
                 android:textColor="#2e2e2e" />
 
             <TextView
@@ -117,7 +131,6 @@
                 android:background="#ffffff"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="违法加企鹅我也完全将佛恶趣味解放前问饿哦发起文件佛前阿胶佛前见未付金额为减肥前金额覅偶见清风问i简欧风无情肥企鹅费偶见 "
                 android:textColor="#959595" />
         </LinearLayout>
     </ScrollView>

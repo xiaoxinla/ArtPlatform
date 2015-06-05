@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gexin.artplatform.bean.Answer;
+import com.gexin.artplatform.bean.AnswerContent;
 import com.gexin.artplatform.bean.Comment;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
@@ -46,13 +48,14 @@ public class QuestionInfoActivity extends Activity {
 
 	private static final String TAG = "QuestionInfoActivity";
 	private String userId = "";
+	private String replyTo = "";
 
 	private ImageView ivHeader;
 	private ImageView ivPic;
 	private ImageView ivZan;
 	private TextView tvName;
 	private TextView tvTime;
-	private TextView tvCommentor;
+	// private TextView tvCommentor;
 	private TextView tvContent;
 	private TextView tvType;
 	private TextView tvAnsNum;
@@ -65,6 +68,9 @@ public class QuestionInfoActivity extends Activity {
 	private LinearLayout llZan;
 	private Button btnSubmit;
 	private ImageButton ibtnFocus;
+	private TextView tvAnswerNum;
+	private TextView tvCommentNum;
+	private View answerLine, commentLine;
 
 	private Problem problem;
 	private Gson gson = new Gson();
@@ -83,12 +89,12 @@ public class QuestionInfoActivity extends Activity {
 				setDataToView(jObject);
 			}
 		};
+		userId = (String) SPUtil.get(this, "userId", "");
 		String problemId = getIntent().getStringExtra("problemId");
-		String userId = (String) SPUtil.get(this, "userId", "");
 		String api = Constant.SERVER_URL + Constant.PROBLEM_API + "/"
 				+ problemId;
 		if (!userId.isEmpty()) {
-			api+="?userId="+userId;
+			api += "?userId=" + userId;
 		}
 		new HttpConnectionUtils(handler).get(api);
 	}
@@ -98,7 +104,8 @@ public class QuestionInfoActivity extends Activity {
 		ivPic = (ImageView) findViewById(R.id.iv_pic_question_info);
 		ivZan = (ImageView) findViewById(R.id.iv_zan_question_info);
 		tvContent = (TextView) findViewById(R.id.tv_content_question_info);
-		tvCommentor = (TextView) findViewById(R.id.tv_commentor_question_info);
+		// tvCommentor = (TextView)
+		// findViewById(R.id.tv_commentor_question_info);
 		tvAnsNum = (TextView) findViewById(R.id.tv_ans_question_info);
 		tvName = (TextView) findViewById(R.id.tv_name_question_info);
 		tvTime = (TextView) findViewById(R.id.tv_time_question_info);
@@ -111,64 +118,36 @@ public class QuestionInfoActivity extends Activity {
 		llComment = (LinearLayout) findViewById(R.id.ll_area_comment_question_info);
 		llAnswer = (LinearLayout) findViewById(R.id.ll_area_answer_question_info);
 		llZan = (LinearLayout) findViewById(R.id.ll_zan_question_info);
+		tvAnswerNum = (TextView) findViewById(R.id.tv_answernum_question_info);
+		tvCommentNum = (TextView) findViewById(R.id.tv_commentnum_question_info);
+		answerLine = findViewById(R.id.v_answer_line_activity_question_info);
+		commentLine = findViewById(R.id.v_comment_line_activity_question_info);
 		initTitleBar();
 		btnSubmit.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				String content = etComment.getText().toString();
-				String replyTo = null;
 				if (!content.isEmpty()) {
-					postComment(content, replyTo);
+					postComment(content);
 				}
 			}
 		});
 
 		ibtnFocus.setOnClickListener(new OnClickListener() {
 
-			@SuppressLint("HandlerLeak")
 			@Override
 			public void onClick(View arg0) {
-				String followApi = Constant.SERVER_URL + "/api/user/" + userId
-						+ "/follow";
-				Handler handler = new Handler() {
-					@Override
-					public void handleMessage(Message msg) {
-						switch (msg.what) {
-						case HttpConnectionUtils.DID_SUCCEED:
-							try {
-								JSONObject jsonObject = new JSONObject(
-										(String) msg.obj);
-								if (jsonObject.getInt("stat") == 1) {
-									Toast.makeText(QuestionInfoActivity.this,
-											"关注成功", Toast.LENGTH_SHORT).show();
-								} else {
-									Toast.makeText(QuestionInfoActivity.this,
-											"关注失败", Toast.LENGTH_SHORT).show();
-								}
-							} catch (JSONException e) {
-								e.printStackTrace();
-								Toast.makeText(QuestionInfoActivity.this,
-										"关注失败", Toast.LENGTH_SHORT).show();
-							}
-							break;
-
-						default:
-							break;
-						}
-						super.handleMessage(msg);
-					}
-				};
-				List<NameValuePair> list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("userId", userId));
-				list.add(new BasicNameValuePair("follow", 1 + ""));
-				new HttpConnectionUtils(handler).post(followApi, list);
+				postFocus(problem.getUserId());
 			}
 		});
+		String status = (String) SPUtil.get(this, "LOGIN", "NONE");
+		if (status.equals("TEACHER")) {
+			btnSubmit.setText("回答");
+		}
 	}
 
-	protected void postComment(String content, String replyTo) {
-		String userId = (String) SPUtil.get(this, "userId", "");
+	protected void postComment(String content) {
 		String status = (String) SPUtil.get(this, "LOGIN", "NONE");
 		if (userId.isEmpty()) {
 			Toast.makeText(this, "请先登录再评论", Toast.LENGTH_SHORT).show();
@@ -188,7 +167,7 @@ public class QuestionInfoActivity extends Activity {
 
 		};
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
-		if (replyTo != null) {
+		if (replyTo != null && !replyTo.isEmpty()) {
 			list.add(new BasicNameValuePair("replyTo", replyTo));
 		}
 		list.add(new BasicNameValuePair("content", content));
@@ -208,10 +187,10 @@ public class QuestionInfoActivity extends Activity {
 			e.printStackTrace();
 		}
 		if (state == 1) {
-			Toast.makeText(this, "评论成功", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "发布成功", Toast.LENGTH_SHORT).show();
 			etComment.setText("");
 		} else {
-			Toast.makeText(this, "评论失败", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "发布失败", Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -251,7 +230,7 @@ public class QuestionInfoActivity extends Activity {
 				String avatarUrl = problem.getAvatarUrl();
 				String time = TimeUtil.getStandardDate(problem.getTimestamp());
 				String tag = "";
-				userId = problem.getUserId();
+				// userId = problem.getUserId();
 				List<Comment> commentList = problem.getCommentList();
 				List<Answer> answerList = problem.getAnswerList();
 				if (problem.getTag() != null && problem.getTag().size() != 0) {
@@ -266,14 +245,14 @@ public class QuestionInfoActivity extends Activity {
 				}
 				String content = problem.getContent();
 				final String imageUrl = problem.getImage();
-				String commentor = "XXX画室";
+				// String commentor = "XXX画室";
 				tvContent.setText(content);
 				tvTime.setText(time);
 				tvName.setText(name);
 				tvType.setText(tag);
 				tvAnsNum.setText(ansNum + "");
 				tvZan.setText(zan + "");
-				tvCommentor.setText(commentor);
+				// tvCommentor.setText(commentor);
 				if (problem.getIsZan() == 1) {
 					ivZan.setImageResource(R.drawable.zan_icon_2);
 				} else {
@@ -317,7 +296,10 @@ public class QuestionInfoActivity extends Activity {
 							Intent intent = new Intent(
 									QuestionInfoActivity.this,
 									LargeImageActivity.class);
-							intent.putExtra("url", imageUrl);
+							List<String> images = new ArrayList<String>();
+							images.add(imageUrl);
+							intent.putStringArrayListExtra("images",
+									(ArrayList<String>) images);
 							startActivity(intent);
 						}
 					}
@@ -325,9 +307,19 @@ public class QuestionInfoActivity extends Activity {
 
 				if (commentList != null && !commentList.isEmpty()) {
 					setComment(commentList);
+					tvCommentNum.setVisibility(View.VISIBLE);
+					tvCommentNum.setText("评论区(" + commentList.size() + ")");
+				} else {
+					tvCommentNum.setVisibility(View.GONE);
+					commentLine.setVisibility(View.GONE);
 				}
 				if (answerList != null && !answerList.isEmpty()) {
 					setAnswer(answerList);
+					tvAnswerNum.setVisibility(View.VISIBLE);
+					tvAnswerNum.setText("回答(" + answerList.size() + ")");
+				} else {
+					tvAnswerNum.setVisibility(View.GONE);
+					answerLine.setVisibility(View.GONE);
 				}
 			}
 		} catch (JSONException e) {
@@ -339,7 +331,6 @@ public class QuestionInfoActivity extends Activity {
 	private void postZan() {
 		String zanAPI = Constant.SERVER_URL + "/api/problem/"
 				+ problem.get_id() + "/zan";
-		String userId = (String) SPUtil.get(this, "userId", "");
 		if (userId.isEmpty()) {
 			Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
 			return;
@@ -356,13 +347,17 @@ public class QuestionInfoActivity extends Activity {
 							if (problem.getIsZan() == 1) {
 								problem.setIsZan(0);
 								ivZan.setImageResource(R.drawable.zan_icon_1);
-								problem.setZan(problem.getZan()-1);
-								tvZan.setText(problem.getZan()+"");
+								problem.setZan(problem.getZan() - 1);
+								tvZan.setText(problem.getZan() + "");
+								Toast.makeText(QuestionInfoActivity.this,
+										"取消赞成功", Toast.LENGTH_SHORT).show();
 							} else {
 								problem.setIsZan(1);
 								ivZan.setImageResource(R.drawable.zan_icon_2);
-								problem.setZan(problem.getZan()-1);
-								tvZan.setText(problem.getZan());
+								problem.setZan(problem.getZan() + 1);
+								tvZan.setText(problem.getZan() + "");
+								Toast.makeText(QuestionInfoActivity.this,
+										"赞成功", Toast.LENGTH_SHORT).show();
 							}
 						}
 					} catch (JSONException e) {
@@ -394,7 +389,7 @@ public class QuestionInfoActivity extends Activity {
 				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
-		for (Answer answer : answerList) {
+		for (final Answer answer : answerList) {
 			View view = LayoutInflater.from(this).inflate(
 					R.layout.problem_answer_item, null);
 			ImageView tmpIvHeader = (ImageView) view
@@ -403,11 +398,80 @@ public class QuestionInfoActivity extends Activity {
 					.findViewById(R.id.tv_name_answer_item);
 			TextView tmpTvContent = (TextView) view
 					.findViewById(R.id.tv_content_answer_item);
-			tmpTvContent.setText(answer.getContent().toString());
+			TextView tmpTvTime = (TextView) view
+					.findViewById(R.id.tv_time_answer_item);
+			LinearLayout tmpLlAsk = (LinearLayout) view
+					.findViewById(R.id.ll_ask_answer_item);
+			ImageView tmpIvFocus = (ImageView) view
+					.findViewById(R.id.iv_interest_answer_item);
+			tmpTvTime.setText(TimeUtil.getStandardDate(answer.getUpdateTime()));
+			tmpTvName.setSingleLine(true);
+			tmpTvName.setTextColor(Color.parseColor("#445bc8"));
+			String tmpContent = "";
+			for (AnswerContent content : answer.getContent()) {
+				tmpContent += content.getContent();
+			}
+			tmpTvContent.setText(tmpContent);
+			tmpTvName.setText(answer.getUserName());
 			ImageLoader.getInstance().displayImage(answer.getAvatarUrl(),
 					tmpIvHeader, imageOptions);
 			llAnswer.addView(view);
+			tmpLlAsk.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					Intent intent = new Intent(QuestionInfoActivity.this,
+							PostProblemActivity.class);
+					intent.putExtra("teacherId", answer.getUserId());
+					startActivity(intent);
+				}
+			});
+			tmpIvFocus.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					postFocus(answer.getUserId());
+				}
+			});
 		}
+	}
+
+	@SuppressLint("HandlerLeak")
+	protected void postFocus(String id) {
+		String followApi = Constant.SERVER_URL + "/api/user/" + userId
+				+ "/follow";
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject(
+								(String) msg.obj);
+						if (jsonObject.getInt("stat") == 1) {
+							Toast.makeText(QuestionInfoActivity.this,
+									"关注成功", Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(QuestionInfoActivity.this,
+									"关注失败", Toast.LENGTH_SHORT).show();
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+						Toast.makeText(QuestionInfoActivity.this,
+								"关注失败", Toast.LENGTH_SHORT).show();
+					}
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("userId", id));
+		list.add(new BasicNameValuePair("follow", 1 + ""));
+		new HttpConnectionUtils(handler).post(followApi, list);
 	}
 
 	@SuppressLint("InflateParams")
@@ -418,7 +482,7 @@ public class QuestionInfoActivity extends Activity {
 				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
-		for (Comment comment : list) {
+		for (final Comment comment : list) {
 			View view = LayoutInflater.from(this).inflate(
 					R.layout.comment_item, null);
 			ImageView tmpIvHeader = (ImageView) view
@@ -429,12 +493,28 @@ public class QuestionInfoActivity extends Activity {
 					.findViewById(R.id.tv_time_comment_item);
 			TextView tmpTvContent = (TextView) view
 					.findViewById(R.id.tv_content_comment_item);
+
 			tmpTvContent.setText(comment.getContent());
+			tmpTvName.setSingleLine(true);
+			tmpTvName.setTextColor(Color.parseColor("#445bc8"));
 			tmpTvName.setText(comment.getFromUserName());
 			tmpTvTime.setText(TimeUtil.getStandardDate(comment.getTimestamp()));
 			ImageLoader.getInstance().displayImage(
 					comment.getFromUserAvatarUrl(), tmpIvHeader, imageOptions);
 			llComment.addView(view);
+			view.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					String hint = comment.getFromUserName();
+					if (hint.length() > 10) {
+						hint = hint.substring(0, 10) + "...";
+					}
+					etComment.setHint("回复 " + hint);
+					replyTo = comment.getFromUser();
+					Log.v(TAG, "replyTo:" + replyTo);
+				}
+			});
 		}
 	}
 }

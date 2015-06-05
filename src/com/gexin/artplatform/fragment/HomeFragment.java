@@ -9,11 +9,13 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gexin.artplatform.CityInflateActivity;
@@ -34,10 +37,14 @@ import com.gexin.artplatform.adapter.HomeListAdapter;
 import com.gexin.artplatform.bean.Article;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.NetUtil;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class HomeFragment extends Fragment {
@@ -48,6 +55,7 @@ public class HomeFragment extends Fragment {
 	private List<Article> dataList = new ArrayList<Article>();
 	private HomeListAdapter adapter;
 	private Gson gson = new Gson();
+	private int option = 1;
 
 	private TitleBar titleBar;
 	private LinearLayout llAddr;
@@ -75,6 +83,7 @@ public class HomeFragment extends Fragment {
 
 	private void initData() {
 		adapter = new HomeListAdapter(dataList, getActivity());
+		mListView.setMode(Mode.BOTH);
 		mListView.setAdapter(adapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -83,21 +92,44 @@ public class HomeFragment extends Fragment {
 					long arg3) {
 				Intent intent = new Intent(getActivity(),
 						HomeItemInfoActivity.class);
-				intent.putExtra("id", dataList.get(arg2-1).getArticleId());
+				intent.putExtra("id", dataList.get(arg2 - 1).getArticleId());
 				startActivity(intent);
+			}
+		});
+		mListView.setOnRefreshListener(new OnRefreshListener2<ListView>() {
+
+			@Override
+			public void onPullDownToRefresh(
+					PullToRefreshBase<ListView> refreshView) {
+				String label = DateUtils.formatDateTime(getActivity(),
+						System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
+								| DateUtils.FORMAT_SHOW_DATE
+								| DateUtils.FORMAT_ABBREV_ALL);
+				// Update the LastUpdatedLabel
+				refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+				// Do work to refresh the list here.
+				new GetLatestDataTask().execute();
+			}
+
+			@Override
+			public void onPullUpToRefresh(
+					PullToRefreshBase<ListView> refreshView) {
+				new GetNextDataTask().execute();
+
 			}
 		});
 		getData(1);
 	}
-	
+
 	@SuppressLint("HandlerLeak")
-	private void getData(int option){
+	private void getData(int option) {
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case HttpConnectionUtils.DID_SUCCEED:
 					dealResponse((String) msg.obj);
+					adapter.notifyDataSetChanged();
 					break;
 
 				default:
@@ -113,9 +145,13 @@ public class HomeFragment extends Fragment {
 	private String genApiUrl(int i, long timestamp) {
 		String api = ARTICLE_API + "?sort=" + i;
 		if (timestamp != 0) {
-			api += "?timestamp=" + timestamp;
+			api += "&timestamp=" + timestamp;
 		}
 		return api;
+	}
+
+	private String genApiUrlBySkip(int i, int skip) {
+		return ARTICLE_API + "?sort=" + i + "&skip=" + skip;
 	}
 
 	private void dealResponse(String obj) {
@@ -124,13 +160,14 @@ public class HomeFragment extends Fragment {
 			JSONObject jsonObject = new JSONObject(obj);
 			state = jsonObject.getInt("stat");
 			if (state == 1) {
-				List<Article> tmpList = gson.fromJson(jsonObject.getJSONArray("articles")
-						.toString(), new TypeToken<List<Article>>() {
-				}.getType());
+				List<Article> tmpList = gson.fromJson(
+						jsonObject.getJSONArray("articles").toString(),
+						new TypeToken<List<Article>>() {
+						}.getType());
 				dataList.clear();
 				dataList.addAll(tmpList);
-				Log.v(TAG,"dataList:"+dataList.toString());
-				adapter.notifyDataSetChanged();
+				Log.v(TAG, "dataList:" + dataList.toString());
+				// adapter.notifyDataSetChanged();
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -162,6 +199,7 @@ public class HomeFragment extends Fragment {
 				tvTimeFirst.setTextColor(Color.parseColor("#cd504f4f"));
 				vRightLine.setVisibility(View.GONE);
 				getData(1);
+				option = 1;
 			}
 		});
 		llTimeFirst.setOnClickListener(new OnClickListener() {
@@ -173,6 +211,7 @@ public class HomeFragment extends Fragment {
 				tvTimeFirst.setTextColor(Color.parseColor("#cdfe6060"));
 				vRightLine.setVisibility(View.VISIBLE);
 				getData(0);
+				option = 0;
 			}
 		});
 
@@ -204,5 +243,71 @@ public class HomeFragment extends Fragment {
 						CityInflateActivity.class));
 			}
 		});
+	}
+
+	private class GetLatestDataTask extends
+			AsyncTask<Void, Void, List<Article>> {
+
+		@Override
+		protected List<Article> doInBackground(Void... params) {
+			// Simulates a background job.
+			String api = genApiUrl(option, 0);
+			String result = "";
+			Log.v(TAG, api);
+			result = NetUtil.connect(NetUtil.GET, api, null);
+			dealResponse(result);
+			return dataList;
+		}
+
+		@Override
+		protected void onPostExecute(List<Article> result) {
+			adapter.notifyDataSetChanged();
+
+			// Call onRefreshComplete when the list has been refreshed.
+			mListView.onRefreshComplete();
+
+			super.onPostExecute(result);
+		}
+	}
+
+	private class GetNextDataTask extends AsyncTask<Void, Void, List<Article>> {
+
+		@Override
+		protected List<Article> doInBackground(Void... params) {
+			// Simulates a background job.
+			String result = "";
+			if (dataList == null || dataList.size() == 0) {
+				return new ArrayList<Article>();
+			}
+			String api = genApiUrlBySkip(option, dataList.size());
+			result = NetUtil.connect(NetUtil.GET, api, null);
+			Log.v(TAG, "url:" + api);
+			JSONObject jsonObject;
+			try {
+				jsonObject = new JSONObject(result);
+				int state = jsonObject.getInt("stat");
+				if (state == 1) {
+					List<Article> tmpList = gson.fromJson(jsonObject
+							.getJSONArray("articles").toString(),
+							new TypeToken<List<Article>>() {
+							}.getType());
+					dataList.addAll(tmpList);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			return dataList;
+		}
+
+		@Override
+		protected void onPostExecute(List<Article> result) {
+			Log.v(TAG, "problemNum:" + dataList.size());
+			adapter.notifyDataSetChanged();
+
+			// Call onRefreshComplete when the list has been refreshed.
+			mListView.onRefreshComplete();
+
+			super.onPostExecute(result);
+		}
 	}
 }

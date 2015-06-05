@@ -3,6 +3,8 @@ package com.gexin.artplatform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +33,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -89,6 +92,7 @@ public class RoomDetailActivity extends FragmentActivity implements
 	private TextView tvFocusNum;
 	private TextView tvFanNum;
 	private ImageView ivHeader;
+	private ImageButton ibtnFocus;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,9 +112,11 @@ public class RoomDetailActivity extends FragmentActivity implements
 		roomTeacherFragment = new RoomTeacherFragment();
 		roomHireFragment = new RoomHireFragment();
 		roomVideoFragment = new RoomVideoFragment();
-		
+
 		roomTeacherFragment.setStudioId(studioId);
 		roomHireFragment.setStudioId(studioId);
+		roomVideoFragment.setStudioId(studioId);
+		roomGalleryFragment.setStudioId(studioId);
 
 		mTabs.add(roomAnswerFragment);
 		mTabs.add(roomGalleryFragment);
@@ -157,11 +163,63 @@ public class RoomDetailActivity extends FragmentActivity implements
 			}
 		});
 
+		ibtnFocus.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				postFocusStudio();
+			}
+		});
+
 		getStudioInfo();
+	}
+
+	private void postFocusStudio() {
+		String userId = (String) SPUtil.get(this, "userId", "");
+		if (userId.isEmpty()) {
+			Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		String url = Constant.SERVER_URL + "/api/user/" + userId + "/studio";
+		Handler handler = new HttpHandler(this) {
+			@Override
+			protected void succeed(JSONObject jObject) {
+				try {
+					int state = jObject.getInt("stat");
+					if (state == 1) {
+						if (studio.getIsWatched() == 0) {
+							Toast.makeText(RoomDetailActivity.this, "关注成功",
+									Toast.LENGTH_SHORT).show();
+							studio.setIsWatched(1);
+							ibtnFocus.setImageResource(R.drawable.focus_cancle_icon);
+						} else {
+							Toast.makeText(RoomDetailActivity.this, "取消关注成功",
+									Toast.LENGTH_SHORT).show();
+							studio.setIsWatched(0);
+							ibtnFocus.setImageResource(R.drawable.interest_icon_1);
+						}
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("studioId", studioId));
+		if (studio.getIsWatched() == 0) {
+			new HttpConnectionUtils(handler).put(url, list);
+		}else {
+			url+="?studioId="+studioId;
+			new HttpConnectionUtils(handler).delete(url);
+		}
 	}
 
 	private void getStudioInfo() {
 		String url = Constant.SERVER_URL + "/api/studio/" + studioId;
+		String userId = (String) SPUtil.get(this, "userId", "");
+		if (!userId.isEmpty()) {
+			url += "?userId=" + userId;
+		}
 		Handler handler = new HttpHandler(this) {
 			@Override
 			protected void succeed(JSONObject jObject) {
@@ -184,9 +242,9 @@ public class RoomDetailActivity extends FragmentActivity implements
 		tvName.setText(studio.getName());
 		tvPhone.setText(studio.getPhone());
 		tvDescribe.setText(studio.getDescription());
-		tvAnswerNum.setText("回答 "+studio.getAnswerNum());
-		tvFocusNum.setText("关注 "+studio.getFollowNum());
-		tvFanNum.setText("粉丝 "+studio.getFanNum());
+		tvAnswerNum.setText("回答 " + studio.getAnswerNum());
+		tvFocusNum.setText("关注 " + studio.getFollowNum());
+		tvFanNum.setText("粉丝 " + studio.getFanNum());
 
 		logoOptions = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.ic_menu_home)
@@ -195,6 +253,12 @@ public class RoomDetailActivity extends FragmentActivity implements
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		ImageLoader.getInstance().displayImage(studio.getAvatarUrl(), ivHeader,
 				logoOptions);
+		Log.v(TAG, "isWatched:" + studio.getIsWatched());
+		if (studio.getIsWatched() == 0) {
+			ibtnFocus.setImageResource(R.drawable.interest_icon_1);
+		} else {
+			ibtnFocus.setImageResource(R.drawable.focus_cancle_icon);
+		}
 	}
 
 	private void initView() {
@@ -213,6 +277,7 @@ public class RoomDetailActivity extends FragmentActivity implements
 		tvFocusNum = (TextView) findViewById(R.id.tv_focusnum_room_detail);
 		tvFanNum = (TextView) findViewById(R.id.tv_fannum_room_detail);
 		ivHeader = (ImageView) findViewById(R.id.iv_roomlogo_room_detail);
+		ibtnFocus = (ImageButton) findViewById(R.id.ibtn_interest_room_detail);
 
 		tvAnswer.setOnClickListener(this);
 		tvGallery.setOnClickListener(this);

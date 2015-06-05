@@ -1,11 +1,15 @@
 package com.gexin.artplatform.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,20 +17,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.SimpleAdapter;
 
 import com.gexin.artplatform.R;
+import com.gexin.artplatform.adapter.RoomGalleryAdapter;
+import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class RoomGalleryFragment extends Fragment {
 
 	private static final String TAG = "RoomGalleryFragment";
-	private SimpleAdapter adapter;
-	private int[] imageArray = { R.drawable.ic_contact_picture,
-			R.drawable.ic_empty, R.drawable.ic_error, R.drawable.ic_launcher,
-			R.drawable.ic_menu_emoticons, R.drawable.ic_menu_friendslist,
-			R.drawable.ic_menu_home, R.drawable.ic_menu_myplaces,
-			R.drawable.ic_menu_notifications, R.drawable.ic_menu_star };
-	private List<Map<String, Object>> mList = new ArrayList<Map<String, Object>>();
+	private List<String> mList = new ArrayList<String>();
+	private RoomGalleryAdapter adapter;
+	private Gson gson = new Gson();
+	
 	private GridView mGridView;
 
 	@Override
@@ -45,15 +50,46 @@ public class RoomGalleryFragment extends Fragment {
 	}
 
 	private void initData() {
-		for (int id : imageArray) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("id", id);
-			mList.add(map);
-		}
-		adapter = new SimpleAdapter(getActivity(), mList,
-				R.layout.room_gallery_item, new String[] { "id" },
-				new int[] { R.id.iv_room_gallery_item });
+		adapter = new RoomGalleryAdapter(getActivity(), mList);
 		mGridView.setAdapter(adapter);
-		Log.v(TAG, "childCount:" + adapter.getCount());
+	}
+	
+	@SuppressLint("HandlerLeak")
+	public void setStudioId(String studioId) {
+		String url = Constant.SERVER_URL + "/api/studio/" + studioId
+				+ "/work";
+		Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					dealResponse((String) msg.obj);
+					break;
+
+				default:
+					break;
+				}
+			};
+		};
+		new HttpConnectionUtils(handler).get(url);
+	}
+
+	private void dealResponse(String res) {
+		try {
+			JSONObject jsonObject = new JSONObject(res);
+			int state = jsonObject.getInt("stat");
+			if (state == 1) {
+				List<String> tmpList = gson.fromJson(
+						jsonObject.getJSONArray("works").toString(),
+						new TypeToken<List<String>>() {
+						}.getType());
+				mList.clear();
+				mList.addAll(tmpList);
+				Log.v(TAG,"size:"+mList.size());
+				adapter.notifyDataSetChanged();
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

@@ -32,7 +32,7 @@ import com.gexin.artplatform.mine.MyCollectActivity;
 import com.gexin.artplatform.mine.MyCommentActivity;
 import com.gexin.artplatform.mine.MyFansActivity;
 import com.gexin.artplatform.mine.MyFocusActivity;
-import com.gexin.artplatform.mine.MyFollowActivity;
+import com.gexin.artplatform.mine.MyQuestionActivity;
 import com.gexin.artplatform.mine.MySubscribeActivity;
 import com.gexin.artplatform.mine.MyWorkActivity;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
@@ -192,7 +192,7 @@ public class MineFragment extends Fragment {
 			public void onClick(View v) {
 				if (job != -1) {
 					Intent intent = new Intent(getActivity(),
-							MyFollowActivity.class);
+							MyQuestionActivity.class);
 					startActivity(intent);
 				} else {
 					Toast.makeText(getActivity(), "ÇëÏÈµÇÂ¼", Toast.LENGTH_SHORT)

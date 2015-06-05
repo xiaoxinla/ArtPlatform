@@ -258,6 +258,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:textColor="#2e2e2e"
+        android:maxLines="3"
         android:textSize="14sp" />
 
     <View

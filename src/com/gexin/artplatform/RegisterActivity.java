@@ -29,12 +29,13 @@ public class RegisterActivity extends Activity {
 	private static final String REGISTER_API = Constant.SERVER_URL
 			+ Constant.USER_API;
 	private EditText etUsername;
+	private EditText etName;
 	private EditText etPassword;
 	private Button btnConfirm;
-	private Spinner mSpinner;
+//	private Spinner mSpinner;
 
-	private String[] jobs = { "学生", "教师" };
-	private ArrayAdapter<String> adapter;
+//	private String[] jobs = { "学生", "教师" };
+//	private ArrayAdapter<String> adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +48,19 @@ public class RegisterActivity extends Activity {
 		etUsername = (EditText) findViewById(R.id.et_username_reg);
 		etPassword = (EditText) findViewById(R.id.et_password_reg);
 		btnConfirm = (Button) findViewById(R.id.btn_confirm_reg);
-		mSpinner = (Spinner) findViewById(R.id.sp_job_reg);
-		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, jobs);
-		mSpinner.setAdapter(adapter);
+//		mSpinner = (Spinner) findViewById(R.id.sp_job_reg);
+		etName = (EditText) findViewById(R.id.et_name_reg);
+//		adapter = new ArrayAdapter<String>(this,
+//				android.R.layout.simple_spinner_item, jobs);
+//		mSpinner.setAdapter(adapter);
 		btnConfirm.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				String name = etUsername.getText().toString();
 				String password = etPassword.getText().toString();
-				int isTeacher = mSpinner.getSelectedItemPosition();
+				//默认为学生
+				int isTeacher = 0;
 				if (name.isEmpty() || password.isEmpty()) {
 					Toast.makeText(RegisterActivity.this, "请完整填写信息",
 							Toast.LENGTH_SHORT).show();

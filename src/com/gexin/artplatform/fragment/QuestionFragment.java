@@ -171,8 +171,8 @@ public class QuestionFragment extends Fragment {
 	private void initData() {
 		String userId = (String) SPUtil.get(getActivity(), "userId", "");
 		String api = PROBLEMS_API;
-		if(!userId.isEmpty()){
-			api+="?userId="+userId;
+		if (!userId.isEmpty()) {
+			api += "?userId=" + userId;
 		}
 		problems = new ArrayList<Problem>();
 		adapter = new QuestionAdapter(getActivity(), problems);
@@ -234,8 +234,8 @@ public class QuestionFragment extends Fragment {
 			// Simulates a background job.
 			String userId = (String) SPUtil.get(getActivity(), "userId", "");
 			String api = PROBLEMS_API;
-			if(!userId.isEmpty()){
-				api+="?userId="+userId;
+			if (!userId.isEmpty()) {
+				api += "?userId=" + userId;
 			}
 			String result = "";
 			Log.v(TAG, api);
@@ -273,18 +273,19 @@ public class QuestionFragment extends Fragment {
 		protected List<Problem> doInBackground(Void... params) {
 			// Simulates a background job.
 			String result = "";
-//			String prm = "?skip=" + problems.size();
-			if(problems==null||problems.size()==0){
+			// String prm = "?skip=" + problems.size();
+			if (problems == null || problems.size() == 0) {
 				return new ArrayList<Problem>();
 			}
 			String userId = (String) SPUtil.get(getActivity(), "userId", "");
 			String api = PROBLEMS_API;
-			if(!userId.isEmpty()){
-				api+="?userId="+userId;
+			api += "?timestamp="
+					+ problems.get(problems.size() - 1).getTimestamp();
+			if (!userId.isEmpty()) {
+				api += "&userId=" + userId;
 			}
-			String prm = "?timestamp="+problems.get(problems.size()-1).getTimestamp();
-			result = NetUtil.connect(NetUtil.GET, api + prm, null);
-			// Log.v(TAG, "result:" + result);
+			result = NetUtil.connect(NetUtil.GET, api, null);
+			Log.v(TAG, "url:" + api);
 			try {
 				JSONObject jObject = new JSONObject(result == null ? ""
 						: result.trim());
@@ -319,7 +320,7 @@ public class QuestionFragment extends Fragment {
 	private List<Problem> success(JSONObject jObject) {
 		int state = -1;
 		List<Problem> tempList = null;
-		Log.v(TAG, "jObject:"+jObject.toString());
+		Log.v(TAG, "jObject:" + jObject.toString());
 		try {
 			state = jObject.getInt("stat");
 			if (state == 1) {
@@ -334,7 +335,7 @@ public class QuestionFragment extends Fragment {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-//		Log.v(TAG, "success:" + tempList);
+		// Log.v(TAG, "success:" + tempList);
 		return tempList;
 
 	}

@@ -54,8 +54,10 @@ public class RoomTeacherFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				startActivity(new Intent(getActivity(),
-						TeacherDetailActivity.class));
+				Intent intent = new Intent(getActivity(),
+						TeacherDetailActivity.class);
+				intent.putExtra("teacherId", mList.get(arg2).getUserId());
+				startActivity(intent);
 			}
 		});
 	}

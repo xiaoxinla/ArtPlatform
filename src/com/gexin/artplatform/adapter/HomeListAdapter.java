@@ -1,5 +1,6 @@
 package com.gexin.artplatform.adapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -10,12 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
+import com.gexin.artplatform.LargeImageActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.RoomDetailActivity;
 import com.gexin.artplatform.bean.Article;
@@ -95,6 +97,15 @@ public class HomeListAdapter extends BaseAdapter {
 		holder.tvName.setText(article.getStudioName());
 		holder.tvTime.setText(TimeUtil.getDateString(article.getCreateTime()));
 		holder.tvTitle.setText(article.getTitle());
+		holder.ivHeader.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(mContext, RoomDetailActivity.class);
+				intent.putExtra("studioId", article.getStudioId());
+				mContext.startActivity(intent);
+			}
+		});
 		holder.tvName.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -107,16 +118,31 @@ public class HomeListAdapter extends BaseAdapter {
 		ImageLoader.getInstance().displayImage(article.getStudioAvatarUrl(),
 				holder.ivHeader, avatarOptions);
 		holder.flPics.removeAllViews();
+		int cnt = 0;
 		for (String url : article.getImages()) {
 			ImageView imageView = new ImageView(mContext);
-			imageView.setMaxHeight(120);
-			imageView.setMaxWidth(150);
-			imageView.setAdjustViewBounds(true);
+//			imageView.setMaxHeight(120);
+//			imageView.setMaxWidth(150);
+//			imageView.setAdjustViewBounds(true);
+			imageView.setScaleType(ScaleType.CENTER_CROP);
 			MarginLayoutParams lp = new MarginLayoutParams(
-					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+					130, 130);
 			lp.setMargins(5, 5, 5, 5);
 			ImageLoader.getInstance().displayImage(url, imageView, picOptions);
 			holder.flPics.addView(imageView, lp);
+			final int index = cnt;
+			imageView.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					Intent intent = new Intent(mContext,
+							LargeImageActivity.class);
+					intent.putStringArrayListExtra("images",
+							(ArrayList<String>) article.getImages());
+					intent.putExtra("index", index);
+					mContext.startActivity(intent);
+				}
+			});
 		}
 
 		return convertView;

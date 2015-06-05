@@ -31,15 +31,13 @@
 
     <ImageView
         android:id="@+id/iv_pic_question_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         android:layout_below="@id/tv_content_question_item"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:adjustViewBounds="true"
-        android:maxHeight="150dp"
-        android:scaleType="fitStart"
+        android:scaleType="centerCrop"
         android:src="@drawable/ic_menu_emoticons" />
 
     <LinearLayout
@@ -111,7 +109,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:clickable="true"
             android:background="@drawable/selector_titlebar_btn"
             android:orientation="horizontal"
             android:paddingBottom="10dp"

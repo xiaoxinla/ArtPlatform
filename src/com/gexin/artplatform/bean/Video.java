@@ -8,6 +8,7 @@ public class Video {
 	private String description;
 	private String userId;
 	private String videoUrl;
+	private String imageUrl;
 
 	public long getCreateTime() {
 		return createTime;
@@ -57,11 +58,20 @@ public class Video {
 		this.videoUrl = videoUrl;
 	}
 
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
 	@Override
 	public String toString() {
 		return "Video [createTime=" + createTime + ", updateTime=" + updateTime
 				+ ", title=" + title + ", description=" + description
-				+ ", userId=" + userId + ", videoUrl=" + videoUrl + "]";
+				+ ", userId=" + userId + ", videoUrl=" + videoUrl
+				+ ", imageUrl=" + imageUrl + "]";
 	}
 
 }

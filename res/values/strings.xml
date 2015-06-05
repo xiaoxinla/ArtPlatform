@@ -13,7 +13,7 @@
     <string name="login">登录</string>
     <string name="post_hint">拍照更容易获得答案哦</string>
     <string name="wordleft_hint">还可以输入140字</string>
-    <string name="large_image_title">大图</string>
+    <string name="large_image_title">查看大图</string>
     <string name="city_inflate_title">选择地区</string>
     <string name="room_detail_phone">联系电话：</string>
     <string name="room_detail_environment">画室环境：</string>
@@ -35,5 +35,6 @@
     <string name="title_activity_modify_user_info">ModifyUserInfoActivity</string>
     <string name="title_activity_teacher_detail">TeacherDetailActivity</string>
     <string name="title_activity_video_detail">VideoDetailActivity</string>
+    <string name="title_activity_download">DownloadActivity</string>
 
 </resources>

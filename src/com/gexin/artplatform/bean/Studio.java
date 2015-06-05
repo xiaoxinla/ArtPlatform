@@ -16,6 +16,7 @@ public class Studio {
 	private int teacherNum;
 	private int videoNum;
 	private int workNum;
+	private int isWatched;
 
 	public String getStudioId() {
 		return studioId;
@@ -129,6 +130,14 @@ public class Studio {
 		this.workNum = workNum;
 	}
 
+	public int getIsWatched() {
+		return isWatched;
+	}
+
+	public void setIsWatched(int isWatched) {
+		this.isWatched = isWatched;
+	}
+
 	@Override
 	public String toString() {
 		return "Studio [studioId=" + studioId + ", avatarUrl=" + avatarUrl
@@ -137,7 +146,8 @@ public class Studio {
 				+ ", register=" + register + ", answerNum=" + answerNum
 				+ ", articleNum=" + articleNum + ", fanNum=" + fanNum
 				+ ", followNum=" + followNum + ", teacherNum=" + teacherNum
-				+ ", videoNum=" + videoNum + ", workNum=" + workNum + "]";
+				+ ", videoNum=" + videoNum + ", workNum=" + workNum
+				+ ", isWatched=" + isWatched + "]";
 	}
 
 }

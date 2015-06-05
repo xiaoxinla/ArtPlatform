@@ -190,7 +190,10 @@ public class QuestionAdapter extends BaseAdapter {
 				if (imageUrl != null && !imageUrl.isEmpty()) {
 					Intent intent = new Intent(mContext,
 							LargeImageActivity.class);
-					intent.putExtra("url", imageUrl);
+					List<String> images = new ArrayList<String>();
+					images.add(imageUrl);
+					intent.putStringArrayListExtra("images",
+							(ArrayList<String>) images);
 					mContext.startActivity(intent);
 				}
 			}

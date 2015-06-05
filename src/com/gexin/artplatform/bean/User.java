@@ -11,6 +11,7 @@ public class User {
 	private String avatarUrl;
 	private String school;
 	private String email;
+	private String studioName;
 	private int collectionNum;
 	private int fanNum;
 	private int followNum;
@@ -187,17 +188,26 @@ public class User {
 		this.grade = grade;
 	}
 
+	public String getStudioName() {
+		return studioName;
+	}
+
+	public void setStudioName(String studioName) {
+		this.studioName = studioName;
+	}
+
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", name=" + name + ", avatarUrl="
 				+ avatarUrl + ", school=" + school + ", email=" + email
-				+ ", collectionNum=" + collectionNum + ", fanNum=" + fanNum
-				+ ", followNum=" + followNum + ", gender=" + gender
-				+ ", subscriptionNum=" + subscriptionNum + ", workNum="
-				+ workNum + ", askNum=" + askNum + ", commentNum=" + commentNum
-				+ ", askMeNum=" + askMeNum + ", answerNum=" + answerNum
-				+ ", isTeacher=" + isTeacher + ", phone=" + phone + ", place="
-				+ place + ", weibo=" + weibo + ", grade=" + grade + "]";
+				+ ", studioName=" + studioName + ", collectionNum="
+				+ collectionNum + ", fanNum=" + fanNum + ", followNum="
+				+ followNum + ", gender=" + gender + ", subscriptionNum="
+				+ subscriptionNum + ", workNum=" + workNum + ", askNum="
+				+ askNum + ", commentNum=" + commentNum + ", askMeNum="
+				+ askMeNum + ", answerNum=" + answerNum + ", isTeacher="
+				+ isTeacher + ", phone=" + phone + ", place=" + place
+				+ ", weibo=" + weibo + ", grade=" + grade + "]";
 	}
 
 	public void putToSP(Context context) {
@@ -217,11 +227,14 @@ public class User {
 		SPUtil.put(context, "answerNum", this.answerNum);
 		SPUtil.put(context, "phone", this.phone);
 		SPUtil.put(context, "grade", this.grade);
-		if (this.place.province != null) {
-			SPUtil.put(context, "province", this.place.province);
+		if(this.studioName!=null){
+			SPUtil.put(context, "studioName", this.studioName);
 		}
-		if (this.place.city != null) {
-			SPUtil.put(context, "city", this.place.city);
+		if (this.place.getProvince() != null) {
+			SPUtil.put(context, "province", this.place.getProvince());
+		}
+		if (this.place.getCity() != null) {
+			SPUtil.put(context, "city", this.place.getCity());
 		}
 		if (this.email != null) {
 			SPUtil.put(context, "email", this.email);
@@ -239,17 +252,6 @@ public class User {
 		} else {
 			SPUtil.put(context, "LOGIN", "TEACHER");
 		}
-	}
-
-	private static class Place {
-		public String province;
-		public String city;
-
-		@Override
-		public String toString() {
-			return "Place [province=" + province + ", city=" + city + "]";
-		}
-
 	}
 
 	private static class Weibo {

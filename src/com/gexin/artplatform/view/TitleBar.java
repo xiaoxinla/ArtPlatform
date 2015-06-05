@@ -100,7 +100,7 @@ public class TitleBar extends RelativeLayout {
 		setGravity(Gravity.CENTER_VERTICAL);
 		tvTitle = new TextView(context);
 		tvTitle.setText(titleText);
-		tvTitle.setTextSize(infoTextSize);
+		tvTitle.setTextSize(25);
 		tvTitle.setTextColor(infoTextColor);
 
 		leftView = new RelativeLayout(context);

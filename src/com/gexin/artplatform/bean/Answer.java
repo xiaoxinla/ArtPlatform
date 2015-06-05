@@ -8,7 +8,10 @@ public class Answer {
 	private String userId;
 	private String problemId;
 	private String avatarUrl;
+	private String userName;
 	private List<AnswerContent> content;
+	private long createTime;
+	private long updateTime;
 
 	public String get_id() {
 		return _id;
@@ -50,11 +53,36 @@ public class Answer {
 		this.content = content;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public long getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(long createTime) {
+		this.createTime = createTime;
+	}
+
+	public long getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(long updateTime) {
+		this.updateTime = updateTime;
+	}
+
 	@Override
 	public String toString() {
 		return "Answer [_id=" + _id + ", userId=" + userId + ", problemId="
-				+ problemId + ", avatarUrl=" + avatarUrl + ", content="
-				+ content + "]";
+				+ problemId + ", avatarUrl=" + avatarUrl + ", userName="
+				+ userName + ", content=" + content + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + "]";
 	}
 
 }

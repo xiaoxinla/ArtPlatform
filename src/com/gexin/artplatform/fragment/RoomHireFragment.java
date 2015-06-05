@@ -52,7 +52,7 @@ public class RoomHireFragment extends Fragment {
 		adapter = new RoomHireAdapter(getActivity(), mList);
 		mListView.setAdapter(adapter);
 	}
-	
+
 	@SuppressLint("HandlerLeak")
 	public void setStudioId(String studioId) {
 		String url = Constant.SERVER_URL + "/api/studio/" + studioId
@@ -77,13 +77,17 @@ public class RoomHireFragment extends Fragment {
 			JSONObject jsonObject = new JSONObject(res);
 			int state = jsonObject.getInt("stat");
 			if (state == 1) {
-				List<Recruitment> tmpList = gson.fromJson(
-						jsonObject.getJSONArray("recruitments").toString(),
+				List<Recruitment> tmpList = gson.fromJson(jsonObject
+						.getJSONArray("recruitments").toString(),
 						new TypeToken<List<Recruitment>>() {
 						}.getType());
-				mList.clear();
-				mList.addAll(tmpList);
-				adapter.notifyDataSetChanged();
+				try {
+					mList.clear();
+					mList.addAll(tmpList);
+					adapter.notifyDataSetChanged();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
