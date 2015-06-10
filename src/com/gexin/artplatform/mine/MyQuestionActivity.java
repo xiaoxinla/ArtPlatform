@@ -15,26 +15,31 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 
 import com.gexin.artplatform.QuestionInfoActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.adapter.QuestionAdapter;
+import com.gexin.artplatform.adapter.SimpleProblemAdapter;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.NetUtil;
 import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class MyQuestionActivity extends Activity {
 	private static final String TAG = "MyQuestionActivity";
@@ -44,8 +49,11 @@ public class MyQuestionActivity extends Activity {
 	private Gson gson = new Gson();
 	private static final int POST_REQUEST_CODE = 1;
 	private PullToRefreshListView mListView;
-	private QuestionAdapter adapter;
+	private SimpleProblemAdapter adapter;
 	private List<Problem> problems;
+	private LinearLayout llBack;
+	private TitleBar titleBar;
+	
 	@SuppressLint("HandlerLeak")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +61,7 @@ public class MyQuestionActivity extends Activity {
 		setContentView(R.layout.student_question);
 		
 		initView();
+		initTitleBar();
 		initData();
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -95,15 +104,9 @@ public class MyQuestionActivity extends Activity {
 			}
 		});
 
-		setRightView();
 
 	}
 
-	private void setRightView() {
-		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
-		params.setMargins(10, 0, 10, 0);
-	}
 
 
 	/**
@@ -117,7 +120,7 @@ public class MyQuestionActivity extends Activity {
 			api+="?userId="+userId;
 		}
 		problems = new ArrayList<Problem>();
-		adapter = new QuestionAdapter(MyQuestionActivity.this, problems);
+		adapter = new SimpleProblemAdapter(MyQuestionActivity.this, problems);
 		mListView.setAdapter(adapter);
 		Handler handler = new Handler() {
 
@@ -283,6 +286,28 @@ public class MyQuestionActivity extends Activity {
 //		Log.v(TAG, "success:" + tempList);
 		return tempList;
 
+	}
+	private void initTitleBar() {
+		titleBar = (TitleBar) findViewById(R.id.tb_myquestion);
+		llBack = new LinearLayout(this);
+		ImageView ivBack = new ImageView(this);
+		ivBack.setImageResource(R.drawable.back_icon);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.MATCH_PARENT);
+		llBack.addView(ivBack, params);
+		llBack.setGravity(Gravity.CENTER_VERTICAL);
+		llBack.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llBack.setPadding(20, 0, 20, 0);
+		titleBar.setLeftView(llBack);
+
+		llBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Log.v(TAG, "BackClick");
+				finish();
+			}
+		});
 	}
 	
 }

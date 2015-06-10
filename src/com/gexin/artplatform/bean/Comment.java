@@ -10,6 +10,7 @@ public class Comment {
 	private long timestamp;
 	private String fromUserAvatarUrl;
 	private String fromUserName;
+	private String toUserName;
 	private Problem problem;
 
 	public Problem get_problem() {
@@ -84,12 +85,22 @@ public class Comment {
 		this.fromUserName = fromUserName;
 	}
 
+	public String getToUserName() {
+		return toUserName;
+	}
+
+	public void setToUserName(String toUserName) {
+		this.toUserName = toUserName;
+	}
+
 	@Override
 	public String toString() {
 		return "Comment [_id=" + _id + ", problemId=" + problemId
 				+ ", content=" + content + ", toUserId=" + toUserId
 				+ ", fromUser=" + fromUser + ", timestamp=" + timestamp
 				+ ", fromUserAvatarUrl=" + fromUserAvatarUrl
-				+ ", fromUserName=" + fromUserName + "]";
+				+ ", fromUserName=" + fromUserName + ", toUserName="
+				+ toUserName + "]";
 	}
+
 }

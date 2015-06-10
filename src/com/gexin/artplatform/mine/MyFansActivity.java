@@ -12,9 +12,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 
 import com.gexin.artplatform.R;
@@ -24,6 +30,7 @@ import com.gexin.artplatform.bean.Fans;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,6 +41,8 @@ public class MyFansActivity extends Activity {
 	private List<Fans> fansList = new ArrayList<Fans>();
 	ListView list;
 	MyFansListAdapter adapter;
+	private LinearLayout llBack;
+	private TitleBar titleBar;
 
 	@SuppressLint("HandlerLeak")
 	@Override
@@ -41,6 +50,7 @@ public class MyFansActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.student_fans);
 
+		initTitleBar();
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -70,6 +80,29 @@ public class MyFansActivity extends Activity {
 		};
 		new HttpConnectionUtils(handler).get(MyFans_API + "/"
 				+ (String) SPUtil.get(this, "userId", "") + "/fan");
+	}
+	
+	private void initTitleBar() {
+		titleBar = (TitleBar) findViewById(R.id.tb_myfans);
+		llBack = new LinearLayout(this);
+		ImageView ivBack = new ImageView(this);
+		ivBack.setImageResource(R.drawable.back_icon);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.MATCH_PARENT);
+		llBack.addView(ivBack, params);
+		llBack.setGravity(Gravity.CENTER_VERTICAL);
+		llBack.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llBack.setPadding(20, 0, 20, 0);
+		titleBar.setLeftView(llBack);
+
+		llBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Log.v(TAG, "BackClick");
+				finish();
+			}
+		});
 	}
 
 	private void initList() {

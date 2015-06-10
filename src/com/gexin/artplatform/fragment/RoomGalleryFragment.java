@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,8 +17,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+import com.gexin.artplatform.LargeImageActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.adapter.RoomGalleryAdapter;
 import com.gexin.artplatform.constant.Constant;
@@ -50,8 +54,24 @@ public class RoomGalleryFragment extends Fragment {
 	}
 
 	private void initData() {
+		for(int i=0;i<7;i++){
+			mList.add("");
+		}
 		adapter = new RoomGalleryAdapter(getActivity(), mList);
 		mGridView.setAdapter(adapter);
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Intent intent = new Intent(getActivity(),
+						LargeImageActivity.class);
+				intent.putStringArrayListExtra("images",
+						(ArrayList<String>) mList);
+				intent.putExtra("index", arg2);
+				startActivity(intent);
+			}
+		});
 	}
 	
 	@SuppressLint("HandlerLeak")

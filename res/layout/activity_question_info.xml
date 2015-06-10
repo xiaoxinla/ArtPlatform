@@ -29,6 +29,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/rl_main_activity_question_info"
                 android:background="#ffffff" >
 
                 <ImageView
@@ -44,7 +45,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_toRightOf="@id/iv_header_question_info"
+                    android:singleLine="true"
                     android:textColor="#445bc8"
+                    android:layout_marginRight="70dp"
                     android:textSize="20sp" />
 
                 <LinearLayout

@@ -15,8 +15,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout.LayoutParams;
@@ -30,6 +34,7 @@ import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.NetUtil;
 import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
@@ -46,6 +51,8 @@ public class MyCommentActivity extends Activity {
 	private PullToRefreshListView mListView;
 	private Gson gson = new Gson();
 	private QuestionAdapter adapter;
+	private LinearLayout llBack;
+	private TitleBar titleBar;
 
 	@SuppressLint("HandlerLeak")
 	@Override
@@ -54,19 +61,21 @@ public class MyCommentActivity extends Activity {
 		setContentView(R.layout.student_comment);
 
 		initView();
+		initTitleBar();
 		adapter = new QuestionAdapter(MyCommentActivity.this, problems);
 		mListView.setAdapter(adapter);
-		
+
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				Log.v(TAG, "positon:" + arg2);
-				Problem problem = (Problem) adapter.getItem(arg2 - 1);
+//				Problem problem = (Problem) adapter.getItem(arg2 - 1);
 				Intent intent = new Intent(MyCommentActivity.this,
 						QuestionInfoActivity.class);
-				intent.putExtra("problemId", problem.get_id());
+				intent.putExtra("problemId", commentList.get(arg2 - 1)
+						.getProblemId());
 				startActivity(intent);
 			}
 		});
@@ -83,11 +92,10 @@ public class MyCommentActivity extends Activity {
 								response == null ? "" : response.trim());
 						if (jObject != null) {
 							commentList.addAll(success(jObject));
-							for(int i = 0; i < commentList.size(); i++){
+							for (int i = 0; i < commentList.size(); i++) {
 								problems.add(commentList.get(i).get_problem());
-								
+
 							}
-							Log.i(TAG, problems.get(0).toString());
 							adapter.notifyDataSetChanged();
 						}
 					} catch (JSONException e) {
@@ -107,6 +115,28 @@ public class MyCommentActivity extends Activity {
 
 	}
 
+	private void initTitleBar() {
+		titleBar = (TitleBar) findViewById(R.id.tb_mycomment);
+		llBack = new LinearLayout(this);
+		ImageView ivBack = new ImageView(this);
+		ivBack.setImageResource(R.drawable.back_icon);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.MATCH_PARENT);
+		llBack.addView(ivBack, params);
+		llBack.setGravity(Gravity.CENTER_VERTICAL);
+		llBack.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llBack.setPadding(20, 0, 20, 0);
+		titleBar.setLeftView(llBack);
+
+		llBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Log.v(TAG, "BackClick");
+				finish();
+			}
+		});
+	}
 
 	private List<Comment> success(JSONObject jObject) {
 		int state = -1;
@@ -125,47 +155,47 @@ public class MyCommentActivity extends Activity {
 		return commentTemp;
 	}
 
-//	@SuppressLint("InflateParams")
-//	private void setComment() {
-//		DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
-//				.showImageOnLoading(R.drawable.ic_contact_picture)
-//				.showImageForEmptyUri(R.drawable.ic_contact_picture)
-//				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
-//				.cacheOnDisk(true).considerExifParams(true)
-//				.bitmapConfig(Bitmap.Config.RGB_565).build();
-//		
-//		for (int i = comment.size() - 1; i >= 0 ; i--) {
-//			View view = LayoutInflater.from(this).inflate(
-//					R.layout.comment_item, null);
-//			view.setClickable(true);
-//			ImageView tmpIvHeader = (ImageView) view
-//					.findViewById(R.id.iv_header_comment_item);
-//			TextView tmpTvName = (TextView) view
-//					.findViewById(R.id.tv_name_comment_item);
-//			TextView tmpTvTime = (TextView) view
-//					.findViewById(R.id.tv_time_comment_item);
-//			TextView tmpTvContent = (TextView) view
-//					.findViewById(R.id.tv_content_comment_item);
-//			tmpTvContent.setText(comment.get(i).getContent());
-//			tmpTvName.setText(problem.get(i).getName());
-//			tmpTvTime.setText(TimeUtil.getStandardDate(comment.get(i).getTimestamp()));
-//			ImageLoader.getInstance().displayImage(
-//					problem.get(i).getImage(), tmpIvHeader, imageOptions);
-//			llComment.addView(view);
-//			final String _id = problem.get(i).get_id();
-//			view.setOnClickListener(new OnClickListener() {
-//				
-//				@Override
-//				public void onClick(View v) {
-//					Intent intent = new Intent(MyCommentActivity.this,
-//							QuestionInfoActivity.class);
-//					intent.putExtra("problemId", _id);
-//					startActivity(intent);
-//				}
-//			});
-//		}
-//	}
-	
+	// @SuppressLint("InflateParams")
+	// private void setComment() {
+	// DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
+	// .showImageOnLoading(R.drawable.ic_contact_picture)
+	// .showImageForEmptyUri(R.drawable.ic_contact_picture)
+	// .showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
+	// .cacheOnDisk(true).considerExifParams(true)
+	// .bitmapConfig(Bitmap.Config.RGB_565).build();
+	//
+	// for (int i = comment.size() - 1; i >= 0 ; i--) {
+	// View view = LayoutInflater.from(this).inflate(
+	// R.layout.comment_item, null);
+	// view.setClickable(true);
+	// ImageView tmpIvHeader = (ImageView) view
+	// .findViewById(R.id.iv_header_comment_item);
+	// TextView tmpTvName = (TextView) view
+	// .findViewById(R.id.tv_name_comment_item);
+	// TextView tmpTvTime = (TextView) view
+	// .findViewById(R.id.tv_time_comment_item);
+	// TextView tmpTvContent = (TextView) view
+	// .findViewById(R.id.tv_content_comment_item);
+	// tmpTvContent.setText(comment.get(i).getContent());
+	// tmpTvName.setText(problem.get(i).getName());
+	// tmpTvTime.setText(TimeUtil.getStandardDate(comment.get(i).getTimestamp()));
+	// ImageLoader.getInstance().displayImage(
+	// problem.get(i).getImage(), tmpIvHeader, imageOptions);
+	// llComment.addView(view);
+	// final String _id = problem.get(i).get_id();
+	// view.setOnClickListener(new OnClickListener() {
+	//
+	// @Override
+	// public void onClick(View v) {
+	// Intent intent = new Intent(MyCommentActivity.this,
+	// QuestionInfoActivity.class);
+	// intent.putExtra("problemId", _id);
+	// startActivity(intent);
+	// }
+	// });
+	// }
+	// }
+
 	private void initView() {
 		mListView = (PullToRefreshListView) findViewById(R.id.lv_my_comment);
 		mListView.setMode(Mode.BOTH);
@@ -195,13 +225,13 @@ public class MyCommentActivity extends Activity {
 		setRightView();
 
 	}
-	
+
 	private void setRightView() {
 		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		params.setMargins(10, 0, 10, 0);
 	}
-	
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.v(TAG, "requestCode:" + requestCode);
@@ -224,10 +254,11 @@ public class MyCommentActivity extends Activity {
 		@Override
 		protected List<Problem> doInBackground(Void... params) {
 			// Simulates a background job.
-			String userId = (String) SPUtil.get(MyCommentActivity.this, "userId", "");
+			String userId = (String) SPUtil.get(MyCommentActivity.this,
+					"userId", "");
 			String api = MyComment_API + "/" + userId + "/comments";
-			if(!userId.isEmpty()){
-				api+="?userId="+userId;
+			if (!userId.isEmpty()) {
+				api += "?userId=" + userId;
 			}
 			String result = "";
 			Log.v(TAG, api);
@@ -239,7 +270,7 @@ public class MyCommentActivity extends Activity {
 				List<Comment> tempList = success(jObject);
 				List<Problem> probTemp = new ArrayList<Problem>();
 				if (tempList != null) {
-					for(int i = 0; i < tempList.size(); i++)
+					for (int i = 0; i < tempList.size(); i++)
 						probTemp.add(tempList.get(i).get_problem());
 					problems.clear();
 					problems.addAll(probTemp);
@@ -267,16 +298,18 @@ public class MyCommentActivity extends Activity {
 		protected List<Problem> doInBackground(Void... params) {
 			// Simulates a background job.
 			String result = "";
-//			String prm = "?skip=" + problems.size();
-			if(problems==null||problems.size()==0){
+			// String prm = "?skip=" + problems.size();
+			if (problems == null || problems.size() == 0) {
 				return new ArrayList<Problem>();
 			}
-			String userId = (String) SPUtil.get(MyCommentActivity.this, "userId", "");
+			String userId = (String) SPUtil.get(MyCommentActivity.this,
+					"userId", "");
 			String api = MyComment_API + "/" + userId + "/comments";
-			if(!userId.isEmpty()){
-				api+="?userId="+userId;
+			if (!userId.isEmpty()) {
+				api += "?userId=" + userId;
 			}
-			String prm = "?timestamp="+problems.get(problems.size()-1).getTimestamp();
+			String prm = "?timestamp="
+					+ problems.get(problems.size() - 1).getTimestamp();
 			result = NetUtil.connect(NetUtil.GET, api + prm, null);
 			// Log.v(TAG, "result:" + result);
 			try {
@@ -285,7 +318,7 @@ public class MyCommentActivity extends Activity {
 				List<Comment> tempList = success(jObject);
 				List<Problem> probTemp = new ArrayList<Problem>();
 				if (tempList != null) {
-					for(int i = 0; i < tempList.size(); i++)
+					for (int i = 0; i < tempList.size(); i++)
 						probTemp.add(tempList.get(i).get_problem());
 					problems.addAll(probTemp);
 				}

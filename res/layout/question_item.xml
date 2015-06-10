@@ -17,6 +17,7 @@
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/iv_header_question_item"
         android:text="我是用户名"
+        android:singleLine="true"
         android:textColor="#445bc8"
         android:textSize="20sp" />
 
@@ -37,8 +38,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_menu_emoticons" />
+        android:scaleType="centerCrop"/>
 
     <LinearLayout
         android:id="@+id/ll_tag_question_item"

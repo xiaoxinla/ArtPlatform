@@ -244,7 +244,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/iv_pump_fragment_mine"
                     android:padding="8dp"
-                    android:text="我的追问"
+                    android:text="我的提问"
                     android:textColor="#2e2e2e"
                     android:textSize="17sp" />
 

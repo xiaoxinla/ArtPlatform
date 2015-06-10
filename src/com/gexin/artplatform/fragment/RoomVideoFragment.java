@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.VideoDetailActivity;
@@ -54,12 +55,18 @@ public class RoomVideoFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
+				String videoId = mList.get(arg2).getVideoId();
+				if(videoId==null||videoId.isEmpty()){
+					Toast.makeText(getActivity(), " ”∆µ≤ª¥Ê‘⁄", Toast.LENGTH_SHORT).show();
+					return ;
+				}
 				Intent intent = new Intent(getActivity(),
 						VideoDetailActivity.class);
-				intent.putExtra("url", mList.get(arg2).getVideoUrl());
-				intent.putExtra("image", mList.get(arg2).getImageUrl());
-				intent.putExtra("title", mList.get(arg2).getTitle());
-				intent.putExtra("description", mList.get(arg2).getDescription());
+//				intent.putExtra("url", mList.get(arg2).getVideoUrl());
+//				intent.putExtra("image", mList.get(arg2).getImageUrl());
+//				intent.putExtra("title", mList.get(arg2).getTitle());
+//				intent.putExtra("description", mList.get(arg2).getDescription());
+				intent.putExtra("id", videoId);
 				startActivity(intent);
 			}
 		});

@@ -13,17 +13,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.JSONUtil;
 import com.gexin.artplatform.utils.SPUtil;
+import com.gexin.artplatform.view.TitleBar;
 
 public class LoginActivity extends Activity {
 
@@ -31,11 +36,13 @@ public class LoginActivity extends Activity {
 	private static final String LOGIN_API = Constant.SERVER_URL
 			+ Constant.USER_API + "/login";
 	protected static final int WEIBO_LOGIN_REQUEST = 0;
-	// private int mode = 0; //0表示登录模式，1表示注册模式
+	protected static final int REG_REQUEST = 1;
 
 	private Button btnLogin, btnReg, btnWeiboLog;
 	private EditText etUsername, etPassword;
 	private String username, password;
+	private TitleBar titleBar;
+	private LinearLayout llBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +59,8 @@ public class LoginActivity extends Activity {
 		btnWeiboLog = (Button) findViewById(R.id.btn_weibolog_activity_login);
 		etUsername = (EditText) findViewById(R.id.login_user_edit);
 		etPassword = (EditText) findViewById(R.id.login_passwd_edit);
+		titleBar = (TitleBar) findViewById(R.id.tb_login_activity);
+		initTitleBar();
 
 		btnLogin.setOnClickListener(new OnClickListener() {
 
@@ -87,7 +96,7 @@ public class LoginActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, RegisterActivity.class);
-				startActivity(intent);
+				startActivityForResult(intent, REG_REQUEST);
 			}
 		});
 
@@ -95,9 +104,9 @@ public class LoginActivity extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent intent=new Intent();   
-			    intent.setClass(LoginActivity.this, WeiboLoginActivity.class);
-			    startActivityForResult(intent, WEIBO_LOGIN_REQUEST); 
+				Intent intent = new Intent();
+				intent.setClass(LoginActivity.this, WeiboLoginActivity.class);
+				startActivityForResult(intent, WEIBO_LOGIN_REQUEST);
 			}
 		});
 	}
@@ -106,20 +115,26 @@ public class LoginActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case WEIBO_LOGIN_REQUEST:
-			if(resultCode==RESULT_OK){
+			if (resultCode == RESULT_OK) {
 				setResult(RESULT_OK);
-				int isTeacher = (Integer) SPUtil.get(this, "isTeacher", 8);
-				Log.v(TAG, "isTeacher:"+isTeacher);
+				int isTeacher = (Integer) SPUtil.get(this, "isTeacher", 0);
+				Log.v(TAG, "isTeacher:" + isTeacher);
 				finish();
 			}
 			break;
 
+		case REG_REQUEST:
+			if (resultCode == RESULT_OK) {
+				String phone = data.getStringExtra("phone");
+				etUsername.setText(phone);
+			}
+			break;
 		default:
 			break;
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	private void success(JSONObject jObject) {
 
 		try {
@@ -138,5 +153,27 @@ public class LoginActivity extends Activity {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void initTitleBar() {
+		llBack = new LinearLayout(this);
+		ImageView ivBack = new ImageView(this);
+		ivBack.setImageResource(R.drawable.back_icon);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.MATCH_PARENT);
+		llBack.addView(ivBack, params);
+		llBack.setGravity(Gravity.CENTER_VERTICAL);
+		llBack.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llBack.setPadding(20, 0, 20, 0);
+		titleBar.setLeftView(llBack);
+
+		llBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Log.v(TAG, "BackClick");
+				finish();
+			}
+		});
 	}
 }

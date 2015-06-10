@@ -142,7 +142,7 @@
         android:text="北京壹加壹画室"
         android:background="#ffffff"
         android:textColor="#2e2e2e"/>
-    <TextView 
+    <TextView android:id="@+id/tv_comnum_teacher_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
@@ -153,7 +153,7 @@
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#ededef"/>
-    <ListView android:id="@+id/lv_activity_room_detail"
+    <ListView android:id="@+id/lv_activity_teacher_detail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

@@ -23,9 +23,13 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gexin.artplatform.adapter.SimpleProblemAdapter;
+import com.gexin.artplatform.bean.Comment;
+import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.bean.User;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
@@ -33,6 +37,7 @@ import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -41,6 +46,8 @@ public class TeacherDetailActivity extends Activity {
 	private static final String TAG = "TeacherDetailActiviity";
 	private String teacherId;
 	private User mTeacher;
+	private List<Problem> problems = new ArrayList<Problem>();
+	private SimpleProblemAdapter adapter;
 	private Gson gson = new Gson();
 
 	private TitleBar titleBar;
@@ -55,6 +62,8 @@ public class TeacherDetailActivity extends Activity {
 	private TextView tvFanNum;
 	private TextView tvFollowNum;
 	private TextView tvStudioName;
+	private TextView tvComNum;
+	private ListView mListView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +89,32 @@ public class TeacherDetailActivity extends Activity {
 			@Override
 			public void handleMessage(Message msg) {
 				Log.v(TAG, "comments" + msg.obj);
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							List<Comment> tmpList = gson.fromJson(jsonObject
+									.getJSONArray("comments").toString(),
+									new TypeToken<List<Comment>>() {
+									}.getType());
+							problems.clear();
+							for(Comment comment:tmpList){
+								problems.add(comment.get_problem());
+							}
+							Log.v(TAG, "problems:"+problems.toString());
+							adapter.notifyDataSetChanged();
+							tvComNum.setText("ÆÀÂÛ£¨"+problems.size()+"£©");
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				default:
+					break;
+				}
 				super.handleMessage(msg);
 			}
 		};
@@ -142,6 +177,9 @@ public class TeacherDetailActivity extends Activity {
 		tvFanNum = (TextView) findViewById(R.id.tv_fannum_teacher_detial);
 		tvFollowNum = (TextView) findViewById(R.id.tv_focusnum_teacher_detial);
 		tvStudioName = (TextView) findViewById(R.id.tv_artroom_teacher_detail);
+		tvComNum = (TextView) findViewById(R.id.tv_comnum_teacher_detail);
+		mListView = (ListView) findViewById(R.id.lv_activity_teacher_detail);
+		
 		initTitleBar();
 		ivFocus.setOnClickListener(new OnClickListener() {
 
@@ -150,6 +188,8 @@ public class TeacherDetailActivity extends Activity {
 				postFocus();
 			}
 		});
+		adapter = new SimpleProblemAdapter(this, problems);
+		mListView.setAdapter(adapter);
 	}
 
 	@SuppressLint("HandlerLeak")

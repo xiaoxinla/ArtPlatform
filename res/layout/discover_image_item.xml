@@ -8,8 +8,9 @@
 
     <ImageView
         android:id="@+id/iv_discover_image_item"
-        android:layout_width="wrap_content"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/ic_menu_star" />
 
 </LinearLayout>

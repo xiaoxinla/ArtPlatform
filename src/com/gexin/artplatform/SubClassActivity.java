@@ -55,8 +55,7 @@ public class SubClassActivity extends Activity {
 
 		initView();
 		initData();
-		
-		
+
 	}
 
 	private void initData() {
@@ -76,7 +75,7 @@ public class SubClassActivity extends Activity {
 		mGridView = (GridView) findViewById(R.id.gv_activity_subclass);
 
 		initTitleBar();
-		
+
 	}
 
 	private void initTitleBar() {
@@ -112,40 +111,47 @@ public class SubClassActivity extends Activity {
 					mGridView.setOnItemClickListener(new OnItemClickListener() {
 
 						@Override
-						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-								long arg3) {
+						public void onItemClick(AdapterView<?> arg0, View arg1,
+								int arg2, long arg3) {
 							Intent intent = new Intent(SubClassActivity.this,
 									SubClassActivity.class);
-							intent.putExtra("name", mSubClassList.get(arg2).getName());
-							intent.putExtra("classId", mSubClassList.get(arg2).get_id());
+							intent.putExtra("name", mSubClassList.get(arg2)
+									.getName());
+							intent.putExtra("classId", mSubClassList.get(arg2)
+									.get_id());
 							startActivity(intent);
 						}
 					});
 					mSubClassList.clear();
 					mSubClassList.addAll(classification.getSubclass());
-					Log.i(TAG, "没有图片只有sub:" + mSubClassList.size()+"");
-					discoverGridAdapter = new DiscoverGridAdapter(this, mSubClassList);
+					Log.i(TAG, "没有图片只有sub:" + mSubClassList.size() + "");
+					discoverGridAdapter = new DiscoverGridAdapter(this,
+							mSubClassList);
 					mGridView.setAdapter(discoverGridAdapter);
 					mGridView.setNumColumns(2);
-				}
-				else if(classification.getImage() != null
-						&& !classification.getImage().isEmpty()){
+				} else if (classification.getImage() != null
+						&& !classification.getImage().isEmpty()) {
 					mImageList.clear();
 					mImageList.addAll(classification.getImage());
-					Log.i(TAG, "没有图片只有sub:" + mImageList.size()+"");
-					for(int i = 0; i < mImageList.size(); i++)
+					Log.i(TAG, "没有图片只有sub:" + mImageList.size() + "");
+					for (int i = 0; i < mImageList.size(); i++)
 						mImageUrlList.add(mImageList.get(i).getUrl());
-					discoverImageGridAdapter = new DiscoverImageGridAdapter(this, mImageUrlList);
+					discoverImageGridAdapter = new DiscoverImageGridAdapter(
+							this, mImageUrlList);
 					mGridView.setAdapter(discoverImageGridAdapter);
 					mGridView.setNumColumns(3);
 					mGridView.setOnItemClickListener(new OnItemClickListener() {
 
 						@Override
-						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-								long arg3) {
+						public void onItemClick(AdapterView<?> arg0, View arg1,
+								int arg2, long arg3) {
+							// ArrayList<String> Imgs = new ArrayList<String>();
+							// Imgs.add(mImageList.get(arg2).getUrl());
 							Intent intent = new Intent(SubClassActivity.this,
 									LargeImageActivity.class);
-							intent.putExtra("url", mImageList.get(arg2).getUrl());
+							intent.putStringArrayListExtra("images",
+									(ArrayList<String>) mImageUrlList);
+							intent.putExtra("index", arg2);
 							startActivity(intent);
 						}
 					});

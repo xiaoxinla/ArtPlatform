@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,22 +17,24 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.gexin.artplatform.HomeItemInfoActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.adapter.QuestionAdapter;
-import com.gexin.artplatform.bean.Problem;
+import com.gexin.artplatform.adapter.RoomAnswerAdapter;
+import com.gexin.artplatform.bean.Article;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
-import com.gexin.artplatform.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class RoomAnswerFragment extends Fragment {
 
 	private static final String TAG = "RoomAnswerFragment";
-	private QuestionAdapter adapter;
-	private List<Problem> problems;
+	private RoomAnswerAdapter adapter;
+	private List<Article> articles;
 	private Gson gson = new Gson();
 	
 	private ListView mListView;
@@ -47,24 +50,31 @@ public class RoomAnswerFragment extends Fragment {
 	
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		articles = new ArrayList<Article>();
+		adapter = new RoomAnswerAdapter(articles,getActivity());
+		mListView.setAdapter(adapter);
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Intent intent = new Intent(getActivity(),
+						HomeItemInfoActivity.class);
+				intent.putExtra("id", articles.get(arg2).getArticleId());
+				startActivity(intent);
+			}
+		});
 		super.onActivityCreated(savedInstanceState);
-		initData();
 	}
 	
 	/**
 	 * 初始化数据
 	 */
 	@SuppressLint("HandlerLeak")
-	private void initData() {
-		String userId = (String) SPUtil.get(getActivity(), "userId", "");
+	public void setStudioId(String studioId) {
 		String api = Constant.SERVER_URL
-				+ Constant.PROBLEM_API + "s";
-		if(!userId.isEmpty()){
-			api+="?userId="+userId;
-		}
-		problems = new ArrayList<Problem>();
-		adapter = new QuestionAdapter(getActivity(), problems);
-		mListView.setAdapter(adapter);
+				+ "/api/studio/"+studioId+"/article";
+		Log.v(TAG, "studioApi"+api);
 		Handler handler = new Handler() {
 
 			@Override
@@ -76,11 +86,11 @@ public class RoomAnswerFragment extends Fragment {
 						JSONObject jObject = new JSONObject(
 								response == null ? "" : response.trim());
 						if (jObject != null) {
-							List<Problem> tempList = success(jObject);
+							List<Article> tempList = success(jObject);
 							if (tempList != null) {
-								problems.clear();
-								problems.addAll(tempList);
-								Log.v(TAG, "size:"+problems.size());
+								articles.clear();
+								articles.addAll(tempList);
+								Log.v(TAG, "size:"+articles.size());
 								adapter.notifyDataSetChanged();
 //								adapter.updateData(tempList);
 							}
@@ -100,16 +110,15 @@ public class RoomAnswerFragment extends Fragment {
 		new HttpConnectionUtils(handler).get(api);
 	}
 	
-	private List<Problem> success(JSONObject jObject) {
-//		Log.v(TAG, jObject.toString());
+	private List<Article> success(JSONObject jObject) {
 		int state = -1;
-		List<Problem> tempList = null;
+		List<Article> tempList = null;
 		try {
 			state = jObject.getInt("stat");
 			if (state == 1) {
 				try {
-					tempList = gson.fromJson(jObject.getJSONArray("problems")
-							.toString(), new TypeToken<List<Problem>>() {
+					tempList = gson.fromJson(jObject.getJSONArray("articles")
+							.toString(), new TypeToken<List<Article>>() {
 					}.getType());
 				} catch (Exception e) {
 					e.printStackTrace();

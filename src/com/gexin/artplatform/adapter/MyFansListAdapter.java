@@ -1,28 +1,41 @@
 package com.gexin.artplatform.adapter;
 
-
+import java.util.ArrayList;
 import java.util.List;
-import com.gexin.artplatform.R;
-import com.gexin.artplatform.bean.Fans;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.gexin.artplatform.R;
+import com.gexin.artplatform.bean.Fans;
+import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.SPUtil;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class MyFansListAdapter extends BaseAdapter {
 
 	private Context context;
 	private List<Fans> mList;
 	private DisplayImageOptions avatarOptions;
-	private String[] userType = {"学生","老师","画室"};
+	private String[] userType = { "学生", "老师", "画室" };
 
 	public MyFansListAdapter(Context context, List<Fans> mList) {
 		this.context = context;
@@ -54,7 +67,7 @@ public class MyFansListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
-		Fans fans = mList.get(position);
+		final Fans fans = mList.get(position);
 		if (convertView == null) {
 			convertView = LayoutInflater.from(context).inflate(
 					R.layout.fans_list_item, null);
@@ -76,7 +89,53 @@ public class MyFansListAdapter extends BaseAdapter {
 		holder.tvFollowTA.setText("关注TA");
 		ImageLoader.getInstance().displayImage(fans.getAvatarUrl(),
 				holder.ivHeader, avatarOptions);
+		holder.tvFollowTA.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				postFollow(fans.get_id());
+			}
+		});
 		return convertView;
+	}
+
+	@SuppressLint("HandlerLeak")
+	protected void postFollow(String id) {
+		String userId = (String) SPUtil.get(context, "userId", "");
+		String followApi = Constant.SERVER_URL + "/api/user/" + userId
+				+ "/follow";
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							Toast.makeText(context, "关注成功", Toast.LENGTH_SHORT)
+									.show();
+						}else {
+							Toast.makeText(context, "关注失败", Toast.LENGTH_SHORT)
+							.show();
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+						Toast.makeText(context, "关注失败", Toast.LENGTH_SHORT)
+						.show();
+					}
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("userId", id));
+		list.add(new BasicNameValuePair("follow", 1 + ""));
+		new HttpConnectionUtils(handler).post(followApi, list);
 	}
 
 	private static class ViewHolder {

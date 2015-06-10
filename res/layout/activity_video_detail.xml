@@ -70,6 +70,7 @@
                 android:textColor="#2e2e2e" />
 
             <RelativeLayout
+                android:id="@+id/rl_teacher_video_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
@@ -82,7 +83,7 @@
                     android:src="@drawable/ic_contact_picture" />
 
                 <TextView
-                    android:id="@+id/tv_name_teacher_detail"
+                    android:id="@+id/tv_name_video_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -92,15 +93,6 @@
                     android:textColor="#2e2e2e"
                     android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/tv_intro_video_detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/iv_header_video_detail"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@id/iv_header_video_detail"
-                    android:text="一级名师"
-                    android:textColor="#959595" />
 
                 <ImageView
                     android:id="@+id/iv_focus_video_detail"

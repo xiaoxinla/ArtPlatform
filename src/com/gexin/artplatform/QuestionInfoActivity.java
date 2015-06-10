@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ public class QuestionInfoActivity extends Activity {
 	private ImageButton ibtnFocus;
 	private TextView tvAnswerNum;
 	private TextView tvCommentNum;
+	private RelativeLayout rlMain;
 	private View answerLine, commentLine;
 
 	private Problem problem;
@@ -122,6 +124,7 @@ public class QuestionInfoActivity extends Activity {
 		tvCommentNum = (TextView) findViewById(R.id.tv_commentnum_question_info);
 		answerLine = findViewById(R.id.v_answer_line_activity_question_info);
 		commentLine = findViewById(R.id.v_comment_line_activity_question_info);
+		rlMain = (RelativeLayout) findViewById(R.id.rl_main_activity_question_info);
 		initTitleBar();
 		btnSubmit.setOnClickListener(new OnClickListener() {
 
@@ -139,6 +142,14 @@ public class QuestionInfoActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				postFocus(problem.getUserId());
+			}
+		});
+		rlMain.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				etComment.setHint("回复楼主");
+				replyTo = "";
 			}
 		});
 		String status = (String) SPUtil.get(this, "LOGIN", "NONE");
@@ -229,6 +240,7 @@ public class QuestionInfoActivity extends Activity {
 				String name = problem.getName();
 				String avatarUrl = problem.getAvatarUrl();
 				String time = TimeUtil.getStandardDate(problem.getTimestamp());
+				String askToName = problem.getAskToName();
 				String tag = "";
 				// userId = problem.getUserId();
 				List<Comment> commentList = problem.getCommentList();
@@ -246,7 +258,11 @@ public class QuestionInfoActivity extends Activity {
 				String content = problem.getContent();
 				final String imageUrl = problem.getImage();
 				// String commentor = "XXX画室";
-				tvContent.setText(content);
+				if(askToName==null||askToName.isEmpty()){
+					tvContent.setText(content);
+				}else {
+					tvContent.setText("@"+askToName+" "+content);
+				}
 				tvTime.setText(time);
 				tvName.setText(name);
 				tvType.setText(tag);
@@ -427,7 +443,7 @@ public class QuestionInfoActivity extends Activity {
 				}
 			});
 			tmpIvFocus.setOnClickListener(new OnClickListener() {
-				
+
 				@Override
 				public void onClick(View arg0) {
 					postFocus(answer.getUserId());
@@ -446,19 +462,18 @@ public class QuestionInfoActivity extends Activity {
 				switch (msg.what) {
 				case HttpConnectionUtils.DID_SUCCEED:
 					try {
-						JSONObject jsonObject = new JSONObject(
-								(String) msg.obj);
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
 						if (jsonObject.getInt("stat") == 1) {
-							Toast.makeText(QuestionInfoActivity.this,
-									"关注成功", Toast.LENGTH_SHORT).show();
+							Toast.makeText(QuestionInfoActivity.this, "关注成功",
+									Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(QuestionInfoActivity.this,
-									"关注失败", Toast.LENGTH_SHORT).show();
+							Toast.makeText(QuestionInfoActivity.this, "关注失败",
+									Toast.LENGTH_SHORT).show();
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
-						Toast.makeText(QuestionInfoActivity.this,
-								"关注失败", Toast.LENGTH_SHORT).show();
+						Toast.makeText(QuestionInfoActivity.this, "关注失败",
+								Toast.LENGTH_SHORT).show();
 					}
 					break;
 
@@ -493,8 +508,17 @@ public class QuestionInfoActivity extends Activity {
 					.findViewById(R.id.tv_time_comment_item);
 			TextView tmpTvContent = (TextView) view
 					.findViewById(R.id.tv_content_comment_item);
-
-			tmpTvContent.setText(comment.getContent());
+			if (comment.getToUserName() == null
+					|| comment.getToUserName().isEmpty()) {
+				tmpTvContent.setText(comment.getContent());
+			} else {
+				String toUserName = comment.getToUserName();
+				if (toUserName.length() > 10) {
+					toUserName = toUserName.substring(0, 10) + "...";
+				}
+				tmpTvContent.setText("回复"+comment.getToUserName() + ":"
+						+ comment.getContent());
+			}
 			tmpTvName.setSingleLine(true);
 			tmpTvName.setTextColor(Color.parseColor("#445bc8"));
 			tmpTvName.setText(comment.getFromUserName());

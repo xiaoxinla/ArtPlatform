@@ -19,6 +19,9 @@ public class Problem {
 	private List<Answer> answerList;
 	private String askTo;
 	private List<String> tag;
+	private int askToType;
+	private String askToAvatarUrl;
+	private String askToName;
 
 	public int getAnswerNum() {
 		return answerNum;
@@ -140,18 +143,41 @@ public class Problem {
 		this.answerList = answerList;
 	}
 
+	public int getAskToType() {
+		return askToType;
+	}
+
+	public void setAskToType(int askToType) {
+		this.askToType = askToType;
+	}
+
+	public String getAskToAvatarUrl() {
+		return askToAvatarUrl;
+	}
+
+	public void setAskToAvatarUrl(String askToAvatarUrl) {
+		this.askToAvatarUrl = askToAvatarUrl;
+	}
+
+	public String getAskToName() {
+		return askToName;
+	}
+
+	public void setAskToName(String askToName) {
+		this.askToName = askToName;
+	}
+
 	@Override
 	public String toString() {
-		if(this==null){
-			return "";
-		}
 		return "Problem [_id=" + _id + ", answerNum=" + answerNum
 				+ ", avatarUrl=" + avatarUrl + ", content=" + content
 				+ ", image=" + image + ", name=" + name + ", timestamp="
 				+ timestamp + ", viewNum=" + viewNum + ", zan=" + zan
 				+ ", isZan=" + isZan + ", userId=" + userId + ", commentList="
 				+ commentList + ", answerList=" + answerList + ", askTo="
-				+ askTo + ", tag=" + tag + "]";
+				+ askTo + ", tag=" + tag + ", askToType=" + askToType
+				+ ", askToAvatarUrl=" + askToAvatarUrl + ", askToName="
+				+ askToName + "]";
 	}
 
 }

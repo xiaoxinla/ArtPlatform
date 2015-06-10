@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,21 +82,28 @@ public class SelectTagActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				list.clear();
-				for (int i = 0; i < tagNames.length; i++) {
-					if (i == arg2) {
-						checkFlags.set(i, true);
-					} else {
-						checkFlags.set(i, false);
-					}
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("tagName", tagNames[i]);
-					if (checkFlags.get(i)) {
-						map.put("checkicon", R.drawable.check2);
-					} else {
-						map.put("checkicon", R.drawable.check1);
-					}
-					list.add(map);
+//				list.clear();
+//				for (int i = 0; i < tagNames.length; i++) {
+//					if (i == arg2) {
+//						checkFlags.set(i, true);
+//					} else {
+//						checkFlags.set(i, false);
+//					}
+//					Map<String, Object> map = new HashMap<String, Object>();
+//					map.put("tagName", tagNames[i]);
+//					if (checkFlags.get(i)) {
+//						map.put("checkicon", R.drawable.check2);
+//					} else {
+//						map.put("checkicon", R.drawable.check1);
+//					}
+//					list.add(map);
+//				}
+				if(checkFlags.get(arg2)){
+					checkFlags.set(arg2, false);
+					list.get(arg2).put("checkicon", R.drawable.check1);
+				}else {
+					checkFlags.set(arg2, true);
+					list.get(arg2).put("checkicon", R.drawable.check2);
 				}
 				adapter.notifyDataSetChanged();
 			}
@@ -160,13 +168,14 @@ public class SelectTagActivity extends Activity {
 	private boolean postProblem() {
 		String userId = (String) SPUtil.get(this, "userId", "");
 		choosenTags.clear();
+		JSONArray jsonArray = new JSONArray();
 		for (int i = 0; i < checkFlags.size(); i++) {
 			if (checkFlags.get(i)) {
 				choosenTags.add(tagNames[i]);
-				break;
+				jsonArray.put(tagNames[i]);
 			}
 		}
-		final String tag = choosenTags.toString();
+		final String tag = jsonArray.toString();
 		if (tag.isEmpty()) {
 			Toast.makeText(this, "请为问题添加标签", Toast.LENGTH_SHORT).show();
 			return false;
@@ -218,6 +227,11 @@ public class SelectTagActivity extends Activity {
 
 			@Override
 			public void run() {
+				Log.v(TAG, "imagePath:"+imagePath);
+				if(imagePath==null||imagePath.isEmpty()){
+					handler.sendEmptyMessage(POST_IMAGE_SUCCESS);
+					return ;
+				}
 				String imageResult = NetUtil.uploadFile(new File(imagePath),
 						POST_IMAGE_API);
 				if (imageResult != null && !imageResult.isEmpty()) {

@@ -19,6 +19,7 @@
    	    android:layout_toRightOf="@+id/iv_fans_avatar"
    	    android:gravity="center"
    	    android:text="我是名字"
+   	    android:textColor="#2e2e2e"
    	    android:textSize="20sp" />
 
    	<TextView

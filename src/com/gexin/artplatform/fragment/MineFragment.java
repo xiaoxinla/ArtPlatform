@@ -152,7 +152,7 @@ public class MineFragment extends Fragment {
 			tvWork.setText("我的作品(" + workNum + ")");
 		}
 		if (askNum != 0 && job != -1) {
-			tvPump.setText("我的追问(" + askNum + ")");
+			tvPump.setText("我的提问(" + askNum + ")");
 		}
 		if (commentNum != 0 && job != -1) {
 			tvComment.setText("我的评论(" + commentNum + ")");

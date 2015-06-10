@@ -5,23 +5,28 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
+import com.gexin.artplatform.view.TitleBar;
 
 public class RegisterActivity extends Activity {
 
@@ -32,10 +37,8 @@ public class RegisterActivity extends Activity {
 	private EditText etName;
 	private EditText etPassword;
 	private Button btnConfirm;
-//	private Spinner mSpinner;
-
-//	private String[] jobs = { "学生", "教师" };
-//	private ArrayAdapter<String> adapter;
+	private TitleBar titleBar;
+	private LinearLayout llBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,20 +51,17 @@ public class RegisterActivity extends Activity {
 		etUsername = (EditText) findViewById(R.id.et_username_reg);
 		etPassword = (EditText) findViewById(R.id.et_password_reg);
 		btnConfirm = (Button) findViewById(R.id.btn_confirm_reg);
-//		mSpinner = (Spinner) findViewById(R.id.sp_job_reg);
 		etName = (EditText) findViewById(R.id.et_name_reg);
-//		adapter = new ArrayAdapter<String>(this,
-//				android.R.layout.simple_spinner_item, jobs);
-//		mSpinner.setAdapter(adapter);
+		titleBar = (TitleBar) findViewById(R.id.tb_reg_activity);
+		initTitleBar();
 		btnConfirm.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				String name = etUsername.getText().toString();
+				String phone = etUsername.getText().toString();
 				String password = etPassword.getText().toString();
-				//默认为学生
-				int isTeacher = 0;
-				if (name.isEmpty() || password.isEmpty()) {
+				// 默认为学生
+				if (phone.isEmpty() || password.isEmpty()) {
 					Toast.makeText(RegisterActivity.this, "请完整填写信息",
 							Toast.LENGTH_SHORT).show();
 				} else {
@@ -77,18 +77,49 @@ public class RegisterActivity extends Activity {
 					HttpConnectionUtils httpConnectionUtils = new HttpConnectionUtils(
 							handler);
 					List<NameValuePair> list = new ArrayList<NameValuePair>();
-					list.add(new BasicNameValuePair("email", name));
+					list.add(new BasicNameValuePair("phone", phone));
 					list.add(new BasicNameValuePair("password", password));
-					list.add(new BasicNameValuePair("isTeacher", String
-							.valueOf(isTeacher)));
 					httpConnectionUtils.post(REGISTER_API, list);
 				}
 			}
 		});
 	}
-	
-	private void success(JSONObject jObject){
-		
+
+	private void success(JSONObject jObject) {
+		try {
+			int state = jObject.getInt("stat");
+			if (state == 0) {
+				Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent();
+				intent.putExtra("phone", etUsername.getText().toString());
+				setResult(RESULT_OK, intent);
+				finish();
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void initTitleBar() {
+		llBack = new LinearLayout(this);
+		ImageView ivBack = new ImageView(this);
+		ivBack.setImageResource(R.drawable.back_icon);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.MATCH_PARENT);
+		llBack.addView(ivBack, params);
+		llBack.setGravity(Gravity.CENTER_VERTICAL);
+		llBack.setBackgroundResource(R.drawable.selector_titlebar_btn);
+		llBack.setPadding(20, 0, 20, 0);
+		titleBar.setLeftView(llBack);
+
+		llBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Log.v(TAG, "BackClick");
+				finish();
+			}
+		});
 	}
 
 }

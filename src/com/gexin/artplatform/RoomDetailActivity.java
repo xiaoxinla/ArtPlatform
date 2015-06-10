@@ -93,6 +93,7 @@ public class RoomDetailActivity extends FragmentActivity implements
 	private TextView tvFanNum;
 	private ImageView ivHeader;
 	private ImageButton ibtnFocus;
+	private Button btnEnvirDetail;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +114,7 @@ public class RoomDetailActivity extends FragmentActivity implements
 		roomHireFragment = new RoomHireFragment();
 		roomVideoFragment = new RoomVideoFragment();
 
+		roomAnswerFragment.setStudioId(studioId);
 		roomTeacherFragment.setStudioId(studioId);
 		roomHireFragment.setStudioId(studioId);
 		roomVideoFragment.setStudioId(studioId);
@@ -171,6 +173,17 @@ public class RoomDetailActivity extends FragmentActivity implements
 			}
 		});
 
+		btnEnvirDetail.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(RoomDetailActivity.this,
+						StudioEnvironmentActivity.class);
+				intent.putExtra("studioId", studioId);
+				startActivity(intent);
+			}
+		});
+
 		getStudioInfo();
 	}
 
@@ -191,12 +204,14 @@ public class RoomDetailActivity extends FragmentActivity implements
 							Toast.makeText(RoomDetailActivity.this, "关注成功",
 									Toast.LENGTH_SHORT).show();
 							studio.setIsWatched(1);
-							ibtnFocus.setImageResource(R.drawable.focus_cancle_icon);
+							ibtnFocus
+									.setImageResource(R.drawable.focus_cancle_icon);
 						} else {
 							Toast.makeText(RoomDetailActivity.this, "取消关注成功",
 									Toast.LENGTH_SHORT).show();
 							studio.setIsWatched(0);
-							ibtnFocus.setImageResource(R.drawable.interest_icon_1);
+							ibtnFocus
+									.setImageResource(R.drawable.interest_icon_1);
 						}
 					}
 				} catch (JSONException e) {
@@ -208,8 +223,8 @@ public class RoomDetailActivity extends FragmentActivity implements
 		list.add(new BasicNameValuePair("studioId", studioId));
 		if (studio.getIsWatched() == 0) {
 			new HttpConnectionUtils(handler).put(url, list);
-		}else {
-			url+="?studioId="+studioId;
+		} else {
+			url += "?studioId=" + studioId;
 			new HttpConnectionUtils(handler).delete(url);
 		}
 	}
@@ -278,6 +293,7 @@ public class RoomDetailActivity extends FragmentActivity implements
 		tvFanNum = (TextView) findViewById(R.id.tv_fannum_room_detail);
 		ivHeader = (ImageView) findViewById(R.id.iv_roomlogo_room_detail);
 		ibtnFocus = (ImageButton) findViewById(R.id.ibtn_interest_room_detail);
+		btnEnvirDetail = (Button) findViewById(R.id.btn_envir_info_room_detail);
 
 		tvAnswer.setOnClickListener(this);
 		tvGallery.setOnClickListener(this);
@@ -340,8 +356,10 @@ public class RoomDetailActivity extends FragmentActivity implements
 							Toast.LENGTH_SHORT).show();
 					return;
 				}
-				startActivity(new Intent(RoomDetailActivity.this,
-						PostProblemActivity.class));
+				Intent intent = new Intent(RoomDetailActivity.this,
+						PostProblemActivity.class);
+				intent.putExtra("teacherId", studioId);
+				startActivity(intent);
 			}
 		});
 	}

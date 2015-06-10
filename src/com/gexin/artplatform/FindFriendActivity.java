@@ -1,29 +1,44 @@
 package com.gexin.artplatform;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
+import com.gexin.artplatform.adapter.FindFriendAdapter;
+import com.gexin.artplatform.bean.User;
+import com.gexin.artplatform.constant.Constant;
+import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.view.TitleBar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class FindFriendActivity extends Activity {
 
-	private List<Map<String, Object>> mList = new ArrayList<Map<String, Object>>();
-	private SimpleAdapter adapter;
+	private static final String TAG = "FindFriendActivity";
+	private List<User> mList = new ArrayList<User>();
+	private FindFriendAdapter adapter;
+	private Gson gson = new Gson();
 
 	private LinearLayout llBack;
 	private TitleBar titleBar;
@@ -40,29 +55,71 @@ public class FindFriendActivity extends Activity {
 	}
 
 	private void initData() {
-		for (int i = 0; i < 10; i++) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("name", "昵称" + i);
-			mList.add(map);
-		}
-		adapter = new SimpleAdapter(this, mList, R.layout.find_friend_item,
-				new String[] { "name" },
-				new int[] { R.id.tv_name_find_friend_item });
+		adapter = new FindFriendAdapter(this, mList);
 		mListView.setAdapter(adapter);
 		mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
-			
+
 			@Override
 			public boolean onQueryTextSubmit(String arg0) {
-				// TODO Auto-generated method stub
+				getUsers(arg0);
 				return false;
 			}
-			
+
 			@Override
 			public boolean onQueryTextChange(String arg0) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 		});
+		mSearchView.setOnSearchClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				getUsers(mSearchView.getQuery().toString());
+			}
+		});
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Intent intent = new Intent(FindFriendActivity.this,
+						ViewOtherUserActivity.class);
+				intent.putExtra("userId", mList.get(arg2).getUserId());
+				startActivity(intent);
+			}
+		});
+	}
+
+	protected void getUsers(String name) {
+		String url = Constant.SERVER_URL + "/api/user/name?name=" + name;
+		Handler handler = new HttpHandler(this) {
+			@Override
+			protected void succeed(JSONObject jObject) {
+				dealResponse(jObject);
+			}
+		};
+		new HttpConnectionUtils(handler).get(url);
+	}
+
+	private void dealResponse(JSONObject jObject) {
+		try {
+			int state = jObject.getInt("stat");
+			if (state == 1) {
+				List<User> tmpList = gson.fromJson(jObject
+						.getJSONArray("users").toString(),
+						new TypeToken<List<User>>() {
+						}.getType());
+				Log.v(TAG, tmpList.toString());
+				mList.clear();
+				mList.addAll(tmpList);
+				adapter.notifyDataSetChanged();
+				if (mList.isEmpty()) {
+					Toast.makeText(this, "没有匹配的好友", Toast.LENGTH_SHORT).show();
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void initView() {

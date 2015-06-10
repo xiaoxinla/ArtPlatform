@@ -99,7 +99,9 @@ public class ModifyUserInfoActivity extends Activity {
 				}
 				mList.add(map);
 			}
-			mList.get(selectPos).put("select", true);
+			if (selectPos >= 0) {
+				mList.get(selectPos).put("select", true);
+			}
 			break;
 		case 2:
 			for (int i = 0; i < provinceArray.length; i++) {
@@ -111,7 +113,9 @@ public class ModifyUserInfoActivity extends Activity {
 				}
 				mList.add(map);
 			}
-			mList.get(selectPos).put("select", true);
+			if (selectPos >= 0) {
+				mList.get(selectPos).put("select", true);
+			}
 			break;
 		case 3:
 			for (int i = 0; i < statusArray.length; i++) {
@@ -123,7 +127,9 @@ public class ModifyUserInfoActivity extends Activity {
 				}
 				mList.add(map);
 			}
-			mList.get(selectPos).put("select", true);
+			if (selectPos >= 0) {
+				mList.get(selectPos).put("select", true);
+			}
 			break;
 		case 4:
 			cetInput.setText(mValue);
@@ -268,7 +274,7 @@ public class ModifyUserInfoActivity extends Activity {
 		case 5:
 			String oldPswd = etOldPswd.getText().toString();
 			String newPswd = etNewPswd.getText().toString();
-			url+="/password";
+			url += "/password";
 			mValue = "";
 			list.add(new BasicNameValuePair("oldPassword", oldPswd));
 			list.add(new BasicNameValuePair("newPassword", newPswd));

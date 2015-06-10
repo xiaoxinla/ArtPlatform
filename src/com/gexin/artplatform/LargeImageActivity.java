@@ -30,6 +30,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.frontia.Frontia;
+import com.baidu.frontia.api.FrontiaSocialShare;
+import com.baidu.frontia.api.FrontiaSocialShare.FrontiaTheme;
+import com.baidu.frontia.api.FrontiaSocialShareContent;
+import com.baidu.frontia.api.FrontiaSocialShareListener;
+import com.gexin.artplatform.constant.Conf;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.SPUtil;
@@ -43,8 +49,11 @@ public class LargeImageActivity extends Activity {
 
 	private static final String TAG = "LargeImageActivity";
 	private List<String> imageList;
+	private int mIndex = 0;
 	private LargeImageAdapter adapter;
 	private boolean isShow = false;
+	private FrontiaSocialShare mSocialShare;
+	private FrontiaSocialShareContent mImageContent = new FrontiaSocialShareContent();
 
 	private ViewPager mViewPager;
 	private TitleBar titleBar;
@@ -59,41 +68,19 @@ public class LargeImageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_large_image);
 
+		Frontia.init(this.getApplicationContext(), Conf.APIKEY);
 		initView();
 		initData();
 	}
 
 	private void initData() {
 		imageList = getIntent().getStringArrayListExtra("images");
+		mIndex = getIntent().getIntExtra("index", 0);
 		adapter = new LargeImageAdapter(imageList, this);
 		mViewPager.setAdapter(adapter);
-		// ImageLoader.getInstance().displayImage(imageUrl, ivLargeImage,
-		// picOptions, new ImageLoadingListener() {
-		//
-		// @Override
-		// public void onLoadingStarted(String arg0, View arg1) {
-		//
-		// }
-		//
-		// @Override
-		// public void onLoadingFailed(String arg0, View arg1,
-		// FailReason arg2) {
-		//
-		// }
-		//
-		// @Override
-		// public void onLoadingComplete(String arg0, View arg1,
-		// Bitmap arg2) {
-		// mAttacher = new PhotoViewAttacher(ivLargeImage);
-		// mAttacher.setScaleType(ScaleType.FIT_CENTER);
-		// }
-		//
-		// @Override
-		// public void onLoadingCancelled(String arg0, View arg1) {
-		//
-		// }
-		// });
-
+		mViewPager.setCurrentItem(mIndex);
+		mSocialShare = Frontia.getSocialShare();
+		mSocialShare.setContext(this);
 	}
 
 	private void initView() {
@@ -118,12 +105,18 @@ public class LargeImageActivity extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
-				Toast.makeText(LargeImageActivity.this, "分享成功",
-						Toast.LENGTH_SHORT).show();
 				isShow = false;
 				llCmdFrame.setVisibility(View.GONE);
+				sharePic();
 			}
 		});
+	}
+
+	protected void sharePic() {
+		mSocialShare.show(LargeImageActivity.this.getWindow().getDecorView(),
+				mImageContent, FrontiaTheme.DARK, new ShareListener());
+		// Toast.makeText(LargeImageActivity.this, "分享成功",
+		// Toast.LENGTH_SHORT).show();
 	}
 
 	@SuppressLint("HandlerLeak")
@@ -169,7 +162,7 @@ public class LargeImageActivity extends Activity {
 
 		};
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
-		data.add(new BasicNameValuePair("imageUrl",imageUrl));
+		data.add(new BasicNameValuePair("imageUrl", imageUrl));
 		new HttpConnectionUtils(handler).put(url, data);
 	}
 
@@ -318,6 +311,25 @@ public class LargeImageActivity extends Activity {
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
 			container.removeView((View) object);
+		}
+
+	}
+	
+	private class ShareListener implements FrontiaSocialShareListener {
+
+		@Override
+		public void onSuccess() {
+			Log.d("Test", "share success");
+		}
+
+		@Override
+		public void onFailure(int errCode, String errMsg) {
+			Log.d("Test", "share errCode " + errCode);
+		}
+
+		@Override
+		public void onCancel() {
+			Log.d("Test", "cancel ");
 		}
 
 	}

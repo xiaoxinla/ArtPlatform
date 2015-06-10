@@ -112,8 +112,8 @@ public class QuestionAdapter extends BaseAdapter {
 					.findViewById(R.id.tv_ansnum_question_item);
 			holder.llZan = (LinearLayout) convertView
 					.findViewById(R.id.ll_zan_question_item);
-			holder.llAns = (LinearLayout) convertView
-					.findViewById(R.id.ll_ans_question_item);
+//			holder.llAns = (LinearLayout) convertView
+//					.findViewById(R.id.ll_ans_question_item);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -123,6 +123,7 @@ public class QuestionAdapter extends BaseAdapter {
 		final String id = item.get_id();
 		String name = item.getName();
 		String time = TimeUtil.getStandardDate(item.getTimestamp());
+		String askToName = item.getAskToName();
 		String type = "";
 		String avatarUrl = item.getAvatarUrl();
 		if (item.getTag() != null && item.getTag().size() != 0) {
@@ -141,7 +142,11 @@ public class QuestionAdapter extends BaseAdapter {
 		holder.tvName.setText(name);
 		holder.tvTime.setText(time);
 		holder.tvType.setText(type);
-		holder.tvContent.setText(content);
+		if(askToName==null||askToName.isEmpty()){
+			holder.tvContent.setText(content);
+		}else {
+			holder.tvContent.setText("@"+askToName+" "+content);
+		}
 		// holder.tvCommentor.setText(commentor);
 		holder.tvZan.setText("" + zan);
 		holder.tvAnsNum.setText("" + ansNum);
@@ -282,7 +287,7 @@ public class QuestionAdapter extends BaseAdapter {
 		TextView tvZan;
 		TextView tvAnsNum;
 		LinearLayout llZan;
-		LinearLayout llAns;
+//		LinearLayout llAns;
 	}
 
 }
