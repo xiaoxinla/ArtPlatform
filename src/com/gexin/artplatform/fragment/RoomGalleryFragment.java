@@ -54,7 +54,7 @@ public class RoomGalleryFragment extends Fragment {
 	}
 
 	private void initData() {
-		for(int i=0;i<7;i++){
+		for(int i=0;i<10;i++){
 			mList.add("");
 		}
 		adapter = new RoomGalleryAdapter(getActivity(), mList);

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.gexin.artplatform.fragment.StudioCommentFragment;
 import com.gexin.artplatform.fragment.StudioEnvironmentFragment;
 import com.gexin.artplatform.view.TitleBar;
 
@@ -26,6 +28,7 @@ public class StudioEnvironmentActivity extends FragmentActivity {
 	private List<Fragment> mTabs = new ArrayList<Fragment>();
 	private FragmentPagerAdapter mAdapter;
 	private StudioEnvironmentFragment studioEnvironmentFragment;
+	private StudioCommentFragment studioCommentFragment;
 	
 	private ViewPager mViewPager;
 	private LinearLayout llPics;
@@ -49,9 +52,12 @@ public class StudioEnvironmentActivity extends FragmentActivity {
 
 	private void initData() {
 		studioEnvironmentFragment = new StudioEnvironmentFragment();
+		studioCommentFragment = new StudioCommentFragment();
 		
 		studioEnvironmentFragment.setStudioId(studioId);
+		studioCommentFragment.setStudioId(studioId);
 		mTabs.add(studioEnvironmentFragment);
+		mTabs.add(studioCommentFragment);
 		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
 
 			@Override
@@ -65,6 +71,34 @@ public class StudioEnvironmentActivity extends FragmentActivity {
 			}
 		};
 		mViewPager.setAdapter(mAdapter);
+		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+			@Override
+			public void onPageSelected(int arg0) {
+				if(arg0==0){
+					tvPics.setTextColor(Color.parseColor("#cdfe6060"));
+					vLeftLine.setVisibility(View.VISIBLE);
+					tvComments.setTextColor(Color.parseColor("#cd504f4f"));
+					vRightLine.setVisibility(View.GONE);
+				}else {
+					tvPics.setTextColor(Color.parseColor("#cd504f4f"));
+					vLeftLine.setVisibility(View.GONE);
+					tvComments.setTextColor(Color.parseColor("#cdfe6060"));
+					vRightLine.setVisibility(View.VISIBLE);
+				}
+
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+
+			}
+		});
 	}
 
 	private void initView() {
@@ -86,6 +120,7 @@ public class StudioEnvironmentActivity extends FragmentActivity {
 				vLeftLine.setVisibility(View.VISIBLE);
 				tvComments.setTextColor(Color.parseColor("#cd504f4f"));
 				vRightLine.setVisibility(View.GONE);
+				mViewPager.setCurrentItem(0);
 			}
 		});
 		llComments.setOnClickListener(new OnClickListener() {
@@ -96,6 +131,7 @@ public class StudioEnvironmentActivity extends FragmentActivity {
 				vLeftLine.setVisibility(View.GONE);
 				tvComments.setTextColor(Color.parseColor("#cdfe6060"));
 				vRightLine.setVisibility(View.VISIBLE);
+				mViewPager.setCurrentItem(1);
 			}
 		});
 	}
