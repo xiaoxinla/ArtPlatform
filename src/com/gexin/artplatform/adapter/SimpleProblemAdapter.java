@@ -69,8 +69,11 @@ public class SimpleProblemAdapter extends BaseAdapter {
 		}
 		holder.tvContent.setText(problem.getContent());
 		if (problem.getImage() != null && !problem.getImage().isEmpty()) {
+			holder.ivPic.setVisibility(View.VISIBLE);
 			ImageLoader.getInstance().displayImage(problem.getImage(),
 					holder.ivPic, picOptions);
+		}else {
+			holder.ivPic.setVisibility(View.GONE);
 		}
 		return convertView;
 	}

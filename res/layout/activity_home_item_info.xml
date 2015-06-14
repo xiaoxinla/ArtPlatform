@@ -15,10 +15,11 @@
     </com.gexin.artplatform.view.TitleBar>
     <ImageView
         android:id="@+id/iv_header_home_item_info"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_margin="10dp"
         android:src="@drawable/ic_menu_home"
+        android:scaleType="centerCrop"
         android:layout_below="@id/tb_home_item_info" />
 
     <TextView
@@ -30,7 +31,7 @@
         android:layout_below="@id/tb_home_item_info"
         android:text="画室名"
         android:textColor="#445bc8"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/tv_content_home_item_info"

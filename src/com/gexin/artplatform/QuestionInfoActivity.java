@@ -50,6 +50,8 @@ public class QuestionInfoActivity extends Activity {
 	private static final String TAG = "QuestionInfoActivity";
 	private String userId = "";
 	private String replyTo = "";
+	private String askAfterTo = "";
+	private String answerId = "";
 
 	private ImageView ivHeader;
 	private ImageView ivPic;
@@ -84,6 +86,11 @@ public class QuestionInfoActivity extends Activity {
 
 		initView();
 
+		userId = (String) SPUtil.get(this, "userId", "");
+		getProblemInfo();
+	}
+
+	private void getProblemInfo() {
 		Handler handler = new HttpHandler(this) {
 			@Override
 			protected void succeed(JSONObject jObject) {
@@ -91,7 +98,6 @@ public class QuestionInfoActivity extends Activity {
 				setDataToView(jObject);
 			}
 		};
-		userId = (String) SPUtil.get(this, "userId", "");
 		String problemId = getIntent().getStringExtra("problemId");
 		String api = Constant.SERVER_URL + Constant.PROBLEM_API + "/"
 				+ problemId;
@@ -106,8 +112,6 @@ public class QuestionInfoActivity extends Activity {
 		ivPic = (ImageView) findViewById(R.id.iv_pic_question_info);
 		ivZan = (ImageView) findViewById(R.id.iv_zan_question_info);
 		tvContent = (TextView) findViewById(R.id.tv_content_question_info);
-		// tvCommentor = (TextView)
-		// findViewById(R.id.tv_commentor_question_info);
 		tvAnsNum = (TextView) findViewById(R.id.tv_ans_question_info);
 		tvName = (TextView) findViewById(R.id.tv_name_question_info);
 		tvTime = (TextView) findViewById(R.id.tv_time_question_info);
@@ -132,7 +136,11 @@ public class QuestionInfoActivity extends Activity {
 			public void onClick(View arg0) {
 				String content = etComment.getText().toString();
 				if (!content.isEmpty()) {
-					postComment(content);
+					if (askAfterTo.isEmpty()) {
+						postComment(content);
+					} else {
+						postAskAfter(content, 0);
+					}
 				}
 			}
 		});
@@ -150,18 +158,51 @@ public class QuestionInfoActivity extends Activity {
 			public void onClick(View arg0) {
 				etComment.setHint("回复楼主");
 				replyTo = "";
+				askAfterTo = "";
 			}
 		});
-		String status = (String) SPUtil.get(this, "LOGIN", "NONE");
-		if (status.equals("TEACHER")) {
-			btnSubmit.setText("回答");
-		}
+	}
+
+	@SuppressLint("HandlerLeak")
+	private void postAskAfter(String content, int aType) {
+		String url = Constant.SERVER_URL + "/api/answer/" + answerId;
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					Log.v(TAG, "askAfterRes:" + msg.obj);
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							Toast.makeText(QuestionInfoActivity.this, "发送成功",
+									Toast.LENGTH_SHORT).show();
+							etComment.setText("");
+							getProblemInfo();
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		List<NameValuePair> data = new ArrayList<NameValuePair>();
+		data.add(new BasicNameValuePair("content", content));
+		data.add(new BasicNameValuePair("aType", "" + aType));
+		new HttpConnectionUtils(handler).put(url, data);
 	}
 
 	protected void postComment(String content) {
 		String status = (String) SPUtil.get(this, "LOGIN", "NONE");
 		if (userId.isEmpty()) {
-			Toast.makeText(this, "请先登录再评论", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		final String commentAPI = Constant.SERVER_URL + "/api/user/" + userId
@@ -186,7 +227,11 @@ public class QuestionInfoActivity extends Activity {
 		if (status.equals("STUDENT")) {
 			new HttpConnectionUtils(handler).post(commentAPI, list);
 		} else {
-			new HttpConnectionUtils(handler).post(answerAPI, list);
+			if (answerId.isEmpty()) {
+				new HttpConnectionUtils(handler).post(answerAPI, list);
+			} else {
+				postAskAfter(content, 1);
+			}
 		}
 	}
 
@@ -200,6 +245,7 @@ public class QuestionInfoActivity extends Activity {
 		if (state == 1) {
 			Toast.makeText(this, "发布成功", Toast.LENGTH_SHORT).show();
 			etComment.setText("");
+			getProblemInfo();
 		} else {
 			Toast.makeText(this, "发布失败", Toast.LENGTH_SHORT).show();
 		}
@@ -258,10 +304,10 @@ public class QuestionInfoActivity extends Activity {
 				String content = problem.getContent();
 				final String imageUrl = problem.getImage();
 				// String commentor = "XXX画室";
-				if(askToName==null||askToName.isEmpty()){
+				if (askToName == null || askToName.isEmpty()) {
 					tvContent.setText(content);
-				}else {
-					tvContent.setText("@"+askToName+" "+content);
+				} else {
+					tvContent.setText("@" + askToName + " " + content);
 				}
 				tvTime.setText(time);
 				tvName.setText(name);
@@ -405,29 +451,67 @@ public class QuestionInfoActivity extends Activity {
 				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		llAnswer.removeAllViews();
+		TextView tmpTvNum = new TextView(this);
+		LayoutParams tmpLp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+		if(!answerList.isEmpty()){
+			tmpTvNum.setText("回答("+answerList.size()+")");
+		}
+		tmpTvNum.setTextColor(Color.RED);
+		tmpTvNum.setPadding(10, 5, 0, 5);
+		tmpTvNum.setBackgroundColor(Color.WHITE);
+		llAnswer.addView(tmpTvNum,tmpLp);
 		for (final Answer answer : answerList) {
+			if (answer.getUserId().equals(userId)) {
+				answerId = answer.get_id();
+			}
 			View view = LayoutInflater.from(this).inflate(
 					R.layout.problem_answer_item, null);
 			ImageView tmpIvHeader = (ImageView) view
 					.findViewById(R.id.iv_header_answer_item);
 			TextView tmpTvName = (TextView) view
 					.findViewById(R.id.tv_name_answer_item);
-			TextView tmpTvContent = (TextView) view
-					.findViewById(R.id.tv_content_answer_item);
 			TextView tmpTvTime = (TextView) view
 					.findViewById(R.id.tv_time_answer_item);
 			LinearLayout tmpLlAsk = (LinearLayout) view
 					.findViewById(R.id.ll_ask_answer_item);
+			LinearLayout tmpLlContent = (LinearLayout) view
+					.findViewById(R.id.ll_content_answer_item);
 			ImageView tmpIvFocus = (ImageView) view
 					.findViewById(R.id.iv_interest_answer_item);
 			tmpTvTime.setText(TimeUtil.getStandardDate(answer.getUpdateTime()));
 			tmpTvName.setSingleLine(true);
 			tmpTvName.setTextColor(Color.parseColor("#445bc8"));
-			String tmpContent = "";
 			for (AnswerContent content : answer.getContent()) {
-				tmpContent += content.getContent();
+				LinearLayout linearLayout = new LinearLayout(this);
+				linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+				TextView textView = new TextView(this);
+				textView.setTextColor(Color.parseColor("#2e2e2e"));
+				textView.setTextSize(15);
+				textView.setGravity(Gravity.CENTER_VERTICAL);
+				textView.setBackgroundResource(R.drawable.btn_group_pressed_holo_light);
+				LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
+						LayoutParams.WRAP_CONTENT);
+				if (content.getaType() == 1 || content.getaType() == 2) {
+					textView.setText(content.getContent());
+					lp.setMargins(0, 5, 0, 5);
+					linearLayout.setGravity(Gravity.LEFT);
+					linearLayout.addView(textView, lp);
+					tmpLlContent.addView(linearLayout);
+				} else {
+					textView.setText(content.getContent());
+					lp.setMargins(0, 5, 10, 5);
+					linearLayout.setGravity(Gravity.RIGHT);
+					TextView tvZhuiwen = new TextView(this);
+					tvZhuiwen.setText("追问");
+					tvZhuiwen.setTextSize(16);
+					tvZhuiwen.setTextColor(Color.parseColor("#2e2e2e"));
+					linearLayout.addView(textView, lp);
+					linearLayout.addView(tvZhuiwen);
+					tmpLlContent.addView(linearLayout);
+
+				}
 			}
-			tmpTvContent.setText(tmpContent);
 			tmpTvName.setText(answer.getUserName());
 			ImageLoader.getInstance().displayImage(answer.getAvatarUrl(),
 					tmpIvHeader, imageOptions);
@@ -447,6 +531,22 @@ public class QuestionInfoActivity extends Activity {
 				@Override
 				public void onClick(View arg0) {
 					postFocus(answer.getUserId());
+				}
+			});
+			view.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					if (!problem.getUserId().equals(userId)) {
+						return;
+					}
+					String toTeacherName = answer.getUserName();
+					if (toTeacherName.length() > 10) {
+						toTeacherName = toTeacherName.substring(0, 10) + "...";
+					}
+					etComment.setHint("追问 " + toTeacherName + ":");
+					askAfterTo = answer.getUserId();
+					answerId = answer.get_id();
 				}
 			});
 		}
@@ -497,6 +597,16 @@ public class QuestionInfoActivity extends Activity {
 				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		llComment.removeAllViews();
+		TextView tmpTvNum = new TextView(this);
+		LayoutParams tmpLp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+		if(!list.isEmpty()){
+			tmpTvNum.setText("评论("+list.size()+")");
+		}
+		tmpTvNum.setTextColor(Color.RED);
+		tmpTvNum.setPadding(10, 5, 0, 5);
+		tmpTvNum.setBackgroundColor(Color.WHITE);
+		llComment.addView(tmpTvNum,tmpLp);
 		for (final Comment comment : list) {
 			View view = LayoutInflater.from(this).inflate(
 					R.layout.comment_item, null);
@@ -516,7 +626,7 @@ public class QuestionInfoActivity extends Activity {
 				if (toUserName.length() > 10) {
 					toUserName = toUserName.substring(0, 10) + "...";
 				}
-				tmpTvContent.setText("回复"+comment.getToUserName() + ":"
+				tmpTvContent.setText("回复" + comment.getToUserName() + ":"
 						+ comment.getContent());
 			}
 			tmpTvName.setSingleLine(true);
@@ -530,6 +640,11 @@ public class QuestionInfoActivity extends Activity {
 
 				@Override
 				public void onClick(View arg0) {
+					String status = (String) SPUtil.get(
+							QuestionInfoActivity.this, "LOGIN", "");
+					if (status.equals("TEACHER")) {
+						return;
+					}
 					String hint = comment.getFromUserName();
 					if (hint.length() > 10) {
 						hint = hint.substring(0, 10) + "...";
@@ -537,6 +652,7 @@ public class QuestionInfoActivity extends Activity {
 					etComment.setHint("回复 " + hint);
 					replyTo = comment.getFromUser();
 					Log.v(TAG, "replyTo:" + replyTo);
+					askAfterTo = "";
 				}
 			});
 		}

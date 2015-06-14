@@ -15,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="#d0f6f6f6"
+        android:background="#f6f6f6"
         android:orientation="horizontal" >
 
         <LinearLayout android:id="@+id/ll_indicator_one_main"

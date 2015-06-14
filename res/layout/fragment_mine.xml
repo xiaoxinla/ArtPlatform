@@ -45,7 +45,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginTop="15dp"
                     android:clickable="true"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_contact_picture" />
 
                 <ImageView
@@ -63,11 +63,27 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginRight="50dp"
+                    android:singleLine="true"
                     android:layout_toRightOf="@+id/iv_header_fragment_mine"
-                    android:text="学生用户名\n学生用户ID"
+                    android:text="用户名"
                     android:textColor="#2e2e2e"
                     android:textStyle="bold"
                     android:textSize="17sp" />
+                <TextView android:id="@+id/tv_status_fragment_mine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="教师"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone"
+                    android:background="#f26d5f"/>
             </RelativeLayout>
 
             <View

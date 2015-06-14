@@ -34,7 +34,7 @@
             android:layout_centerVertical="true"
             android:layout_marginTop="15dp"
             android:clickable="true"
-            android:scaleType="fitXY"
+			android:scaleType="centerCrop"
             android:src="@drawable/ic_contact_picture" />
 
         <TextView

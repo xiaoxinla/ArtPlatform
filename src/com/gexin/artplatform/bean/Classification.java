@@ -7,6 +7,7 @@ public class Classification {
 	private String icon;
 	private String _id;
 	private String superior;
+	private long updateTime;
 	private int type;
 	private List<ImageItem> image;
 	private List<Classification> subclass;
@@ -14,8 +15,9 @@ public class Classification {
 	@Override
 	public String toString() {
 		return "Classification [name=" + name + ", icon=" + icon + ", _id="
-				+ _id + ", superior=" + superior + ", type=" + type
-				+ ", image=" + image + ", subclass=" + subclass + "]";
+				+ _id + ", superior=" + superior + ", updateTime=" + updateTime
+				+ ", type=" + type + ", image=" + image + ", subclass="
+				+ subclass + "]";
 	}
 
 	public List<Classification> getSubclass() {
@@ -72,6 +74,14 @@ public class Classification {
 
 	public void setImage(List<ImageItem> image) {
 		this.image = image;
+	}
+
+	public long getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(long updateTime) {
+		this.updateTime = updateTime;
 	}
 
 }

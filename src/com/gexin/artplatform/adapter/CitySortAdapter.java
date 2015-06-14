@@ -58,10 +58,12 @@ public class CitySortAdapter extends BaseAdapter implements SectionIndexer {
 		final CityItem item = mCitys.get(position);
 		if (view == null) {
 			holder = new ViewHolder();
-			view = LayoutInflater.from(mContext).inflate(R.layout.city_list_item,
-					null);
-			holder.tvLetter = (TextView) view.findViewById(R.id.tv_catalog_city_item);
-			holder.tvName = (TextView) view.findViewById(R.id.tv_name_city_item);
+			view = LayoutInflater.from(mContext).inflate(
+					R.layout.city_list_item, null);
+			holder.tvLetter = (TextView) view
+					.findViewById(R.id.tv_catalog_city_item);
+			holder.tvName = (TextView) view
+					.findViewById(R.id.tv_name_city_item);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -83,19 +85,28 @@ public class CitySortAdapter extends BaseAdapter implements SectionIndexer {
 	@SuppressLint("DefaultLocale")
 	@Override
 	public int getPositionForSection(int section) {
-		for (int i = 0; i < getCount(); i++) {
-			String sortStr = mCitys.get(i).getSortLetter();
-			char firstChar = sortStr.toUpperCase().charAt(0);
-			if (firstChar == section) {
-				return i;
+		try {
+			for (int i = 0; i < getCount(); i++) {
+				String sortStr = mCitys.get(i).getSortLetter();
+				char firstChar = sortStr.toUpperCase().charAt(0);
+				if (firstChar == section) {
+					return i;
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return -1;
 	}
 
 	@Override
 	public int getSectionForPosition(int position) {
-		return mCitys.get(position).getSortLetter().charAt(0);
+		int section = 0;
+		try {
+			section = mCitys.get(position).getSortLetter().charAt(0);
+		} catch (Exception e) {
+		}
+		return section;
 	}
 
 	@Override
@@ -108,8 +119,8 @@ public class CitySortAdapter extends BaseAdapter implements SectionIndexer {
 		TextView tvLetter;
 		TextView tvName;
 	}
-	
-	public void updateData(List<CityItem> list){
+
+	public void updateData(List<CityItem> list) {
 		this.mCitys = list;
 		notifyDataSetChanged();
 	}

@@ -1,10 +1,10 @@
-package com.gexin.artplatform.view;
+package com.gexin.artplatform.utils;
 
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
 
-import com.gexin.artplatform.view.HanziToPinyin.Token;
+import com.gexin.artplatform.utils.HanziToPinyin.Token;
 
 public class PinYin {
 	@SuppressLint("DefaultLocale") 

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
-import com.gexin.artplatform.view.PinYin;
+
+import com.gexin.artplatform.utils.PinYin;
 
 @SuppressLint("DefaultLocale")
 public class CityItem implements Comparable<CityItem>{
@@ -49,9 +50,13 @@ public class CityItem implements Comparable<CityItem>{
 
 	public void setName(String name) {
 		this.name = name;
-		this.fullPinyin = PinYin.getPinYin(name);
-		this.simplePinyin = PinYin.getSimplePinYin(name);
-		this.sortLetter = fullPinyin.substring(0, 1).toUpperCase();
+		try {
+			this.fullPinyin = PinYin.getPinYin(name);
+			this.simplePinyin = PinYin.getSimplePinYin(name);
+			this.sortLetter = fullPinyin.substring(0, 1).toUpperCase();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public String getFullPinyin() {

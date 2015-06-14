@@ -34,10 +34,9 @@
 
                 <ImageView
                     android:id="@+id/iv_header_question_info"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="10dp"
-                    android:src="@drawable/ic_contact_picture" />
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp" />
 
                 <TextView
                     android:id="@+id/tv_name_question_info"
@@ -48,7 +47,7 @@
                     android:singleLine="true"
                     android:textColor="#445bc8"
                     android:layout_marginRight="70dp"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
 
                 <LinearLayout
                     android:id="@+id/ll_header_question_info_2"
@@ -211,7 +210,7 @@
                     android:background="#ffffff"
                     android:padding="10dp"
                     android:textColor="#ff0000"
-                    android:text="回答(10)" />
+                    android:text="回答" />
 
                 <View android:id="@+id/v_answer_line_activity_question_info"
                     android:layout_width="match_parent"
@@ -232,7 +231,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="评论区(10)"
+                    android:text="评论区"
                     android:background="#ffffff"
                     android:textColor="#ff0000" />
 
@@ -262,7 +261,7 @@
             android:id="@+id/btn_comment_question_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="评论"
+            android:text="发送"
             android:textColor="#000000" />
     </LinearLayout>
 

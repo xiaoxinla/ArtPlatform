@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">革心美术平台</string>
+    <string name="app_name">美术帮</string>
     <string name="tab_homepage">主页</string>
     <string name="tab_question_answer">问答</string>
     <string name="tab_me">个人</string>
@@ -37,5 +37,6 @@
     <string name="title_activity_video_detail">VideoDetailActivity</string>
     <string name="title_activity_download">DownloadActivity</string>
     <string name="title_activity_studio_environment">StudioEnvironmentActivity</string>
+    <string name="title_activity_find_studio">FindStudioActivity</string>
 
 </resources>

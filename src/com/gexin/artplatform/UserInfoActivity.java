@@ -52,6 +52,7 @@ public class UserInfoActivity extends Activity {
 	protected static final int ALBUM_REQUEST_CODE = 0;
 	protected static final int CAMERA_REQUEST_CODE = 1;
 	protected static final int MODIFY_REQUEST_CODE = 2;
+	public static final String ACTION_HEADER_MODIFY = "ACTION_HEADER_MODIFY";
 	private static final int POST_IMAGE_SUCCESS = 3;
 	private static final String POST_IMAGE_API = Constant.SERVER_URL
 			+ "/api/image";
@@ -321,6 +322,10 @@ public class UserInfoActivity extends Activity {
 										"头像更新成功", Toast.LENGTH_SHORT).show();
 								SPUtil.put(UserInfoActivity.this, "avatarUrl",
 										imageUrl);
+								Intent intent = new Intent();
+								intent.putExtra("avatarUrl", imageUrl);
+								intent.setAction(ACTION_HEADER_MODIFY);
+								UserInfoActivity.this.sendBroadcast(intent);
 							} else {
 								Toast.makeText(getApplicationContext(),
 										"头像更新失败", Toast.LENGTH_SHORT).show();

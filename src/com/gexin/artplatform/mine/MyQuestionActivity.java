@@ -27,7 +27,7 @@ import android.widget.ListView;
 
 import com.gexin.artplatform.QuestionInfoActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.adapter.SimpleProblemAdapter;
+import com.gexin.artplatform.adapter.QuestionAdapter;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
@@ -49,7 +49,7 @@ public class MyQuestionActivity extends Activity {
 	private Gson gson = new Gson();
 	private static final int POST_REQUEST_CODE = 1;
 	private PullToRefreshListView mListView;
-	private SimpleProblemAdapter adapter;
+	private QuestionAdapter adapter;
 	private List<Problem> problems;
 	private LinearLayout llBack;
 	private TitleBar titleBar;
@@ -120,7 +120,7 @@ public class MyQuestionActivity extends Activity {
 			api+="?userId="+userId;
 		}
 		problems = new ArrayList<Problem>();
-		adapter = new SimpleProblemAdapter(MyQuestionActivity.this, problems);
+		adapter = new QuestionAdapter(MyQuestionActivity.this, problems);
 		mListView.setAdapter(adapter);
 		Handler handler = new Handler() {
 
@@ -224,10 +224,10 @@ public class MyQuestionActivity extends Activity {
 			}
 			String userId = (String) SPUtil.get(MyQuestionActivity.this, "userId", "");
 			String api = MyQuestion_API + "/" + userId + "/problems";
-			if(!userId.isEmpty()){
-				api+="?userId="+userId;
-			}
 			String prm = "?timestamp="+problems.get(problems.size()-1).getTimestamp();
+			if(!userId.isEmpty()){
+				api+="&userId="+userId;
+			}
 			result = NetUtil.connect(NetUtil.GET, api + prm, null);
 			// Log.v(TAG, "result:" + result);
 			try {

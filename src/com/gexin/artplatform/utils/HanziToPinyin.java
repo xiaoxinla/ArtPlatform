@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.gexin.artplatform.view;
+package com.gexin.artplatform.utils;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -392,8 +392,9 @@ public class HanziToPinyin {
             }
             // Check if zh_CN collation data is available
             final Locale locale[] = Collator.getAvailableLocales();
+            Locale newChina = new Locale("zh", "HANS", "CN");
             for (int i = 0; i < locale.length; i++) {
-                if (locale[i].equals(Locale.CHINA)) {
+                if (locale[i].equals(Locale.CHINA)||locale[i].equals(newChina)) {
                     // Do self validation just once.
                     if (DEBUG) {
                         Log.d(TAG, "Self validation. Result: " + doSelfValidation());
@@ -554,5 +555,9 @@ public class HanziToPinyin {
         String str = sb.toString();
         tokens.add(new Token(tokenType, str, str));
         sb.setLength(0);
+    }
+    
+    public boolean getHasChinaCollator(){
+    	return mHasChinaCollator;
     }
 }

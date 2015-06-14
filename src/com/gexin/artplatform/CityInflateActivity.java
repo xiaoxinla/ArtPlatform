@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.gexin.artplatform.adapter.CitySortAdapter;
 import com.gexin.artplatform.bean.CityItem;
+import com.gexin.artplatform.utils.HanziToPinyin;
 import com.gexin.artplatform.view.SideBar;
 import com.gexin.artplatform.view.SideBar.onTouchLetterChangeListener;
 
@@ -76,7 +77,14 @@ public class CityInflateActivity extends Activity {
 	private void initData() {
 		cityList = CityItem.getCityList();
 		Log.v(TAG, "size:" + cityList.size());
-		Collections.sort(cityList);
+		try {
+			Collections.sort(cityList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (!HanziToPinyin.getInstance().getHasChinaCollator()) {
+			mSideBar.setVisibility(View.GONE);
+		}
 		adapter = new CitySortAdapter(cityList, this);
 		mListView.setAdapter(adapter);
 		mSideBar.setLetterShow(tvLetter);
@@ -106,7 +114,8 @@ public class CityInflateActivity extends Activity {
 		});
 	}
 
-	@SuppressLint("DefaultLocale") private void onQueryChange(String arg0) {
+	@SuppressLint("DefaultLocale")
+	private void onQueryChange(String arg0) {
 		if (arg0.isEmpty()) {
 			adapter.updateData(cityList);
 		} else {

@@ -79,6 +79,8 @@ public class RegisterActivity extends Activity {
 					List<NameValuePair> list = new ArrayList<NameValuePair>();
 					list.add(new BasicNameValuePair("phone", phone));
 					list.add(new BasicNameValuePair("password", password));
+					list.add(new BasicNameValuePair("name", etName.getText()
+							.toString()));
 					httpConnectionUtils.post(REGISTER_API, list);
 				}
 			}

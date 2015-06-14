@@ -15,10 +15,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.gexin.artplatform.adapter.DiscoverGridAdapter;
@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 
 public class SubClassActivity extends Activity {
 
+	private static final int FIND_STUDIO_REQUEST = 0;
 	private List<Classification> mSubClassList = new ArrayList<Classification>();
 	private List<ImageItem> mImageList = new ArrayList<ImageItem>();
 	private List<String> mImageUrlList = new ArrayList<String>();
@@ -99,6 +100,19 @@ public class SubClassActivity extends Activity {
 		});
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case FIND_STUDIO_REQUEST:
+			finish();
+			break;
+
+		default:
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
 	protected void dealResponse(JSONObject jObject) {
 		try {
 			int state = jObject.getInt("stat");
@@ -106,8 +120,7 @@ public class SubClassActivity extends Activity {
 				Classification classification = gson.fromJson(jObject
 						.getJSONObject("classification").toString(),
 						Classification.class);
-				if (classification.getSubclass() != null
-						&& !classification.getSubclass().isEmpty()) {
+				if (classification.getType() !=1&&classification.getType()!=0) {
 					mGridView.setOnItemClickListener(new OnItemClickListener() {
 
 						@Override
@@ -129,8 +142,7 @@ public class SubClassActivity extends Activity {
 							mSubClassList);
 					mGridView.setAdapter(discoverGridAdapter);
 					mGridView.setNumColumns(2);
-				} else if (classification.getImage() != null
-						&& !classification.getImage().isEmpty()) {
+				} else if (classification.getType() == 1) {
 					mImageList.clear();
 					mImageList.addAll(classification.getImage());
 					Log.i(TAG, "没有图片只有sub:" + mImageList.size() + "");
@@ -155,6 +167,10 @@ public class SubClassActivity extends Activity {
 							startActivity(intent);
 						}
 					});
+				} else if (classification.getType() == 4) {
+					Intent intent = new Intent(SubClassActivity.this,
+							FindStudioActivity.class);
+					startActivityForResult(intent, FIND_STUDIO_REQUEST);
 				}
 			}
 		} catch (JSONException e) {
@@ -162,4 +178,5 @@ public class SubClassActivity extends Activity {
 		}
 
 	}
+
 }

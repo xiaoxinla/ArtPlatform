@@ -24,6 +24,7 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 
 import com.gexin.artplatform.FindFriendActivity;
+import com.gexin.artplatform.FindStudioActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.SubClassActivity;
 import com.gexin.artplatform.adapter.DiscoverGridAdapter;
@@ -71,11 +72,17 @@ public class DiscoverFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				Intent intent = new Intent(getActivity(),
-						SubClassActivity.class);
-				intent.putExtra("name", discoverList.get(arg2).getName());
-				intent.putExtra("classId", discoverList.get(arg2).get_id());
-				startActivity(intent);
+				if (discoverList.get(arg2).getType() == 0) {
+					Intent intent = new Intent(getActivity(),
+							FindStudioActivity.class);
+					startActivity(intent);
+				} else {
+					Intent intent = new Intent(getActivity(),
+							SubClassActivity.class);
+					intent.putExtra("name", discoverList.get(arg2).getName());
+					intent.putExtra("classId", discoverList.get(arg2).get_id());
+					startActivity(intent);
+				}
 			}
 		});
 	}

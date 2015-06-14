@@ -5,9 +5,10 @@
     android:background="#ffffff" >
     <ImageView
         android:id="@+id/iv_header_home_item"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_margin="10dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/ic_menu_home" />
 
     <TextView
@@ -17,8 +18,10 @@
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/iv_header_home_item"
         android:text="画室名"
+        android:singleLine="true"
+        android:scaleType="centerCrop"
         android:textColor="#445bc8"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/tv_title_home_item"

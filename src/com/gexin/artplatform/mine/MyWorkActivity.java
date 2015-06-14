@@ -26,7 +26,6 @@ import android.widget.LinearLayout.LayoutParams;
 import com.gexin.artplatform.LargeImageActivity;
 import com.gexin.artplatform.R;
 import com.gexin.artplatform.adapter.GallaryGridAdapter;
-import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.SPUtil;
@@ -37,10 +36,7 @@ import com.google.gson.reflect.TypeToken;
 public class MyWorkActivity extends Activity {
 
 	private static final String TAG = "MyWorkActivity";
-	private static final String Gallary_API = Constant.SERVER_URL
-			+ Constant.USER_API;
-	private List<String> UrlList = new ArrayList<String>();
-	private List<Problem> problemList = new ArrayList<Problem>();
+	private List<String> mList = new ArrayList<String>();
 	private Gson gson = new Gson();
 	private GallaryGridAdapter adapter;
 	private GridView mGridView;
@@ -62,7 +58,7 @@ public class MyWorkActivity extends Activity {
 				Intent intent = new Intent(MyWorkActivity.this,
 						LargeImageActivity.class);
 				intent.putStringArrayListExtra("images",
-						(ArrayList<String>) UrlList);
+						(ArrayList<String>) mList);
 				intent.putExtra("index", arg2);
 				startActivity(intent);
 			}
@@ -72,12 +68,8 @@ public class MyWorkActivity extends Activity {
 	@SuppressLint("HandlerLeak")
 	private void initData() {
 		String userId = (String) SPUtil.get(MyWorkActivity.this, "userId", "");
-		String api = Gallary_API + "/"
-				+ (String) SPUtil.get(this, "userId", "") + "/problems";
-		if (!userId.isEmpty()) {
-			api += "?userId=" + userId;
-		}
-		adapter = new GallaryGridAdapter(MyWorkActivity.this, UrlList);
+		String url = Constant.SERVER_URL + "/api/user/" + userId + "/work";
+		adapter = new GallaryGridAdapter(MyWorkActivity.this, mList);
 		mGridView.setAdapter(adapter);
 		Handler handler = new Handler() {
 
@@ -87,18 +79,15 @@ public class MyWorkActivity extends Activity {
 				case HttpConnectionUtils.DID_SUCCEED:
 					String response = (String) msg.obj;
 					try {
-						JSONObject jObject = new JSONObject(
-								response == null ? "" : response.trim());
-						if (jObject != null) {
-							List<Problem> tempList = success(jObject);
-							if (tempList != null) {
-								Log.i(TAG, "tempList != null");
-								problemList.clear();
-								problemList.addAll(tempList);
-								for (int i = 0; i < problemList.size(); i++)
-									UrlList.add(problemList.get(i).getImage());
-								adapter.notifyDataSetChanged();
-							}
+						JSONObject jObject = new JSONObject(response);
+						int state = jObject.getInt("stat");
+						if (state == 1) {
+							List<String> tempList = gson.fromJson(jObject
+									.getJSONArray("work").toString(),
+									new TypeToken<List<String>>() {
+									}.getType());
+							mList.addAll(tempList);
+							adapter.notifyDataSetChanged();
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -112,24 +101,7 @@ public class MyWorkActivity extends Activity {
 
 		};
 
-		new HttpConnectionUtils(handler).get(api);
-	}
-
-	private List<Problem> success(JSONObject jObject) {
-		int state = -1;
-		List<Problem> tempList = null;
-		Log.i(TAG, "jObject:" + jObject.toString());
-		try {
-			state = jObject.getInt("stat");
-			if (state == 1) {
-				tempList = gson.fromJson(jObject.getJSONArray("problems")
-						.toString(), new TypeToken<List<Problem>>() {
-				}.getType());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return tempList;
+		new HttpConnectionUtils(handler).get(url);
 	}
 
 	private void initTitleBar() {

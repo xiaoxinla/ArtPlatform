@@ -187,6 +187,11 @@
             android:label="@string/title_activity_studio_environment"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+        <activity
+            android:name=".FindStudioActivity"
+            android:label="@string/title_activity_find_studio"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
     </application>
 
 </manifest>

@@ -54,7 +54,6 @@ public class QuestionAdapter extends BaseAdapter {
 				.cacheOnDisk(true).considerExifParams(true)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		picOptions = new DisplayImageOptions.Builder()
-				.showImageOnLoading(R.drawable.ic_stub)
 				.showImageOnFail(R.drawable.ic_error).cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
@@ -86,14 +85,10 @@ public class QuestionAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.ivHeader = (ImageView) convertView
 					.findViewById(R.id.iv_header_question_item);
-			// holder.ivComment = (ImageView) convertView
-			// .findViewById(R.id.iv_iscomment_question_item);
 			holder.ivPic = (ImageView) convertView
 					.findViewById(R.id.iv_pic_question_item);
 			holder.ivZan = (ImageView) convertView
 					.findViewById(R.id.iv_zan_question_item);
-			// holder.tvArea = (TextView) convertView
-			// .findViewById(R.id.tv_area_question_item);
 			holder.tvCommentor = (TextView) convertView
 					.findViewById(R.id.tv_commentor_question_item);
 			holder.tvContent = (TextView) convertView
@@ -104,16 +99,12 @@ public class QuestionAdapter extends BaseAdapter {
 					.findViewById(R.id.tv_time_question_item);
 			holder.tvType = (TextView) convertView
 					.findViewById(R.id.tv_type_question_item);
-			// holder.tvIscomment = (TextView) convertView
-			// .findViewById(R.id.tv_iscomment_question_item);
 			holder.tvZan = (TextView) convertView
 					.findViewById(R.id.tv_zan_question_item);
 			holder.tvAnsNum = (TextView) convertView
 					.findViewById(R.id.tv_ansnum_question_item);
 			holder.llZan = (LinearLayout) convertView
 					.findViewById(R.id.ll_zan_question_item);
-//			holder.llAns = (LinearLayout) convertView
-//					.findViewById(R.id.ll_ans_question_item);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -147,7 +138,6 @@ public class QuestionAdapter extends BaseAdapter {
 		}else {
 			holder.tvContent.setText("@"+askToName+" "+content);
 		}
-		// holder.tvCommentor.setText(commentor);
 		holder.tvZan.setText("" + zan);
 		holder.tvAnsNum.setText("" + ansNum);
 		if (commentor == null || commentor.isEmpty()) {

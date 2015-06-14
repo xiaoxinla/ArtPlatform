@@ -30,6 +30,7 @@ import com.gexin.artplatform.adapter.StudioCommentAdapter;
 import com.gexin.artplatform.bean.StudioComment;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -150,13 +151,18 @@ public class StudioCommentFragment extends Fragment {
 
 	@SuppressLint("HandlerLeak")
 	private void sendComment(String str) {
-		String url = Constant.SERVER_URL + "/api/user/" + studioId
+		String userId = (String) SPUtil.get(getActivity(), "userId", "");
+		if (userId.isEmpty()) {
+			Toast.makeText(getActivity(), "ÇëÏÈµÇÂ¼", Toast.LENGTH_SHORT).show();
+		}
+		String url = Constant.SERVER_URL + "/api/user/" + userId
 				+ "/studio-comment";
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case HttpConnectionUtils.DID_SUCCEED:
+					Log.v(TAG, "response:" + msg.obj);
 					try {
 						JSONObject jsonObject = new JSONObject((String) msg.obj);
 						int state = jsonObject.getInt("stat");
@@ -177,7 +183,7 @@ public class StudioCommentFragment extends Fragment {
 		};
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		data.add(new BasicNameValuePair("content", str));
-		data.add(new BasicNameValuePair("studioId",studioId));
+		data.add(new BasicNameValuePair("studioId", studioId));
 		new HttpConnectionUtils(handler).post(url, data);
 	}
 }

@@ -305,11 +305,11 @@ public class MyCommentActivity extends Activity {
 			String userId = (String) SPUtil.get(MyCommentActivity.this,
 					"userId", "");
 			String api = MyComment_API + "/" + userId + "/comments";
-			if (!userId.isEmpty()) {
-				api += "?userId=" + userId;
-			}
 			String prm = "?timestamp="
 					+ problems.get(problems.size() - 1).getTimestamp();
+			if (!userId.isEmpty()) {
+				api += "&userId=" + userId;
+			}
 			result = NetUtil.connect(NetUtil.GET, api + prm, null);
 			// Log.v(TAG, "result:" + result);
 			try {

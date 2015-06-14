@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -27,8 +29,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gexin.artplatform.adapter.SimpleProblemAdapter;
-import com.gexin.artplatform.bean.Comment;
+import com.gexin.artplatform.adapter.QuestionAdapter;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.bean.User;
 import com.gexin.artplatform.constant.Constant;
@@ -47,7 +48,7 @@ public class TeacherDetailActivity extends Activity {
 	private String teacherId;
 	private User mTeacher;
 	private List<Problem> problems = new ArrayList<Problem>();
-	private SimpleProblemAdapter adapter;
+	private QuestionAdapter adapter;
 	private Gson gson = new Gson();
 
 	private TitleBar titleBar;
@@ -78,34 +79,31 @@ public class TeacherDetailActivity extends Activity {
 
 	private void initData() {
 		getTeacherInfo();
-		getCommentList();
+		getProblemList();
 	}
 
 	@SuppressLint("HandlerLeak")
-	private void getCommentList() {
-		String url = Constant.SERVER_URL + "/api/user/" + teacherId
-				+ "/comments";
+	private void getProblemList() {
+		String url = Constant.SERVER_URL + "/api/user/" + teacherId + "/answer";
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				Log.v(TAG, "comments" + msg.obj);
+				Log.v(TAG, "problems" + msg.obj);
 				switch (msg.what) {
 				case HttpConnectionUtils.DID_SUCCEED:
 					try {
 						JSONObject jsonObject = new JSONObject((String) msg.obj);
 						int state = jsonObject.getInt("stat");
 						if (state == 1) {
-							List<Comment> tmpList = gson.fromJson(jsonObject
-									.getJSONArray("comments").toString(),
-									new TypeToken<List<Comment>>() {
+							List<Problem> tmpList = gson.fromJson(jsonObject
+									.getJSONArray("problems").toString(),
+									new TypeToken<List<Problem>>() {
 									}.getType());
 							problems.clear();
-							for(Comment comment:tmpList){
-								problems.add(comment.get_problem());
-							}
-							Log.v(TAG, "problems:"+problems.toString());
+							problems.addAll(tmpList);
+							Log.v(TAG, "problems:" + problems.toString());
 							adapter.notifyDataSetChanged();
-							tvComNum.setText("ÆÀÂÛ£¨"+problems.size()+"£©");
+							tvComNum.setText("»Ø´ð£¨" + problems.size() + "£©");
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -179,7 +177,7 @@ public class TeacherDetailActivity extends Activity {
 		tvStudioName = (TextView) findViewById(R.id.tv_artroom_teacher_detail);
 		tvComNum = (TextView) findViewById(R.id.tv_comnum_teacher_detail);
 		mListView = (ListView) findViewById(R.id.lv_activity_teacher_detail);
-		
+
 		initTitleBar();
 		ivFocus.setOnClickListener(new OnClickListener() {
 
@@ -188,8 +186,19 @@ public class TeacherDetailActivity extends Activity {
 				postFocus();
 			}
 		});
-		adapter = new SimpleProblemAdapter(this, problems);
+		adapter = new QuestionAdapter(this, problems);
 		mListView.setAdapter(adapter);
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Intent intent = new Intent(TeacherDetailActivity.this,
+						QuestionInfoActivity.class);
+				intent.putExtra("problemId", problems.get(arg2).get_id());
+				startActivity(intent);
+			}
+		});
 	}
 
 	@SuppressLint("HandlerLeak")

@@ -5,7 +5,10 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,6 +52,7 @@ public class MineFragment extends Fragment {
 	private RelativeLayout rlWork, rlPump, rlComment, rlSubscribe, rlHeader;
 	private TextView tvFocus, tvFans, tvCollect, tvWork, tvPump, tvComment,
 			tvSubscribe, tvName;
+	private TextView tvStatus;
 	private ImageView ivHeader;
 
 	private int job = -1;// -1为未登录，0为学生，1为教师
@@ -87,12 +91,16 @@ public class MineFragment extends Fragment {
 				.findViewById(R.id.tv_subscribe_fragment_mine);
 		tvName = (TextView) view.findViewById(R.id.tv_name_fragment_mine);
 		ivHeader = (ImageView) view.findViewById(R.id.iv_header_fragment_mine);
+		tvStatus = (TextView) view.findViewById(R.id.tv_status_fragment_mine);
 	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		initData();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(UserInfoActivity.ACTION_HEADER_MODIFY);
+		getActivity().registerReceiver(mReceiver, filter);
 	}
 
 	@Override
@@ -150,15 +158,23 @@ public class MineFragment extends Fragment {
 		tvCollect.setText("" + collectionNum);
 		if (workNum != 0 && job != -1) {
 			tvWork.setText("我的作品(" + workNum + ")");
+		} else {
+			tvWork.setText("我的作品");
 		}
 		if (askNum != 0 && job != -1) {
 			tvPump.setText("我的提问(" + askNum + ")");
+		} else {
+			tvPump.setText("我的提问");
 		}
 		if (commentNum != 0 && job != -1) {
 			tvComment.setText("我的评论(" + commentNum + ")");
+		} else {
+			tvComment.setText("我的评论");
 		}
 		if (subscriptionNum != 0 && job != -1) {
 			tvSubscribe.setText("我的订阅(" + subscriptionNum + ")");
+		} else {
+			tvSubscribe.setText("我的订阅");
 		}
 		if (job != -1) {
 			DisplayImageOptions options = new DisplayImageOptions.Builder()
@@ -170,6 +186,13 @@ public class MineFragment extends Fragment {
 					.bitmapConfig(Bitmap.Config.RGB_565).build();
 			ImageLoader.getInstance()
 					.displayImage(avatarUrl, ivHeader, options);
+		} else {
+			ivHeader.setImageResource(R.drawable.ic_contact_picture);
+		}
+		if (job == 1) {
+			tvStatus.setVisibility(View.VISIBLE);
+		} else {
+			tvStatus.setVisibility(View.GONE);
 		}
 	}
 
@@ -324,7 +347,7 @@ public class MineFragment extends Fragment {
 	}
 
 	protected void dealResponse(String obj) {
-		Log.v("MineFragment", "Response:"+obj);
+		Log.v("MineFragment", "Response:" + obj);
 		try {
 			JSONObject jsonObject = new JSONObject(obj);
 			int state = jsonObject.getInt("stat");
@@ -338,4 +361,30 @@ public class MineFragment extends Fragment {
 		}
 		setDataToView();
 	}
+
+	@Override
+	public void onDestroy() {
+		getActivity().unregisterReceiver(mReceiver);
+		super.onDestroy();
+	}
+
+	BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			Log.v("MineFragment", arg1.getAction());
+			if (UserInfoActivity.ACTION_HEADER_MODIFY.equals(arg1.getAction())) {
+				String avatarUrl = arg1.getStringExtra("avatarUrl");
+				DisplayImageOptions options = new DisplayImageOptions.Builder()
+						.showImageOnLoading(R.drawable.ic_contact_picture)
+						.showImageForEmptyUri(R.drawable.ic_contact_picture)
+						.showImageOnFail(R.drawable.ic_contact_picture)
+						.cacheInMemory(true).cacheOnDisk(true)
+						.considerExifParams(true)
+						.bitmapConfig(Bitmap.Config.RGB_565).build();
+				ImageLoader.getInstance().displayImage(avatarUrl, ivHeader,
+						options);
+			}
+		}
+	};
 }

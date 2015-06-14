@@ -21,10 +21,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gexin.artplatform.HomeItemInfoActivity;
+import com.gexin.artplatform.QuestionInfoActivity;
 import com.gexin.artplatform.R;
-import com.gexin.artplatform.adapter.RoomAnswerAdapter;
-import com.gexin.artplatform.bean.Article;
+import com.gexin.artplatform.adapter.QuestionAdapter;
+import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.google.gson.Gson;
@@ -33,8 +33,8 @@ import com.google.gson.reflect.TypeToken;
 public class RoomAnswerFragment extends Fragment {
 
 	private static final String TAG = "RoomAnswerFragment";
-	private RoomAnswerAdapter adapter;
-	private List<Article> articles;
+	private QuestionAdapter adapter;
+	private List<Problem> mList = new ArrayList<Problem>();
 	private Gson gson = new Gson();
 	
 	private ListView mListView;
@@ -50,8 +50,7 @@ public class RoomAnswerFragment extends Fragment {
 	
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-		articles = new ArrayList<Article>();
-		adapter = new RoomAnswerAdapter(articles,getActivity());
+		adapter = new QuestionAdapter(getActivity(),mList);
 		mListView.setAdapter(adapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -59,8 +58,8 @@ public class RoomAnswerFragment extends Fragment {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				Intent intent = new Intent(getActivity(),
-						HomeItemInfoActivity.class);
-				intent.putExtra("id", articles.get(arg2).getArticleId());
+						QuestionInfoActivity.class);
+				intent.putExtra("problemId", mList.get(arg2).get_id());
 				startActivity(intent);
 			}
 		});
@@ -73,8 +72,8 @@ public class RoomAnswerFragment extends Fragment {
 	@SuppressLint("HandlerLeak")
 	public void setStudioId(String studioId) {
 		String api = Constant.SERVER_URL
-				+ "/api/studio/"+studioId+"/article";
-		Log.v(TAG, "studioApi"+api);
+				+ "/api/studio/"+studioId+"/answer";
+		Log.v(TAG, "url:"+api);
 		Handler handler = new Handler() {
 
 			@Override
@@ -86,11 +85,11 @@ public class RoomAnswerFragment extends Fragment {
 						JSONObject jObject = new JSONObject(
 								response == null ? "" : response.trim());
 						if (jObject != null) {
-							List<Article> tempList = success(jObject);
+							List<Problem> tempList = success(jObject);
 							if (tempList != null) {
-								articles.clear();
-								articles.addAll(tempList);
-								Log.v(TAG, "size:"+articles.size());
+								mList.clear();
+								mList.addAll(tempList);
+								Log.v(TAG, "size:"+mList.size());
 								adapter.notifyDataSetChanged();
 //								adapter.updateData(tempList);
 							}
@@ -110,15 +109,15 @@ public class RoomAnswerFragment extends Fragment {
 		new HttpConnectionUtils(handler).get(api);
 	}
 	
-	private List<Article> success(JSONObject jObject) {
+	private List<Problem> success(JSONObject jObject) {
 		int state = -1;
-		List<Article> tempList = null;
+		List<Problem> tempList = null;
 		try {
 			state = jObject.getInt("stat");
 			if (state == 1) {
 				try {
-					tempList = gson.fromJson(jObject.getJSONArray("articles")
-							.toString(), new TypeToken<List<Article>>() {
+					tempList = gson.fromJson(jObject.getJSONArray("problems")
+							.toString(), new TypeToken<List<Problem>>() {
 					}.getType());
 				} catch (Exception e) {
 					e.printStackTrace();

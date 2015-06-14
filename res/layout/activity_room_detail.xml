@@ -24,6 +24,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:background="#80ffffff"
+            android:scaleType="centerCrop"
             android:padding="3dp"
             android:src="@drawable/me_default" />
 
@@ -39,15 +40,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="广州姜山画室"
+                android:maxLength="12"
                 android:textColor="#ffffff"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/ibtn_interest_room_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="10dp"
                 android:background="@null"
                 android:src="@drawable/interest_icon_1" />
         </LinearLayout>
