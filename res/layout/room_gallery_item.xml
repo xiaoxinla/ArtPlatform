@@ -3,10 +3,8 @@
     android:id="@+id/iv_room_gallery_item"
     android:layout_width="110dp"
     android:layout_height="110dp"
-    android:maxWidth="110dp"
-    android:maxHeight="110dp"
-    android:minHeight="110dp"
-    android:minWidth="110dp"
+    
+    android:scaleType="centerCrop"
     android:adjustViewBounds="true"
     android:background="#ffffff" >
     

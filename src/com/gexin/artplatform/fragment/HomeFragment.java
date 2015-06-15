@@ -37,6 +37,7 @@ import com.gexin.artplatform.adapter.HomeListAdapter;
 import com.gexin.artplatform.bean.Article;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
+import com.gexin.artplatform.utils.HttpHandler;
 import com.gexin.artplatform.utils.NetUtil;
 import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.TitleBar;
@@ -55,7 +56,7 @@ public class HomeFragment extends Fragment {
 	private List<Article> dataList = new ArrayList<Article>();
 	private HomeListAdapter adapter;
 	private Gson gson = new Gson();
-	private int option = 1;
+	private int option = 0;
 
 	private TitleBar titleBar;
 	private LinearLayout llAddr;
@@ -118,12 +119,12 @@ public class HomeFragment extends Fragment {
 
 			}
 		});
-		getData(1);
+		getData(0);
 	}
 
 	@SuppressLint("HandlerLeak")
 	private void getData(int option) {
-		Handler handler = new Handler() {
+		Handler handler = new HttpHandler(getActivity()) {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
@@ -131,7 +132,6 @@ public class HomeFragment extends Fragment {
 					dealResponse((String) msg.obj);
 					adapter.notifyDataSetChanged();
 					break;
-
 				default:
 					break;
 				}

@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.gexin.artplatform.LargeImageActivity;
 import com.gexin.artplatform.R;
+import com.gexin.artplatform.ViewOtherUserActivity;
 import com.gexin.artplatform.bean.Problem;
 import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
@@ -89,8 +90,6 @@ public class QuestionAdapter extends BaseAdapter {
 					.findViewById(R.id.iv_pic_question_item);
 			holder.ivZan = (ImageView) convertView
 					.findViewById(R.id.iv_zan_question_item);
-			holder.tvCommentor = (TextView) convertView
-					.findViewById(R.id.tv_commentor_question_item);
 			holder.tvContent = (TextView) convertView
 					.findViewById(R.id.tv_content_question_item);
 			holder.tvName = (TextView) convertView
@@ -110,6 +109,7 @@ public class QuestionAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 		int ansNum = item.getAnswerNum();
+		int commentNum = item.getCommentNum();
 		int zan = item.getZan();
 		final String id = item.get_id();
 		String name = item.getName();
@@ -128,7 +128,6 @@ public class QuestionAdapter extends BaseAdapter {
 			type = "Œ¥…Ë÷√";
 		}
 		String content = item.getContent();
-		String commentor = "";
 		final String imageUrl = item.getImage();
 		holder.tvName.setText(name);
 		holder.tvTime.setText(time);
@@ -139,13 +138,7 @@ public class QuestionAdapter extends BaseAdapter {
 			holder.tvContent.setText("@"+askToName+" "+content);
 		}
 		holder.tvZan.setText("" + zan);
-		holder.tvAnsNum.setText("" + ansNum);
-		if (commentor == null || commentor.isEmpty()) {
-			holder.tvCommentor.setVisibility(View.GONE);
-		} else {
-			holder.tvCommentor.setVisibility(View.VISIBLE);
-			holder.tvCommentor.setText(commentor);
-		}
+		holder.tvAnsNum.setText("" + commentNum);
 
 		if (item.getIsZan() == 1) {
 			holder.ivZan.setImageResource(R.drawable.zan_icon_2);
@@ -162,13 +155,6 @@ public class QuestionAdapter extends BaseAdapter {
 				postZan(id, item.getIsZan(), position, tmpIvZan, tmpTvZan);
 			}
 		});
-		// holder.llAns.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View arg0) {
-		// Log.v(TAG, "AnsClick");
-		// }
-		// });
 		ImageLoader.getInstance().displayImage(avatarUrl, holder.ivHeader,
 				avatarOptions);
 		if (imageUrl != null && !imageUrl.isEmpty()) {
@@ -193,8 +179,28 @@ public class QuestionAdapter extends BaseAdapter {
 				}
 			}
 		});
+		holder.ivHeader.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				showUserInfo(item.getUserId());
+			}
+		});
+		holder.tvName.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				showUserInfo(item.getUserId());
+			}
+		});
 
 		return convertView;
+	}
+
+	protected void showUserInfo(String userId) {
+		Intent intent = new Intent(mContext,ViewOtherUserActivity.class);
+		intent.putExtra("userId", userId);
+		mContext.startActivity(intent);
 	}
 
 	@SuppressLint("HandlerLeak")
@@ -264,20 +270,15 @@ public class QuestionAdapter extends BaseAdapter {
 
 	private final class ViewHolder {
 		ImageView ivHeader;
-		// ImageView ivComment;
 		ImageView ivPic;
 		ImageView ivZan;
 		TextView tvName;
-		TextView tvCommentor;
 		TextView tvTime;
-		// TextView tvArea;
 		TextView tvContent;
 		TextView tvType;
-		// TextView tvIscomment;
 		TextView tvZan;
 		TextView tvAnsNum;
 		LinearLayout llZan;
-//		LinearLayout llAns;
 	}
 
 }

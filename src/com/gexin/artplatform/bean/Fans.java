@@ -4,7 +4,7 @@ public class Fans {
 	private String _id;
 	private String name;
 	private String avatarUrl;
-	private String relation;
+	private int relation;
 	private int uType;
 	
 	public String get_id() {
@@ -25,10 +25,10 @@ public class Fans {
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
 	}
-	public String getRelation() {
+	public int getRelation() {
 		return relation;
 	}
-	public void setRelation(String relation) {
+	public void setRelation(int relation) {
 		this.relation = relation;
 	}
 	@Override

@@ -184,6 +184,37 @@ public class RoomDetailActivity extends FragmentActivity implements
 			}
 		});
 
+		// tvAnswerNum.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View arg0) {
+		// // TODO Auto-generated method stub
+		//
+		// }
+		// });
+		tvFocusNum.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(RoomDetailActivity.this,
+						FocusOrFansActivity.class);
+				intent.putExtra("type", 4);
+				intent.putExtra("id", studio.getStudioId());
+				startActivity(intent);
+			}
+		});
+		tvFanNum.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(RoomDetailActivity.this,
+						FocusOrFansActivity.class);
+				intent.putExtra("type", 3);
+				intent.putExtra("id", studio.getStudioId());
+				startActivity(intent);
+			}
+		});
+
 		getStudioInfo();
 	}
 
@@ -204,12 +235,16 @@ public class RoomDetailActivity extends FragmentActivity implements
 							Toast.makeText(RoomDetailActivity.this, "关注成功",
 									Toast.LENGTH_SHORT).show();
 							studio.setIsWatched(1);
+							studio.setFanNum(studio.getFanNum() + 1);
+							tvFanNum.setText("粉丝" + studio.getFanNum() + "");
 							ibtnFocus
 									.setImageResource(R.drawable.focus_cancle_icon);
 						} else {
 							Toast.makeText(RoomDetailActivity.this, "取消关注成功",
 									Toast.LENGTH_SHORT).show();
 							studio.setIsWatched(0);
+							studio.setFanNum(studio.getFanNum() - 1);
+							tvFanNum.setText("粉丝" + studio.getFanNum() + "");
 							ibtnFocus
 									.setImageResource(R.drawable.interest_icon_1);
 						}

@@ -50,6 +50,7 @@ public class TeacherDetailActivity extends Activity {
 	private List<Problem> problems = new ArrayList<Problem>();
 	private QuestionAdapter adapter;
 	private Gson gson = new Gson();
+	private boolean isFocus;
 
 	private TitleBar titleBar;
 	private LinearLayout llBack, llAsk;
@@ -161,6 +162,7 @@ public class TeacherDetailActivity extends Activity {
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		ImageLoader.getInstance().displayImage(mTeacher.getAvatarUrl(),
 				ivHeader, options);
+		setFocusStatus();
 	}
 
 	private void initView() {
@@ -217,17 +219,33 @@ public class TeacherDetailActivity extends Activity {
 					try {
 						JSONObject jsonObject = new JSONObject((String) msg.obj);
 						if (jsonObject.getInt("stat") == 1) {
-							Toast.makeText(TeacherDetailActivity.this, "关注成功",
-									Toast.LENGTH_SHORT).show();
+							if (isFocus) {
+								Toast.makeText(TeacherDetailActivity.this,
+										"取消关注成功", Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(TeacherDetailActivity.this,
+										"关注成功", Toast.LENGTH_SHORT).show();
+							}
+						} else {
+							if (isFocus) {
+								Toast.makeText(TeacherDetailActivity.this,
+										"取消关注失败", Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(TeacherDetailActivity.this,
+										"关注失败", Toast.LENGTH_SHORT).show();
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+						if (isFocus) {
+							Toast.makeText(TeacherDetailActivity.this,
+									"取消关注失败", Toast.LENGTH_SHORT).show();
 						} else {
 							Toast.makeText(TeacherDetailActivity.this, "关注失败",
 									Toast.LENGTH_SHORT).show();
 						}
-					} catch (JSONException e) {
-						e.printStackTrace();
-						Toast.makeText(TeacherDetailActivity.this, "关注失败",
-								Toast.LENGTH_SHORT).show();
 					}
+					setFocusStatus();
 					break;
 
 				default:
@@ -238,7 +256,12 @@ public class TeacherDetailActivity extends Activity {
 		};
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair("userId", teacherId));
-		list.add(new BasicNameValuePair("follow", 1 + ""));
+		if (isFocus) {
+			list.add(new BasicNameValuePair("follow", "-1"));
+		} else {
+
+			list.add(new BasicNameValuePair("follow", "1"));
+		}
 		new HttpConnectionUtils(handler).post(followApi, list);
 	}
 
@@ -291,5 +314,44 @@ public class TeacherDetailActivity extends Activity {
 				startActivity(intent);
 			}
 		});
+	}
+
+	private void setFocusStatus() {
+		String userId = (String) SPUtil.get(this, "userId", "");
+		if (userId.isEmpty()) {
+			return;
+		}
+		String url = Constant.SERVER_URL + "/api/user/" + userId + "/relation/"
+				+ mTeacher.getUserId();
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							int relation = jsonObject.getInt("relation");
+							if (relation == 1 || relation == 3) {
+								isFocus = true;
+								ivFocus.setImageResource(R.drawable.focus_cancle_icon);
+							} else {
+								isFocus = false;
+								ivFocus.setImageResource(R.drawable.interest_icon_2);
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		new HttpConnectionUtils(handler).get(url);
 	}
 }

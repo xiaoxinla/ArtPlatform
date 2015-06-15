@@ -6,6 +6,7 @@ public class Problem {
 
 	private String _id;
 	private int answerNum;
+	private int commentNum;
 	private String avatarUrl;
 	private String content;
 	private String image;
@@ -167,17 +168,25 @@ public class Problem {
 		this.askToName = askToName;
 	}
 
+	public int getCommentNum() {
+		return commentNum;
+	}
+
+	public void setCommentNum(int commentNum) {
+		this.commentNum = commentNum;
+	}
+
 	@Override
 	public String toString() {
 		return "Problem [_id=" + _id + ", answerNum=" + answerNum
-				+ ", avatarUrl=" + avatarUrl + ", content=" + content
-				+ ", image=" + image + ", name=" + name + ", timestamp="
-				+ timestamp + ", viewNum=" + viewNum + ", zan=" + zan
-				+ ", isZan=" + isZan + ", userId=" + userId + ", commentList="
-				+ commentList + ", answerList=" + answerList + ", askTo="
-				+ askTo + ", tag=" + tag + ", askToType=" + askToType
-				+ ", askToAvatarUrl=" + askToAvatarUrl + ", askToName="
-				+ askToName + "]";
+				+ ", commentNum=" + commentNum + ", avatarUrl=" + avatarUrl
+				+ ", content=" + content + ", image=" + image + ", name="
+				+ name + ", timestamp=" + timestamp + ", viewNum=" + viewNum
+				+ ", zan=" + zan + ", isZan=" + isZan + ", userId=" + userId
+				+ ", commentList=" + commentList + ", answerList=" + answerList
+				+ ", askTo=" + askTo + ", tag=" + tag + ", askToType="
+				+ askToType + ", askToAvatarUrl=" + askToAvatarUrl
+				+ ", askToName=" + askToName + "]";
 	}
 
 }

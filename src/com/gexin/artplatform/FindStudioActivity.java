@@ -113,10 +113,17 @@ public class FindStudioActivity extends Activity {
 		}
 		List<SimpleStudio> tmpList = new ArrayList<SimpleStudio>();
 		for (SimpleStudio studio : mList) {
-			if (studio.getName().contains(queryStr)
-					|| studio.getFullPinyin().contains(queryStr)
-					|| studio.getSimplePinyin().contains(queryStr)) {
+			if (studio.getName().contains(queryStr) ) {
 				tmpList.add(studio);
+				continue;
+			}
+			try {
+				if(studio.getFullPinyin().contains(queryStr)
+						|| studio.getSimplePinyin().contains(queryStr)){
+					tmpList.add(studio);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		adapter.updateData(tmpList);

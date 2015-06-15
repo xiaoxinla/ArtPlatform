@@ -65,7 +65,7 @@ public class MyFansListAdapter extends BaseAdapter {
 
 	@SuppressLint("InflateParams")
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
 		final Fans fans = mList.get(position);
 		if (convertView == null) {
@@ -93,17 +93,24 @@ public class MyFansListAdapter extends BaseAdapter {
 
 			@Override
 			public void onClick(View arg0) {
-				postFollow(fans.get_id());
+				postFollow(fans,position);
 			}
 		});
+		if (fans.getRelation() == 1 || fans.getRelation() == 3) {
+			holder.tvFollowTA.setText("取消关注");
+		} else {
+			holder.tvFollowTA.setText("关注TA");
+		}
 		return convertView;
 	}
 
 	@SuppressLint("HandlerLeak")
-	protected void postFollow(String id) {
+	protected void postFollow(final Fans fans, final int position) {
 		String userId = (String) SPUtil.get(context, "userId", "");
 		String followApi = Constant.SERVER_URL + "/api/user/" + userId
 				+ "/follow";
+		String followStudioApi = Constant.SERVER_URL + "/api/user/" + userId
+				+ "/studio";
 		Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -113,16 +120,24 @@ public class MyFansListAdapter extends BaseAdapter {
 						JSONObject jsonObject = new JSONObject((String) msg.obj);
 						int state = jsonObject.getInt("stat");
 						if (state == 1) {
-							Toast.makeText(context, "关注成功", Toast.LENGTH_SHORT)
-									.show();
-						}else {
+							if(fans.getRelation()==1||fans.getRelation()==3){
+								Toast.makeText(context, "取消关注成功", Toast.LENGTH_SHORT)
+								.show();
+								mList.get(position).setRelation(0);
+							}else {
+								Toast.makeText(context, "关注成功", Toast.LENGTH_SHORT)
+								.show();
+								mList.get(position).setRelation(1);
+							}
+							notifyDataSetChanged();
+						} else {
 							Toast.makeText(context, "关注失败", Toast.LENGTH_SHORT)
-							.show();
+									.show();
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
 						Toast.makeText(context, "关注失败", Toast.LENGTH_SHORT)
-						.show();
+								.show();
 					}
 					break;
 
@@ -133,9 +148,18 @@ public class MyFansListAdapter extends BaseAdapter {
 			}
 		};
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
-		list.add(new BasicNameValuePair("userId", id));
-		list.add(new BasicNameValuePair("follow", 1 + ""));
-		new HttpConnectionUtils(handler).post(followApi, list);
+		if(fans.getRelation()==1||fans.getRelation()==3){
+			list.add(new BasicNameValuePair("follow", "-1"));
+		}else {
+			list.add(new BasicNameValuePair("follow", "1"));
+		}
+		if(fans.getuType()==2){
+			list.add(new BasicNameValuePair("studioId", fans.get_id()));
+			new HttpConnectionUtils(handler).put(followStudioApi, list);
+		}else {
+			list.add(new BasicNameValuePair("userId", fans.get_id()));
+			new HttpConnectionUtils(handler).post(followApi, list);
+		}
 	}
 
 	private static class ViewHolder {

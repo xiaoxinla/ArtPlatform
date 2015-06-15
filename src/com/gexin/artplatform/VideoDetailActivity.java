@@ -1,10 +1,15 @@
 package com.gexin.artplatform;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,6 +18,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -32,6 +38,7 @@ import com.gexin.artplatform.constant.Constant;
 import com.gexin.artplatform.services.DownloadService;
 import com.gexin.artplatform.utils.HttpConnectionUtils;
 import com.gexin.artplatform.utils.HttpHandler;
+import com.gexin.artplatform.utils.SPUtil;
 import com.gexin.artplatform.view.TitleBar;
 import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -42,7 +49,8 @@ public class VideoDetailActivity extends Activity {
 	private String videoId = "";
 	private Gson gson = new Gson();
 	private VideoItem videoItem = null;
-	private FileInfo fileInfo= null;
+	private FileInfo fileInfo = null;
+	private boolean isFocus = false;
 
 	private TitleBar titleBar;
 	private LinearLayout llBack;
@@ -82,29 +90,30 @@ public class VideoDetailActivity extends Activity {
 		try {
 			int state = jObject.getInt("stat");
 			if (state == 1) {
-				videoItem = gson.fromJson(
-						jObject.getJSONObject("video").toString(), VideoItem.class);
-				ImageLoader.getInstance().displayImage(videoItem.getImageUrl(), ivVideo);
+				videoItem = gson.fromJson(jObject.getJSONObject("video")
+						.toString(), VideoItem.class);
+				ImageLoader.getInstance().displayImage(videoItem.getImageUrl(),
+						ivVideo);
+				setFocusStatus();
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 			Toast.makeText(this, "无法取得视频信息", Toast.LENGTH_SHORT).show();
 		}
-		
+
 		fileInfo = new FileInfo(0, videoItem.getVideoUrl(),
 				getFileNameFromUrl(videoItem.getVideoUrl()), 0, 0);
 		tvTitle.setText(videoItem.getTitle());
 		tvDescription.setText(videoItem.getDescription());
 		titleBar.setTitle(videoItem.getTitle());
 		String name = videoItem.getName();
-		if(name!=null&&!name.isEmpty()){
+		if (name != null && !name.isEmpty()) {
 			tvName.setText(videoItem.getName());
 			rlTeacherInfo.setVisibility(View.VISIBLE);
-		}else {
+		} else {
 			rlTeacherInfo.setVisibility(View.GONE);
 		}
 	}
-
 
 	private void initView() {
 		titleBar = (TitleBar) findViewById(R.id.tb_activity_video_detail);
@@ -140,7 +149,71 @@ public class VideoDetailActivity extends Activity {
 				}
 			}
 		});
-		
+		ivFocus.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				postFocus();
+			}
+		});
+	}
+
+	@SuppressLint("HandlerLeak")
+	private void postFocus() {
+		String userId = (String) SPUtil.get(this, "userId", "");
+		String followApi = Constant.SERVER_URL + "/api/user/" + userId
+				+ "/follow";
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						if (jsonObject.getInt("stat") == 1) {
+							if (isFocus) {
+								Toast.makeText(VideoDetailActivity.this,
+										"取消关注成功", Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(VideoDetailActivity.this,
+										"关注成功", Toast.LENGTH_SHORT).show();
+							}
+							setFocusStatus();
+						} else {
+							if (isFocus) {
+								Toast.makeText(VideoDetailActivity.this,
+										"取消关注失败", Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(VideoDetailActivity.this,
+										"关注失败", Toast.LENGTH_SHORT).show();
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+						if (isFocus) {
+							Toast.makeText(VideoDetailActivity.this, "取消关注失败",
+									Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(VideoDetailActivity.this, "关注失败",
+									Toast.LENGTH_SHORT).show();
+						}
+					}
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("userId", videoItem.getUserId()));
+		if (isFocus) {
+			list.add(new BasicNameValuePair("follow", "-1"));
+		} else {
+			list.add(new BasicNameValuePair("follow", "1"));
+		}
+		new HttpConnectionUtils(handler).post(followApi, list);
 	}
 
 	private void initTitleBar() {
@@ -200,5 +273,46 @@ public class VideoDetailActivity extends Activity {
 			return true;
 		}
 		return false;
+	}
+
+	private void setFocusStatus() {
+		String userId = (String) SPUtil.get(this, "userId", "");
+		if (userId.isEmpty() || videoItem == null
+				|| videoItem.getUserId() == null
+				|| videoItem.getUserId().isEmpty()) {
+			return;
+		}
+		String url = Constant.SERVER_URL + "/api/user/" + userId + "/relation/"
+				+ videoItem.getUserId();
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case HttpConnectionUtils.DID_SUCCEED:
+					try {
+						JSONObject jsonObject = new JSONObject((String) msg.obj);
+						int state = jsonObject.getInt("stat");
+						if (state == 1) {
+							int relation = jsonObject.getInt("relation");
+							if (relation == 1 || relation == 3) {
+								isFocus = true;
+								ivFocus.setImageResource(R.drawable.focus_cancle_icon);
+							} else {
+								isFocus = false;
+								ivFocus.setImageResource(R.drawable.interest_icon_2);
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				default:
+					break;
+				}
+				super.handleMessage(msg);
+			}
+		};
+		new HttpConnectionUtils(handler).get(url);
 	}
 }

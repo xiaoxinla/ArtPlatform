@@ -40,15 +40,18 @@ public class MyCollectActivity extends Activity {
 	private List<String> UrlList = new ArrayList<String>();
 	private Gson gson = new Gson();
 	private GallaryGridAdapter adapter;
+	private int type = 0;
+
 	private GridView mGridView;
 	private LinearLayout llBack;
 	private TitleBar titleBar;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.student_favorite);
-		
+		type = getIntent().getIntExtra("type", 0);
+
 		mGridView = (GridView) findViewById(R.id.gv_collection);
 		initTitleBar();
 		initData();
@@ -66,7 +69,7 @@ public class MyCollectActivity extends Activity {
 			}
 		});
 	}
-	
+
 	private void initTitleBar() {
 		titleBar = (TitleBar) findViewById(R.id.tb_mycollect);
 		llBack = new LinearLayout(this);
@@ -92,10 +95,18 @@ public class MyCollectActivity extends Activity {
 
 	@SuppressLint("HandlerLeak")
 	private void initData() {
-		String userId = (String) SPUtil.get(MyCollectActivity.this, "userId", "");
-		String api = Collection_API + "/" + (String) SPUtil.get(this, "userId", "") + "/collection";
-		if(!userId.isEmpty()){
-			api+="?userId="+userId;
+		String userId = (String) SPUtil.get(MyCollectActivity.this, "userId",
+				"");
+		String api = "";
+		if (type == 0) {
+			api = Collection_API + "/"
+					+ (String) SPUtil.get(this, "userId", "") + "/collection";
+		} else {
+			String id = getIntent().getStringExtra("id");
+			api = Collection_API + "/" + id + "/collection";
+		}
+		if (!userId.isEmpty()) {
+			api += "?userId=" + userId;
 		}
 		adapter = new GallaryGridAdapter(MyCollectActivity.this, UrlList);
 		mGridView.setAdapter(adapter);
@@ -128,7 +139,7 @@ public class MyCollectActivity extends Activity {
 
 		new HttpConnectionUtils(handler).get(api);
 	}
-	
+
 	private List<String> success(JSONObject jObject) {
 		int state = -1;
 		List<String> tempList = null;

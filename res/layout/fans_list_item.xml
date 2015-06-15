@@ -2,13 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:background="#ffffff"
+    android:padding="10dp" >
     <ImageView
         android:id="@+id/iv_fans_avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:scaleType="centerCrop"
-        android:padding="7dp"
         android:src="@drawable/ic_contact_picture" />
 
    	<TextView
@@ -20,8 +20,11 @@
    	    android:layout_toRightOf="@+id/iv_fans_avatar"
    	    android:gravity="center"
    	    android:text="我是名字"
+   	    android:singleLine="true"
    	    android:textColor="#2e2e2e"
-   	    android:textSize="20sp" />
+   	    android:layout_marginLeft="10dp"
+   	    android:layout_marginRight="65dp"
+   	    android:textSize="18sp" />
 
    	<TextView
    	    android:id="@+id/tv_fans_info"
@@ -29,6 +32,7 @@
    	    android:layout_height="wrap_content"
    	    android:layout_alignBottom="@+id/iv_fans_avatar"
         android:textColor="#C2C2C2"
+        android:layout_marginLeft="10dp"
    	    android:layout_alignLeft="@+id/tv_fans_name"
    	    android:text="我是职业和地区" />
 
@@ -39,7 +43,7 @@
    	    android:layout_above="@+id/tv_fans_info"
         android:textColor="#445bc8"
    	    android:layout_alignParentRight="true"
-   	    android:layout_marginRight="24dp"
+   	    android:layout_marginRight="10dp"
    	    android:clickable="true"
    	    android:textSize="15sp"
    	    android:text="我是操作" />

@@ -39,8 +39,8 @@ public class MyFansActivity extends Activity {
 	private String MyFans_API = Constant.SERVER_URL + Constant.USER_API;
 	private Gson gson = new Gson();
 	private List<Fans> fansList = new ArrayList<Fans>();
-	ListView list;
-	MyFansListAdapter adapter;
+	private ListView list;
+	private MyFansListAdapter adapter;
 	private LinearLayout llBack;
 	private TitleBar titleBar;
 

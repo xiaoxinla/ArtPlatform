@@ -85,12 +85,24 @@ public class HomeItemInfoActivity extends Activity {
 		ivHeader = (ImageView) findViewById(R.id.iv_header_home_item_info);
 		flPics = (FlowLayout) findViewById(R.id.fl_pics_home_item_info);
 		initTitleBar();
+		ivHeader.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(HomeItemInfoActivity.this,
+						RoomDetailActivity.class);
+				intent.putExtra("studioId", article.getStudioId());
+				startActivity(intent);
+			}
+		});
 		tvName.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				startActivity(new Intent(HomeItemInfoActivity.this,
-						RoomDetailActivity.class));
+				Intent intent = new Intent(HomeItemInfoActivity.this,
+						RoomDetailActivity.class);
+				intent.putExtra("studioId", article.getStudioId());
+				startActivity(intent);
 			}
 		});
 	}
@@ -128,16 +140,18 @@ public class HomeItemInfoActivity extends Activity {
 				tvClickNum.setText("µã»÷" + article.getViewNum());
 				ImageLoader.getInstance().displayImage(
 						article.getStudioAvatarUrl(), ivHeader, avatarOptions);
-				for(String url:article.getImages()){
+				for (String url : article.getImages()) {
 					ImageView imageView = new ImageView(this);
 					imageView.setMaxHeight(120);
 					imageView.setMaxWidth(150);
 					imageView.setAdjustViewBounds(true);
 					MarginLayoutParams lp = new MarginLayoutParams(
-							LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+							LayoutParams.WRAP_CONTENT,
+							LayoutParams.WRAP_CONTENT);
 					lp.setMargins(5, 5, 5, 5);
-					ImageLoader.getInstance().displayImage(url, imageView, picOptions);
-					flPics.addView(imageView,lp);
+					ImageLoader.getInstance().displayImage(url, imageView,
+							picOptions);
+					flPics.addView(imageView, lp);
 				}
 			}
 		} catch (JSONException e) {

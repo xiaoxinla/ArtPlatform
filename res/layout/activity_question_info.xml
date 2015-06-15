@@ -36,6 +36,7 @@
                     android:id="@+id/iv_header_question_info"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:scaleType="centerCrop"
                     android:layout_margin="10dp" />
 
                 <TextView
@@ -63,13 +64,6 @@
                         android:layout_height="wrap_content"
                         android:textColor="#8a8a8a" />
 
-                    <!-- <TextView
-                        android:id="@+id/tv_commentor_question_info"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:text="XXXX画室"
-                        android:textColor="#445bc8" /> -->
                 </LinearLayout>
 
                 <TextView
@@ -132,7 +126,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@drawable/selector_titlebar_btn"
                         android:clickable="true"
                         android:gravity="center"
                         android:orientation="horizontal"
@@ -164,7 +157,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@drawable/selector_titlebar_btn"
                         android:gravity="center"
                         android:orientation="horizontal"
                         android:paddingBottom="10dp"

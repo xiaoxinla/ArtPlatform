@@ -12,8 +12,10 @@ import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout.LayoutParams;
 
 public class RoomGalleryAdapter extends BaseAdapter {
 
@@ -55,8 +57,12 @@ public class RoomGalleryAdapter extends BaseAdapter {
 			convertView = LayoutInflater.from(context).inflate(
 					R.layout.room_gallery_item, null);
 		}
+		
 		ImageView ivPic = (ImageView) convertView
 				.findViewById(R.id.iv_room_gallery_item);
+		android.widget.AbsListView.LayoutParams params = new android.widget.AbsListView.LayoutParams(
+				210, 210);
+		ivPic.setLayoutParams(params);
 		ImageLoader.getInstance().displayImage(url, ivPic, options);
 		return convertView;
 	}

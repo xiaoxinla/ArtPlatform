@@ -282,6 +282,7 @@ public class QuestionInfoActivity extends Activity {
 				problem = gson.fromJson(jsonObject.toString(), Problem.class);
 				Log.v(TAG, "problem:" + problem.toString());
 				int ansNum = problem.getAnswerNum();
+				int commentNum = problem.getCommentNum();
 				int zan = problem.getZan();
 				String name = problem.getName();
 				String avatarUrl = problem.getAvatarUrl();
@@ -303,7 +304,6 @@ public class QuestionInfoActivity extends Activity {
 				}
 				String content = problem.getContent();
 				final String imageUrl = problem.getImage();
-				// String commentor = "XXX画室";
 				if (askToName == null || askToName.isEmpty()) {
 					tvContent.setText(content);
 				} else {
@@ -312,9 +312,8 @@ public class QuestionInfoActivity extends Activity {
 				tvTime.setText(time);
 				tvName.setText(name);
 				tvType.setText(tag);
-				tvAnsNum.setText(ansNum + "");
+				tvAnsNum.setText(commentNum + "");
 				tvZan.setText(zan + "");
-				// tvCommentor.setText(commentor);
 				if (problem.getIsZan() == 1) {
 					ivZan.setImageResource(R.drawable.zan_icon_2);
 				} else {
@@ -364,6 +363,22 @@ public class QuestionInfoActivity extends Activity {
 									(ArrayList<String>) images);
 							startActivity(intent);
 						}
+					}
+				});
+
+				ivHeader.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						showUserInfo(problem.getUserId());
+					}
+				});
+
+				tvName.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View arg0) {
+						showUserInfo(problem.getUserId());
 					}
 				});
 
@@ -453,14 +468,15 @@ public class QuestionInfoActivity extends Activity {
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		llAnswer.removeAllViews();
 		TextView tmpTvNum = new TextView(this);
-		LayoutParams tmpLp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
-		if(!answerList.isEmpty()){
-			tmpTvNum.setText("回答("+answerList.size()+")");
+		LayoutParams tmpLp = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.WRAP_CONTENT);
+		if (!answerList.isEmpty()) {
+			tmpTvNum.setText("回答(" + answerList.size() + ")");
 		}
 		tmpTvNum.setTextColor(Color.RED);
 		tmpTvNum.setPadding(10, 5, 0, 5);
 		tmpTvNum.setBackgroundColor(Color.WHITE);
-		llAnswer.addView(tmpTvNum,tmpLp);
+		llAnswer.addView(tmpTvNum, tmpLp);
 		for (final Answer answer : answerList) {
 			if (answer.getUserId().equals(userId)) {
 				answerId = answer.get_id();
@@ -533,6 +549,20 @@ public class QuestionInfoActivity extends Activity {
 					postFocus(answer.getUserId());
 				}
 			});
+			tmpIvHeader.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					showUserInfo(answer.getUserId());
+				}
+			});
+			tmpTvName.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					showUserInfo(answer.getUserId());
+				}
+			});
 			view.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -599,14 +629,15 @@ public class QuestionInfoActivity extends Activity {
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		llComment.removeAllViews();
 		TextView tmpTvNum = new TextView(this);
-		LayoutParams tmpLp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
-		if(!list.isEmpty()){
-			tmpTvNum.setText("评论("+list.size()+")");
+		LayoutParams tmpLp = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.WRAP_CONTENT);
+		if (!list.isEmpty()) {
+			tmpTvNum.setText("评论(" + list.size() + ")");
 		}
 		tmpTvNum.setTextColor(Color.RED);
 		tmpTvNum.setPadding(10, 5, 0, 5);
 		tmpTvNum.setBackgroundColor(Color.WHITE);
-		llComment.addView(tmpTvNum,tmpLp);
+		llComment.addView(tmpTvNum, tmpLp);
 		for (final Comment comment : list) {
 			View view = LayoutInflater.from(this).inflate(
 					R.layout.comment_item, null);
@@ -635,6 +666,20 @@ public class QuestionInfoActivity extends Activity {
 			tmpTvTime.setText(TimeUtil.getStandardDate(comment.getTimestamp()));
 			ImageLoader.getInstance().displayImage(
 					comment.getFromUserAvatarUrl(), tmpIvHeader, imageOptions);
+			tmpIvHeader.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					showUserInfo(comment.getFromUser());
+				}
+			});
+			tmpTvName.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					showUserInfo(comment.getFromUser());
+				}
+			});
 			llComment.addView(view);
 			view.setOnClickListener(new OnClickListener() {
 
@@ -656,5 +701,12 @@ public class QuestionInfoActivity extends Activity {
 				}
 			});
 		}
+	}
+
+	private void showUserInfo(String userId) {
+		Intent intent = new Intent(QuestionInfoActivity.this,
+				ViewOtherUserActivity.class);
+		intent.putExtra("userId", userId);
+		startActivity(intent);
 	}
 }

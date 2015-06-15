@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/iv_header_question_item"
-        android:text="我是用户名"
         android:singleLine="true"
         android:textColor="#445bc8"
         android:textSize="18sp" />
@@ -58,7 +57,6 @@
             android:id="@+id/tv_type_question_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="类型"
             android:layout_marginLeft="5dp"
             android:textColor="#8a8a8a" />
     </LinearLayout>
@@ -82,7 +80,6 @@
             android:gravity="center"
             android:orientation="horizontal"
             android:clickable="true"
-            android:background="@drawable/selector_titlebar_btn"
             android:paddingBottom="10dp"
             android:paddingTop="10dp" >
 
@@ -96,7 +93,7 @@
                 android:id="@+id/tv_zan_question_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1"
+                android:text="0"
                 android:textSize="16sp"
                 android:layout_marginLeft="5dp"
                 android:textColor="#8a8a8a" />
@@ -111,7 +108,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:background="@drawable/selector_titlebar_btn"
             android:orientation="horizontal"
             android:paddingBottom="10dp"
             android:paddingTop="10dp" >
@@ -125,7 +121,7 @@
                 android:id="@+id/tv_ansnum_question_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1"
+                android:text="0"
                 android:textSize="16sp"
                 android:layout_marginLeft="5dp"
                 android:textColor="#8a8a8a" />
@@ -144,16 +140,8 @@
             android:id="@+id/tv_time_question_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3小时前"
             android:textColor="#8a8a8a" />
 
-        <TextView
-            android:id="@+id/tv_commentor_question_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:textColor="#445bc8"
-            android:text="XXXX画室" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -17,13 +17,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 
 import com.gexin.artplatform.R;
+import com.gexin.artplatform.RoomDetailActivity;
 import com.gexin.artplatform.ViewOtherUserActivity;
 import com.gexin.artplatform.adapter.MyFollowListAdapter;
 import com.gexin.artplatform.bean.Follow;
@@ -112,11 +113,16 @@ public class MyFocusActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Bundle bundle = new Bundle();
-				bundle.putString("userId", followList.get(position).get_id());
-				Intent intent = new Intent(MyFocusActivity.this, ViewOtherUserActivity.class);
-				intent.putExtras(bundle);
-				startActivity(intent);
+				if(followList.get(position).getuType()==2){
+					Intent intent = new Intent(MyFocusActivity.this,
+							RoomDetailActivity.class);
+					intent.putExtra("studioId",followList.get(position).get_id());
+					startActivity(intent);
+				}else {
+					Intent intent = new Intent(MyFocusActivity.this, ViewOtherUserActivity.class);
+					intent.putExtra("userId", followList.get(position).get_id());
+					startActivity(intent);
+				}
 			}
 		});
 	}
